@@ -45,7 +45,7 @@ def read_file_to_list_str(filename):
 #   Практика 3
 def view_graphic_ser():
 
-    file = "data/ser.txt"
+    file = "../data/ser.txt"
     data = 0
     with open(file, "r") as file:
         data = file.readlines()
@@ -67,7 +67,7 @@ def view_graphic_ser():
     plt.ylabel("symbol error")
     plt.figure(10, figsize=(10, 10))
     for i in range(0, 25):
-        filename = "data/samples/rx_"+str(i)
+        filename = "../data/samples/rx_"+str(i)
         samples = array_float_to_np_complex(read_file_bin(filename, 4))
         
         # plt.subplot(2, 2, 1)
@@ -75,8 +75,8 @@ def view_graphic_ser():
 
 # Практика 4
 def model_soft_solutions():
-    filename_s = "data/practic5/s.bin"
-    filename_s_noise = "data/practic5/s_noise.bin"
+    filename_s = "../data/practice5/s.bin"
+    filename_s_noise = "../data/practice5/s_noise.bin"
 
     samples = array_float_to_np_complex(read_file_bin(filename_s, 4))
     samples_noise = array_float_to_np_complex(read_file_bin(filename_s_noise, 4))
@@ -96,7 +96,7 @@ def model_soft_solutions():
         
         plt.scatter(samples_noise.real, samples_noise.imag)
 
-    file = "data/practic5/ber_soft.txt"
+    file = "../data/practice5/ber_soft.txt"
     data = 0
     with open(file, "r") as file:
         data = file.readlines()
@@ -113,11 +113,13 @@ def model_soft_solutions():
     print(soft_list)
     print(hard_list)
     print(db_list)
-    plt.semilogy(db_list, soft_list)
-    plt.semilogy(db_list, hard_list, c="r")
+    plt.semilogy(db_list, soft_list, label = "Softbit")
+    plt.semilogy(db_list, hard_list, c="r", label = "Hardbit")
+    plt.legend()
+
     
     #plt.plot(db_list, ser_list)
-    plt.title("BER soft")
+    plt.title("BER soft and hard")
     plt.xlabel("SNR")
     plt.ylabel("symbol error")
     plt.figure(10, figsize=(10, 10))
@@ -158,7 +160,7 @@ if PRACTICE == 0:
         #filename_program = "Program.exe"
         os.system('make -j16')
         
-        filename_program = "./Program"
+        filename_program = "./program"
             
         if(os.path.exists(filename_program)):
             subprocess.call(filename_program)

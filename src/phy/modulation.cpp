@@ -10,7 +10,7 @@
 // #include "../generate_packet/generate_packet.h"
 
 #include <ctime>
-
+#include <cmath>
 
 mod_symbol table_QPSK[] = {
         {0.707107, 0.707107}, {0.707107, -0.707107}, 
@@ -61,7 +61,6 @@ mod_symbol table_QAM16[] = {
     { 3.000000, -1.000000 },
     { 1.000000, -3.000000 },
     { -1.000000, -3.000000 },
-    { -3.000000, -3.000000 }
 };
 
 u_char code_tableQAM16[] = {
@@ -222,9 +221,9 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
         //     print_log(CONSOLE, "\n");
         // }
         // print_log( CONSOLE, "%d%d%d%d - %f + %f\n", 
-            // g1, g2, g3, g4, t1.I, t1.Q);
+        //     g1, g2, g3, g4, t1.I, t1.Q);
         // print_log( CONSOLE, "{ %f, %f },\n", 
-            // g1, g2, g3, g4, t1.I, t1.Q);
+        //     g1, g2, g3, g4, t1.I, t1.Q);
 
         samples.push_back(t1);
     }
@@ -334,31 +333,48 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
     bit_sequence *data = new bit_sequence;
     data->size = samples.size() / 2;
     data->buffer = new u_char[data->size];
-    float err_interval = 1.5f;
+    float err_interval = 2.f;
     u_char *step = data->buffer;
     int con_state = 0;
     int conD = 0;
+    
     for( int i = 0; i < (int)samples.size(); ++i) {
+        float min_dist = 999.f;
+        int pos = 0;
         for(int i2 = 0; i2 < (int)ARRAY_SIZE(table_QAM16); ++i2) {
             
-            if(mod_symbol_cmp(samples[i], table_QAM16[i2], err_interval)) {
+            float dist = sqrt(powf(table_QAM16[i2].I - samples[i].I, 2) + powf(table_QAM16[i2].Q - samples[i].Q, 2));
+            // print_log(CONSOLE, "dist: %f, %f %f - %f - %f\n", dist,
+            //     samples[i].I, samples[i].Q, table_QAM16[i2].I, table_QAM16[i2].Q);
+            // if(mod_symbol_cmp(samples[i], table_QAM16[i2], err_interval)) {
+            if(dist <= min_dist) {
                 conD = 1;
+                min_dist = dist;
+                pos = i2;
+            } else {
                 // print_log(CONSOLE, "%f %f - %f - %f\n", 
                 // samples[i].I, samples[i].Q, table_QAM16[i2].I, table_QAM16[i2].Q);
-                switch(con_state) {
-                case 0:
-                    *step = code_tableQAM16[i2] << 4;
-                    con_state = 1;
-                    break;
-                default:    
-                    *step |= code_tableQAM16[i2];
-                    ++step;
-                    con_state = 0;
-                    break;
-                }
-                break;
+                // print_log(CONSOLE, "dist: %f, %f %f - %f - %f\n", dist,
+                // samples[i].I, samples[i].Q, table_QAM16[i2].I, table_QAM16[i2].Q);
             }
         }
+        // print_log(CONSOLE, "min_dist: %f, pos - %d, %f %f - %f - %f\n", min_dist, pos,
+        //         samples[i].I, samples[i].Q, table_QAM16[pos].I, table_QAM16[pos].Q);
+        // if(min_dist <= err_interval) {
+            conD = 1;       
+            switch(con_state) {
+            case 0:
+                *step = code_tableQAM16[pos] << 4;
+                con_state = 1;
+                break;
+            default:    
+                *step |= code_tableQAM16[pos];
+                ++step;
+                con_state = 0;
+                break;
+            }
+            
+        // }
         if(!conD) {
             // print_log(CONSOLE, "Error decode\n");
         }

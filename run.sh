@@ -8,7 +8,7 @@ COUNT_THREAD=-j16
 
 BUILD_FLAGS=""
 
-
+mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
 
@@ -21,14 +21,14 @@ while getopts "mpvcd" OPTION; do
 
     ;;
 	c)
-        mkdir -p $BUILD_DIR
+
         
         #echo $BUILD_FLAGS
         cmake $BUILD_FLAGS ..
         
     ;;
     m)
-        # cd $BUILD_DIR
+        cd $BUILD_DIR
         make $COUNT_THREAD
         # exit;
     ;;
@@ -36,7 +36,7 @@ while getopts "mpvcd" OPTION; do
         ./program
 	;;
 	v) 
-        python3 visual_signal.py
+        python3 ../visual_signal.py
 	;;
 	*)
 		echo "Incorrect option"

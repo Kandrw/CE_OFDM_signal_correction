@@ -5,8 +5,10 @@
 #include <string.h>
 #include <signal.h>
 #include <stdio.h>
-#include <iio.h>
 
+#ifdef M_FOUND_LIBIIO
+#include <iio.h>
+#endif
 
 #include "../types_trx.hpp"
 

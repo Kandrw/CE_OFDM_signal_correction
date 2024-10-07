@@ -6,8 +6,9 @@
 #include <unistd.h>
 #include <thread>
 
+#ifdef M_FOUND_LIBIIO
 #include <iio.h>
-
+#endif
 
 
 #include "ad9361/device_ad9361.hpp"

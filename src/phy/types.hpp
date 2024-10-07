@@ -6,7 +6,7 @@
 #include <output.hpp>
 // #include "../output/output.hpp"
 
-#define CODE_GREY "data/practic5/code_grey.bin"
+#define CODE_GREY "../data/practice5/code_grey.bin"
 
 enum class TypeModulation{
     BPSK = 1,

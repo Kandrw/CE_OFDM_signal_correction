@@ -1,9 +1,9 @@
 
 
 
-#define CONDITION 2
+// #define CONDITION_TARGET_PROGRAM 3
 
-#if CONDITION != 10
+#if CONDITION_TARGET_PROGRAM != 10
 
 #include <iostream>
 #include <cstdlib>
@@ -27,8 +27,11 @@
 // #include "generate_packet/generate_packet.h"
 #include "phy/phy.hpp"
 
+#ifdef M_FOUND_LIBIIO
 
 #include "trx/device_api.hpp"
+#endif
+
 #include "model/modelling.hpp"
 #include "loaders/load_data.hpp"
 
@@ -45,7 +48,7 @@ enum class ARGV_CONSOLE: int {
 };
 
 
-#if CONDITION == 3
+#if CONDITION_TARGET_PROGRAM == 3
 int main(int argc, char *argv[]){
     srand(time(NULL));
     init_log();
@@ -58,12 +61,11 @@ int main(int argc, char *argv[]){
 }
 #endif
 
-#if CONDITION == 4
+#if CONDITION_TARGET_PROGRAM == 4
 int main(int argc, char *argv[]){
     srand(time(NULL));
     init_log();
-
-    model_soft_solutions();
+	model_soft_solutions();
     print_log(CONSOLE, "End program\n");
     // rand
     deinit_log();
@@ -71,7 +73,60 @@ int main(int argc, char *argv[]){
 }
 #endif
 
-#if CONDITION == 1
+
+#if CONDITION_TARGET_PROGRAM == 0
+int main(int argc, char *argv[]){
+    srand(time(NULL));
+    init_log();
+
+	const char filename[] = "../data/data_test.txt";
+	char test_data[9] = {
+        (char)0b00000001,
+        (char)0b00100011,
+        (char)0b01000101,
+        (char)0b01100111,
+        (char)0b10001001,
+        (char)0b10101011,
+        (char)0b11001101,
+        (char)0b11101111
+    };
+
+    test_data[sizeof(test_data) - 1] = 0;
+	int size = sizeof(test_data) - 1;
+	write_file_bin_data(filename, test_data, size);
+
+    // Sleep(4 * 1000);
+    bit_sequence data;
+
+    data.buffer = read_file_data(filename, &data.size);
+    if(data.size == 0){
+        print_log(CONSOLE, "[ERROR] [main.cpp] main: empty data_bin, EXIT\n");
+        return -1;
+    }
+    OFDM_params param_ofdm = {
+
+    };
+    ParamsPhy param_phy = {
+        .type_modulation = TypeModulation::QAM16,
+        .param_ofdm = param_ofdm,
+    };
+    print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
+    VecSymbolMod samples = generate_frame_phy(data, param_phy);
+
+
+    print_log(CONSOLE, "End program\n");
+    // rand
+    deinit_log();
+    return 0;
+}
+#endif
+
+
+#ifdef M_FOUND_LIBIIO
+
+
+
+#if CONDITION_TARGET_PROGRAM == 1
 int main(int argc, char *argv[]){
     srand(time(NULL));
     init_log();
@@ -135,7 +190,7 @@ int main(int argc, char *argv[]){
     return 0;
 }
 #endif
-#if CONDITION == 2
+#if CONDITION_TARGET_PROGRAM == 2
     void print_cfg1(stream_cfg &txcfg){
         print_log(LOG_DEVICE, "bw_hz = %lld, fs_hz = %lld, lo_hz = %lld, rfport = %s\n", 
             txcfg.bw_hz, txcfg.fs_hz, txcfg.lo_hz, txcfg.rfport
@@ -256,7 +311,7 @@ int main(int argc, char *argv[]){
 
 
 
-#if CONDITION == 10
+#if CONDITION_TARGET_PROGRAM == 10
 
 
 // SPDX-License-Identifier: GPL-2.0-or-later
@@ -552,9 +607,9 @@ int main (int argc, char **argv)
 }
 
 
-#endif
+#endif /*CONDITION_TARGET_PROGRAM == 10*/
 
 
 
-
+#endif /*M_FOUND_LIBIIO*/
 

@@ -13,7 +13,9 @@
 
 #define PI 3.1415926535
 
-#define FILE_SER "data/ser.txt"
+#define FILE_SER "../data/ser.txt"
+#define FILE_BER_SOFT "../data/practice5/ber_soft.txt"
+
 
 #define PRINT_BITS( mask, shift)\
 (bits & mask) >> shift
@@ -166,7 +168,7 @@ void model_calc_P_SER() {
         print_to_file(FILE_SER, "a", "%f %d\n", Pser, SNR);
         char filename[30];
         memset(filename, 0, sizeof(filename));
-        sprintf(filename, "data/samples/rx_%d", (int)SNR);
+        sprintf(filename, "../data/samples/rx_%d", (int)SNR);
         write_file_bin_data(
                 filename, &r[0], 
                 r.size() * sizeof(VecSymbolMod::value_type) );
@@ -309,7 +311,6 @@ bit_sequence *decode_soft_solutions(VecSymbolMod &samples_rx, float Q2, bool deb
     }
     return soft_result;
 }
-#define FILE_BER_SOFT "data/practic5/ber_soft.txt"
 
 void model_soft_solutions() {
 
@@ -325,13 +326,13 @@ void model_soft_solutions() {
     }
     test_data[sizeof(test_data) - 1] = 0;
 #endif
-    const char filename[] = "data/data_test.txt";
+    const char filename[] = "../data/data_test.txt";
     
     bit_sequence data, data_grey;
 
     
 
-    int SNR_min = 17;
+    int SNR_min = 0;
     int SNR_max = 30;
     float h2;
     
@@ -341,7 +342,7 @@ void model_soft_solutions() {
     for(int i = SNR_min; i <= SNR_max; ++i) {
         
 #if TEST_DATA == 2
-        char test_data[125000];
+        char test_data[1000000];
         for(int i = 0; i < (int)sizeof(test_data); ++i){
             test_data[i] = (rand() % 200);
             // test_data[i] = (rand() % 20) + 70;
@@ -364,10 +365,10 @@ void model_soft_solutions() {
         //     samples[0].I, samples[0].Q, r[0].I, r[0].Q);
 #if 0
         write_file_bin_data(
-                    "data/practic5/s.bin", &samples[0], 
+                    "../data/practiec5/s.bin", &samples[0], 
                     samples.size() * sizeof(VecSymbolMod::value_type) );
         write_file_bin_data(
-                    "data/practic5/s_noise.bin", &r[0], 
+                    "../data/practice5/s_noise.bin", &r[0], 
                     r.size() * sizeof(VecSymbolMod::value_type) );
 
         print_log(CONSOLE, "\n[%s:%d] Q = %f\n", __func__, __LINE__, Q2);
