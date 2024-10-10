@@ -37,6 +37,7 @@
 
 #endif
 
+#define LOG_FILE "../log.log"
 
 #define SIZE_DATA 1000
 #define STRINGIFY(x) #x
@@ -51,7 +52,7 @@ enum class ARGV_CONSOLE: int {
 #if CONDITION_TARGET_PROGRAM == 3
 int main(int argc, char *argv[]){
     srand(time(NULL));
-    init_log();
+    init_log(LOG_FILE);
 
     model_calc_P_SER();
     print_log(CONSOLE, "End program\n");
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]){
 #if CONDITION_TARGET_PROGRAM == 4
 int main(int argc, char *argv[]){
     srand(time(NULL));
-    init_log();
+    init_log(LOG_FILE);
 	model_soft_solutions();
     print_log(CONSOLE, "End program\n");
     // rand
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]){
 #if CONDITION_TARGET_PROGRAM == 0
 int main(int argc, char *argv[]){
     srand(time(NULL));
-    init_log();
+    init_log(LOG_FILE);
 
 	const char filename[] = "../data/data_test.txt";
 	char test_data[9] = {
@@ -129,7 +130,7 @@ int main(int argc, char *argv[]){
 #if CONDITION_TARGET_PROGRAM == 1
 int main(int argc, char *argv[]){
     srand(time(NULL));
-    init_log();
+    init_log(LOG_FILE);
 
     // if(argc < static_cast<int>(ARGV_CONSOLE::ARGV_MAX)){
     //     print_log(CONSOLE, "Error: Not enough arguments: <ip> <filename data>\n");
@@ -205,7 +206,7 @@ int main(int argc, char *argv[]){
 
 int main(int argc, char *argv[]){
     srand(time(NULL));
-    init_log();
+    init_log(LOG_FILE);
 
 
 #if 0
@@ -216,13 +217,13 @@ int main(int argc, char *argv[]){
     const char *ip_device = argv[static_cast<int>(ARGV_CONSOLE::ARGV_IP_DEVICE)];
     const char *filename = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
 #else
-    const char *ip_device = "ip:192.168.2.1";
-    const char *filename = "./data/data_test.txt";
+    const char *ip_device = "ip:192.168.3.1";
+    const char *filename = "../data/data_test.txt";
 
 #endif
 
 
-#if 0
+#if 1
     char test_data[] = "Test message";
 #else    
     char test_data[310];
@@ -255,10 +256,9 @@ int main(int argc, char *argv[]){
 
     config_device cfg1 = {
         ip_device,
-        iodev::TRX,
         {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        {MHZ(1.5), MHZ(2.5), GHZ(2.5), "A"},
-        
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
+        1024 * 1024,
     };
     print_cfg1(cfg1.tx_cfg);
     // return -1;
@@ -270,7 +270,7 @@ int main(int argc, char *argv[]){
         return -1;
     }
     int result;
-#if 1
+#if 0
     result = DeviceTRX::send_samples((void*)&samples[0], samples.size());
 
     print_log(LOG, "[%s:%d] TX: result = %d\n", __func__, __LINE__, result);
@@ -462,7 +462,7 @@ static bool get_lo_chan(enum iodev d, struct iio_channel **chn)
 }
 
 /* applies streaming configuration through IIO */
-bool cfg_ad9361_streaming_ch(struct stream_cfg *cfg, enum iodev type, int chid)
+bool cfg_ad9361_streaming_ch1(struct stream_cfg *cfg, enum iodev type, int chid)
 {
 	struct iio_channel *chn = NULL;
 
@@ -492,7 +492,7 @@ int main (int argc, char **argv)
 	// Streaming devices
 	struct iio_device *tx;
 	struct iio_device *rx;
-    const char *ip = "ip:192.168.2.1";
+    const char *ip = "ip:192.168.3.1";
 	// RX and TX sample counters    
 	size_t nrx = 0;
 	size_t ntx = 0;
@@ -530,8 +530,8 @@ int main (int argc, char **argv)
 	IIO_ENSURE(get_ad9361_stream_dev(RX, &rx) && "No rx dev found");
 
 	printf("* Configuring AD9361 for streaming\n");
-	IIO_ENSURE(cfg_ad9361_streaming_ch(&rxcfg, RX, 0) && "RX port 0 not found");
-	IIO_ENSURE(cfg_ad9361_streaming_ch(&txcfg, TX, 0) && "TX port 0 not found");
+	IIO_ENSURE(cfg_ad9361_streaming_ch1(&rxcfg, RX, 0) && "RX port 0 not found");
+	IIO_ENSURE(cfg_ad9361_streaming_ch1(&txcfg, TX, 0) && "TX port 0 not found");
 
 	printf("* Initializing AD9361 IIO streaming channels\n");
 	IIO_ENSURE(get_ad9361_stream_ch(RX, rx, 0, &rx0_i) && "RX chan i not found");

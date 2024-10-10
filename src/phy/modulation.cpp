@@ -165,8 +165,7 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
     print_to_file(
             FILE_NAME_DEBUG_DATA_ANNOTATE_MODULATION, "w", NULL);
     time_counting_start();
-    // int bits_symbol = 4;
-    // u_char *buffer_bits = bits.buffer;
+
     u_char *step = bits.buffer;
     u_char con = 0;
     VecSymbolMod samples;

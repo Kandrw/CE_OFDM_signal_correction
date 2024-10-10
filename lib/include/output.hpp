@@ -28,7 +28,7 @@
 // void print_log(int out, const char* format, ...);
 void print_log(int out, const char* format, ...);
 
-int init_log();
+int init_log(const char *log_filename);
 int deinit_log();
 int write_file_bin_data(const char *filename, const void *data, const int size);
 

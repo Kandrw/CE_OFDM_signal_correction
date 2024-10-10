@@ -101,7 +101,8 @@ VecSymbolMod generate_noise_by_SNR(int N, float Q_2) {
     VecSymbolMod n;
     float koeff = sqrt(Q_2 / 2.f);
     for(int i = 0; i < N; ++i) {
-        mod_symbol ms = {(float)randn(0, 1) * koeff, (float)randn(0, 1) * koeff};
+        mod_symbol ms = {(float)randn(0, 1) * koeff, 
+                (float)randn(0, 1) * koeff};
         n.push_back(ms);
     }
     return n;
@@ -152,8 +153,8 @@ void model_calc_P_SER() {
         float Ps = calc_Ps(N, samples);
         h2 = pow(10, SNR * 0.1);
         float Q2 = Ps / h2;
+
         VecSymbolMod n = generate_noise_by_SNR(N, Q2);
-        // print_VecSymbolMod(n);
         VecSymbolMod r = samples + n;
    
         print_log(CONSOLE, "%d\n", i);
@@ -342,7 +343,7 @@ void model_soft_solutions() {
     for(int i = SNR_min; i <= SNR_max; ++i) {
         
 #if TEST_DATA == 2
-        char test_data[1000000];
+        char test_data[100000];
         for(int i = 0; i < (int)sizeof(test_data); ++i){
             test_data[i] = (rand() % 200);
             // test_data[i] = (rand() % 20) + 70;

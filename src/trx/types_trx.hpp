@@ -1,6 +1,6 @@
 #pragma once
 
-#define BLOCK_SIZE (1024 * 1024)
+// #define BLOCK_SIZE (1024 * 1024)
 #define MHZ(x) ((long long)(x*1000000.0 + .5))
 #define GHZ(x) ((long long)(x*1000000000.0 + .5))
 
@@ -15,5 +15,10 @@ struct stream_cfg {
 	const char* rfport; // Port name
 };
 
-
+struct config_device{
+    const char *ip;
+    stream_cfg rx_cfg;
+    stream_cfg tx_cfg; 
+    unsigned int block_size;
+};
 

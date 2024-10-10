@@ -119,9 +119,9 @@ def model_soft_solutions():
 
     
     #plt.plot(db_list, ser_list)
-    plt.title("BER soft and hard")
+    plt.title("BER soft and hard for QAM16")
     plt.xlabel("SNR")
-    plt.ylabel("symbol error")
+    plt.ylabel("error")
     plt.figure(10, figsize=(10, 10))
 
     return 0
@@ -150,9 +150,9 @@ if PRACTICE == 0:
     
     file_names_data = [
     #"192.168.1.1",
-    "data/data_test.txt",
-    "data/modulation.bin",
-    "data/data_bit.txt"
+    "../data/data_test.txt",
+    "../data/modulation.bin",
+    "../data/data_bit.txt"
     ]
     if RUN_ALL == 1:
 

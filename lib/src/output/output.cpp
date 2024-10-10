@@ -10,7 +10,7 @@
 #include <stdarg.h>
 #include <ctime>
 
-#define LOG_FILE "log.log"
+
 #define FFLUSH_BUFFER
 
 void setColorStream(char fcolor, char bgcolor){
@@ -28,11 +28,13 @@ static time_t start_all;
 //     double seconds = (double)(end - start) / CLOCKS_PER_SEC;
 //     print_log(CONSOLE, "[%s:%d] %f clocks\n", __func__, __LINE__, seconds);
 
-int init_log(){
-    
-    file_log = fopen(LOG_FILE, "w");
+static std::string _log_filename;
+
+int init_log(const char *log_filename){
+    _log_filename = log_filename;
+    file_log = fopen(_log_filename.c_str(), "w");
     if(!file_log){
-        printf("[%s:%d] Error open: %s\n", __func__, __LINE__, LOG_FILE);
+        printf("[%s:%d] Error open: %s\n", __func__, __LINE__, _log_filename.c_str());
     }
     print_log(CONSOLE, "[%s:%d] \t\tINIT_LOG\n", __func__, __LINE__);
     // setColorStream('0', '9');
