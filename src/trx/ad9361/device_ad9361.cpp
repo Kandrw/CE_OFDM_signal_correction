@@ -233,10 +233,12 @@ int init_device_TRX(config_device &cfg) {
 	const char *addr = cfg.ip;
 	struct stream_cfg *rxcfg = &cfg.rx_cfg;
 	struct stream_cfg *txcfg = &cfg.tx_cfg;
-	
+	print_log(LOG, "[%s:%d] !ctx\n", __func__, __LINE__);
 	int err;
 	IIO_ENSURE((ctx = iio_create_context(NULL, addr)) && "No context");
-	
+	if(!ctx) {
+		print_log(LOG, "[%s:%d] !ctx\n", __func__, __LINE__);
+	}
 	IIO_ENSURE(iio_context_get_devices_count(ctx) > 0 && "No devices");
 
 	print_log(LOG_DEVICE, "* Acquiring AD9361 streaming devices\n");
@@ -327,8 +329,8 @@ int write_to_device_buffer(const void *data, int size){
 	p_end = (int16_t*)iio_block_end(txblock);
 	for (p_dat = (int16_t*)iio_block_first(txblock, tx0_i); p_dat < p_end;
 			p_dat += p_inc / sizeof(*p_dat)) {
-		p_dat[0] = 4000; /* Real (I) */
-		p_dat[1] = 4000; /* Imag (Q) */
+		p_dat[0] = 4000; /* Real (i) */
+		p_dat[1] = 4000; /* Imag (q) */
 	}
 	print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
 	return 0;
@@ -339,9 +341,10 @@ int read_to_device_buffer(const void *data, int size){
 	ptrdiff_t p_inc;
 	const struct iio_block *rxblock;
 	p_inc = rx_sample_sz;
+	rxblock = iio_stream_get_next_block(rxstream);
 	p_end = (int16_t*)iio_block_end(rxblock);
 	int err = 0;
-	rxblock = iio_stream_get_next_block(rxstream);
+
 	err = iio_err(rxblock);
 	if (err) {
 		print_log(LOG_DEVICE, "ERROR: Unable to receive block");
@@ -349,11 +352,12 @@ int read_to_device_buffer(const void *data, int size){
 	}
 	for (p_dat = (int16_t*)iio_block_first(rxblock, rx0_i); p_dat < p_end;
 			p_dat += p_inc / sizeof(*p_dat)) {
-		/* Example: swap I and Q */
+		/* Example: swap i and q */
 		int16_t i = p_dat[0];
 		int16_t q = p_dat[1];
 
-		print_log(LOG_DATA, "%f, %f\n", (float)i, (float)q);
+		// print_log(LOG_DATA, "%f, %f\n", (float)i, (float)q);
+		print_log(CONSOLE, "%f, %f\n", (float)i, (float)q);
 	}
 	return 0;
 }

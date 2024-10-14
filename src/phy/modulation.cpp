@@ -21,10 +21,10 @@ mod_symbol table_QPSK[] = {
 
 mod_symbol table_QAM16[] = {
   // LTE-16QAM constellation:
-  //                Q
+  //                q
   //  1011  1001  |   0001  0011
   //  1010  1000  |   0000  0010
-  //---------------------------------> I
+  //---------------------------------> i
   //  1110    1100  |  0100  0110
   //  1111    1101  |  0101  0111
 #if 0
@@ -140,8 +140,8 @@ VecSymbolMod modulation_QPSK(bit_sequence &bits){
                 exit(-1);
             }
             mod_symbol t1 = table_QPSK[val];
-            t1.I += 4000.f;
-            t1.Q += 4000.f;
+            t1.i += 4000.f;
+            t1.q += 4000.f;
             samples.push_back(t1);
             mask >>=2;
             shift -= 2;
@@ -150,7 +150,7 @@ VecSymbolMod modulation_QPSK(bit_sequence &bits){
     }
     time_counting_end(CONSOLE);
     for(i = 0; i < (int)samples.size(); ++i){
-        print_log(LOG_DATA, "%f + %fi\t", samples[i].I, samples[i].Q);
+        print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
     }
     print_log(LOG, "\n");
     print_log(LOG, "vector size = %d\n", samples.size());
@@ -165,14 +165,14 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
     print_to_file(
             FILE_NAME_DEBUG_DATA_ANNOTATE_MODULATION, "w", NULL);
     time_counting_start();
-
+   
     u_char *step = bits.buffer;
     u_char con = 0;
     VecSymbolMod samples;
     int i;
     u_char g1, g2, g3, g4;
     u_char val;
-    float Y, Q;
+    float Y, q;
     std::vector<u_char> code_grey; 
     u_char tmp_s = 0;
     for(i = 0; i < bits.size;){
@@ -195,7 +195,7 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
         g3 = ((val & 0b10) >> 1) ^ ((val & 0b100) >> 2);
         g4 = ((val & 0b100) >> 2) ^ ((val & 0b1000) >> 3);
         Y = (g1) | (g2<<1);
-        Q = (g3) | (g4<<1);
+        q = (g3) | (g4<<1);
         switch (con)
         {
         case 1:
@@ -212,24 +212,24 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
             FILE_NAME_DEBUG_DATA_ANNOTATE_MODULATION,
             "a", "%d%d%d%d ", g1, g2, g3, g4);
         
-        mod_symbol t1 = {Y * 2.f - 3.f, Q * 2.f - 3.f};
+        mod_symbol t1 = {Y * 2.f - 3.f, q * 2.f - 3.f};
 
-        // print_log(LOG, "\t%f %f\n", t1.I, t1.Q);
+        // print_log(LOG, "\t%f %f\n", t1.i, t1.q);
         // print_log( CONSOLE, "0b%d%d%d%d,\n", g1, g2, g3, g4);
         // if(i %  == 0){
         //     print_log(CONSOLE, "\n");
         // }
         // print_log( CONSOLE, "%d%d%d%d - %f + %f\n", 
-        //     g1, g2, g3, g4, t1.I, t1.Q);
+        //     g1, g2, g3, g4, t1.i, t1.q);
         // print_log( CONSOLE, "{ %f, %f },\n", 
-        //     g1, g2, g3, g4, t1.I, t1.Q);
+        //     g1, g2, g3, g4, t1.i, t1.q);
 
         samples.push_back(t1);
     }
     // print_log(CONSOLE, "\n");
     time_counting_end(CONSOLE);
     for(i = 0; i < (int)samples.size(); ++i){
-        // print_log(LOG_DATA, "%f + %fi\t", samples[i].I, samples[i].Q);
+        // print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
     }
     // print_log(LOG, "\n");
     // print_log(LOG, "vector size = %d\n", samples.size());
@@ -303,7 +303,7 @@ VecSymbolMod modulation_QAM64(bit_sequence &bits){
     
     time_counting_end(CONSOLE);
     for(i = 0; i < (int)samples.size(); ++i){
-        print_log(LOG_DATA, "%f + %fi\t", samples[i].I, samples[i].Q);
+        print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
     }
     print_log(LOG, "\n");
     print_log(LOG, "vector size = %d\n", samples.size());
@@ -325,7 +325,7 @@ bool symbol_cmp(float a, float b, float error){
 /*comparison taking into account the error*/
 bool mod_symbol_cmp(mod_symbol &A, mod_symbol &B, float error){
     // print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
-    return symbol_cmp(A.I, B.I, error) && symbol_cmp(A.Q, B.Q, error);
+    return symbol_cmp(A.i, B.i, error) && symbol_cmp(A.q, B.q, error);
 }
 
 bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
@@ -342,9 +342,9 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
         int pos = 0;
         for(int i2 = 0; i2 < (int)ARRAY_SIZE(table_QAM16); ++i2) {
             
-            float dist = sqrt(powf(table_QAM16[i2].I - samples[i].I, 2) + powf(table_QAM16[i2].Q - samples[i].Q, 2));
+            float dist = sqrt(powf(table_QAM16[i2].i - samples[i].i, 2) + powf(table_QAM16[i2].q - samples[i].q, 2));
             // print_log(CONSOLE, "dist: %f, %f %f - %f - %f\n", dist,
-            //     samples[i].I, samples[i].Q, table_QAM16[i2].I, table_QAM16[i2].Q);
+            //     samples[i].i, samples[i].q, table_QAM16[i2].i, table_QAM16[i2].q);
             // if(mod_symbol_cmp(samples[i], table_QAM16[i2], err_interval)) {
             if(dist <= min_dist) {
                 conD = 1;
@@ -352,13 +352,13 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
                 pos = i2;
             } else {
                 // print_log(CONSOLE, "%f %f - %f - %f\n", 
-                // samples[i].I, samples[i].Q, table_QAM16[i2].I, table_QAM16[i2].Q);
+                // samples[i].i, samples[i].q, table_QAM16[i2].i, table_QAM16[i2].q);
                 // print_log(CONSOLE, "dist: %f, %f %f - %f - %f\n", dist,
-                // samples[i].I, samples[i].Q, table_QAM16[i2].I, table_QAM16[i2].Q);
+                // samples[i].i, samples[i].q, table_QAM16[i2].i, table_QAM16[i2].q);
             }
         }
         // print_log(CONSOLE, "min_dist: %f, pos - %d, %f %f - %f - %f\n", min_dist, pos,
-        //         samples[i].I, samples[i].Q, table_QAM16[pos].I, table_QAM16[pos].Q);
+        //         samples[i].i, samples[i].q, table_QAM16[pos].i, table_QAM16[pos].q);
         // if(min_dist <= err_interval) {
             conD = 1;       
             switch(con_state) {
@@ -468,7 +468,7 @@ bit_sequence *demodulation_QAM64(VecSymbolMod &samples){
             }
         }
         if(!if_decode_symbol){
-            print_log(CONSOLE, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].I, samples[i].Q);
+            print_log(CONSOLE, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].i, samples[i].q);
         }
     }
     print_log(LOG, "[end %s:%d]\n", __func__, __LINE__);
@@ -516,7 +516,7 @@ bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
             }
         }
         if(!if_decode_symbol){
-            print_log(ERROR_OUT, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].I, samples[i].Q);
+            print_log(ERROR_OUT, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].i, samples[i].q);
         }
 
     }

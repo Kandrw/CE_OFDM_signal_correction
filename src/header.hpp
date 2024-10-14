@@ -17,7 +17,3 @@ typedef unsigned char u_char;
 // typedef std::vector<u_char> binary_list;
 
 
-
-
-
-#pragma once

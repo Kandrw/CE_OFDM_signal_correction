@@ -101,7 +101,7 @@ void print_log(int out, const char* format, ...){
         vfprintf(stdout, format, args);
         break;
     case LOG_DEVICE:
-        // vfprintf(stdout, format, args);
+        vfprintf(stdout, format, args);
         break;
     default:
         break;

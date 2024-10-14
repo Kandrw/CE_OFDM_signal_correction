@@ -9,7 +9,7 @@
 ## Установка зависимостей
 
 ### Linux
-    sudo apt-get install build-essential git libxml2-dev bison flex
+    sudo apt-get install build-essential git libxml2-dev bison flex libcdk5-dev cmake python3-pip libusb-1.0-0-dev libavahi-client-dev libavahi-common-dev libaio-dev libzstd-dev
     
     git clone --branch v0.23 https://github.com/analogdevicesinc/libiio.git
     cd libiio

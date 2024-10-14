@@ -35,8 +35,8 @@ struct bit_sequence{
 };
 
 struct mod_symbol{
-    float I;/*real*/
-    float Q;/*imag*/
+    float i;/*real*/
+    float q;/*imag*/
 };
 struct qam_sequence{
     int size;
@@ -54,5 +54,7 @@ typedef std::vector<mod_symbol> VecSymbolMod;
 
 VecSymbolMod operator * (const VecSymbolMod &A, const VecSymbolMod &B);
 VecSymbolMod operator + (const VecSymbolMod &A, const VecSymbolMod &B);
-
+VecSymbolMod operator * (const VecSymbolMod &A, const std::vector<float> &B);
+VecSymbolMod operator / (const VecSymbolMod &A, const VecSymbolMod &B);
+VecSymbolMod operator / (const VecSymbolMod &A, const std::vector<float> &B);
 // #endif /*TYPES_HPP*/

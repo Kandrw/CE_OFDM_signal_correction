@@ -13,7 +13,9 @@
 #include <vector>
 
 #include <output.hpp>
-
+#include <memory>
+#include <map>
+#include <functional>
 
 #if defined(_WIN64)
 #include "windows.h"
@@ -34,6 +36,7 @@
 
 #include "model/modelling.hpp"
 #include "loaders/load_data.hpp"
+#include "ipc/managment_ipc.hpp"
 
 #endif
 
@@ -45,90 +48,76 @@
 enum class ARGV_CONSOLE: int {
     ARGV_IP_DEVICE = 1,
     ARGV_FILE_DATA,
+    ARGV_TARGET_PROGRAM,
     ARGV_MAX
 };
 
+// struct target_exec {
+//     std::string target;
 
-#if CONDITION_TARGET_PROGRAM == 3
-int main(int argc, char *argv[]){
-    srand(time(NULL));
-    init_log(LOG_FILE);
+// };
 
-    model_calc_P_SER();
-    print_log(CONSOLE, "End program\n");
-    // rand
-    deinit_log();
+void print_input_param() {
+    print_log(CONSOLE,
+        "ARGV: "
+        "<ip> <filename data> <target>"
+        "\n"
+    );
+}
+
+int target(int argc, char *argv[]) {
+    if(argc == static_cast<int>(ARGV_CONSOLE::ARGV_MAX) + 1) {
+        return modelling_signal(argv[static_cast<int>(ARGV_CONSOLE::ARGV_MAX)][0]);
+    }
+    print_log(CONSOLE, "No option for modelling_signal\n");
     return 0;
 }
+int ofdm_model(int argc, char *argv[]);
+#if M_FOUND_LIBIIO
+int trx_test(int argc, char *argv[]);
+int test_RX(int argc, char *argv[]);
+int test_TX(int argc, char *argv[]);
 #endif
+int test_ipc(int argc, char *argv[]);
 
-#if CONDITION_TARGET_PROGRAM == 4
-int main(int argc, char *argv[]){
-    srand(time(NULL));
-    init_log(LOG_FILE);
-	model_soft_solutions();
-    print_log(CONSOLE, "End program\n");
-    // rand
-    deinit_log();
-    return 0;
-}
-#endif
-
-
-#if CONDITION_TARGET_PROGRAM == 0
 int main(int argc, char *argv[]){
     srand(time(NULL));
     init_log(LOG_FILE);
 
-	const char filename[] = "../data/data_test.txt";
-	char test_data[9] = {
-        (char)0b00000001,
-        (char)0b00100011,
-        (char)0b01000101,
-        (char)0b01100111,
-        (char)0b10001001,
-        (char)0b10101011,
-        (char)0b11001101,
-        (char)0b11101111
+    std::map<std::string, std::function<int(int, char**)>> target_exec = {
+        {"model_practice", target},
+        {"ofdm_model", ofdm_model},
+#if M_FOUND_LIBIIO
+        {"trx", trx_test},
+        {"rx", test_RX},
+        {"tx", test_TX},
+#endif
+        {"test_ipc", test_ipc}
     };
 
-    test_data[sizeof(test_data) - 1] = 0;
-	int size = sizeof(test_data) - 1;
-	write_file_bin_data(filename, test_data, size);
-
-    // Sleep(4 * 1000);
-    bit_sequence data;
-
-    data.buffer = read_file_data(filename, &data.size);
-    if(data.size == 0){
-        print_log(CONSOLE, "[ERROR] [main.cpp] main: empty data_bin, EXIT\n");
+    if(argc < static_cast<int>(ARGV_CONSOLE::ARGV_MAX)){
+        print_input_param();
         return -1;
     }
-    OFDM_params param_ofdm = {
-
-    };
-    ParamsPhy param_phy = {
-        .type_modulation = TypeModulation::QAM16,
-        .param_ofdm = param_ofdm,
-    };
-    print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
-    VecSymbolMod samples = generate_frame_phy(data, param_phy);
+    auto find_taget_exec = target_exec.find(
+        argv[static_cast<int>(ARGV_CONSOLE::ARGV_TARGET_PROGRAM)]);
+    if(find_taget_exec != target_exec.end()) {
+        print_log(CONSOLE, "call target: %s\n", find_taget_exec->first.c_str());
+        find_taget_exec->second(argc, argv);
+    } else {
+        print_log(CONSOLE, "No target: %s\n", 
+            argv[static_cast<int>(ARGV_CONSOLE::ARGV_TARGET_PROGRAM)] );
+    }
 
 
     print_log(CONSOLE, "End program\n");
-    // rand
     deinit_log();
     return 0;
 }
-#endif
-
-
-#ifdef M_FOUND_LIBIIO
 
 
 
-#if CONDITION_TARGET_PROGRAM == 1
-int main(int argc, char *argv[]){
+int ofdm_model(int argc, char *argv[]){
     srand(time(NULL));
     init_log(LOG_FILE);
 
@@ -136,7 +125,7 @@ int main(int argc, char *argv[]){
     //     print_log(CONSOLE, "Error: Not enough arguments: <ip> <filename data>\n");
     //     return -1;
     // }
-    const char filename[] = "data/data_test.txt";// = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
+    const char filename[] = "../data/data_test.txt";// = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
 
 #define TEST_DATA 2
 #if TEST_DATA == 0
@@ -181,33 +170,97 @@ int main(int argc, char *argv[]){
     };
     print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
     VecSymbolMod samples = generate_frame_phy(data, param_phy);
-    exit(0);
+    // exit(0);
 
     bit_sequence *read_data = decode_frame_phy(samples, param_phy);
     print_log(LOG_DATA, "read_data: size = %d, data: %s\n", read_data->size, read_data->buffer);
     print_log(CONSOLE, "input size: %d, output size: %d\n", data.size, read_data->size);
-    print_log(CONSOLE, "End program\n");
+    print_log(CONSOLE, "End %s\n", __func__);
     deinit_log();
     return 0;
 }
+
+
+int test_ipc(int argc, char *argv[]) {
+
+
+
+#ifdef ACTIVATE_IPC
+    if(init_ipc()) {
+        print_log(CONSOLE, "Exit\n");
+        return -1;
+    }
 #endif
-#if CONDITION_TARGET_PROGRAM == 2
-    void print_cfg1(stream_cfg &txcfg){
-        print_log(LOG_DEVICE, "bw_hz = %lld, fs_hz = %lld, lo_hz = %lld, rfport = %s\n", 
-            txcfg.bw_hz, txcfg.fs_hz, txcfg.lo_hz, txcfg.rfport
-        );
+    float FF[] = {12, 2, 21, 3};
+    int FF2[] = {10, 20, 30, 40};
+    
+    std::vector<data_array*> arr;
+    char df[] = "asd";
+    data_array d1 = data_array((int)3, (const u_char*)df, (unsigned int)sizeof(FF), 
+            static_cast<u_char>(TYPE_ARRAY::TYPE_FLOAT), (u_char*)FF);
+    data_array d2 = data_array((int)3, (const u_char*)df, (unsigned int)sizeof(FF), 
+            static_cast<u_char>(TYPE_ARRAY::TYPE_INT), (u_char*)FF2);
+     
+    arr.push_back(&d2);                        
+    arr.push_back(&d1);
+    // data_array d1(3, (u_char*)df, sizeof(FF), TYPE_ARRAY::TYPE_FLOAT, (u_char*)FF);
+    // data_array d1;// = {3, (u_char*)df, sizeof(FF), TYPE_ARRAY::TYPE_FLOAT, (u_char*)FF};
+    // d1.array = (u_char*)FF;
+    // d1.size_array = sizeof(FF);
+    // d1.size_str = 3;
+    // d1.str = (const u_char*)df;
+    // d1.type = TYPE_ARRAY::TYPE_FLOAT;
+    full_data_arrays("asd", arr);
+    print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
+    // return 0;
+    while(1) {
+        int command;
+        print_log(CONSOLE, "%s:%d: input:", __func__, __LINE__);
+        std::cin >> command;
+
+        if(command) {
+            print_log(CONSOLE, "send\n");
+            std::string asd = "asdfasfdsdf";
+            send_ipc(command, 4, 12, (u_char*)asd.c_str());
+            if(command == 10) {
+                break;
+            }
+#if 0
+            msg_header msg;
+            recv_ipc(&msg, 0, NULL);
+            for(int i = 0; i < sizeof(msg); ++i) {
+        print_log(CONSOLE, "%d) %x %d\n",i,
+         *((char*)(&msg) + i),  *((char*)(&msg) + i));
     }
-    void print_VecSymbolMod1( VecSymbolMod &vec) {
-        for(int i = 0; i < (int)vec.size(); ++i) {
-            print_log(CONSOLE, "%f + %fi  ", vec[i].I, vec[i].Q);
+    print_log(CONSOLE, "\nsizeof(msg_con) = %d\n", sizeof(msg));
+            print_log(CONSOLE, "c = %d, t = %d, s = %d\n", msg.command, msg.type, msg.size_data_shm);
+#endif
         }
-        print_log(CONSOLE, "\n");
     }
+    deinit_ipc();
 
-int main(int argc, char *argv[]){
-    srand(time(NULL));
-    init_log(LOG_FILE);
 
+
+    return 0;
+}
+
+
+#ifdef M_FOUND_LIBIIO
+
+
+void print_cfg1(stream_cfg &txcfg){
+    print_log(LOG_DEVICE, "bw_hz = %lld, fs_hz = %lld, lo_hz = %lld, rfport = %s\n", 
+        txcfg.bw_hz, txcfg.fs_hz, txcfg.lo_hz, txcfg.rfport
+    );
+}
+void print_VecSymbolMod1( VecSymbolMod &vec) {
+    for(int i = 0; i < (int)vec.size(); ++i) {
+        print_log(CONSOLE, "%f + %fi  ", vec[i].i, vec[i].q);
+    }
+    print_log(CONSOLE, "\n");
+}
+
+int trx_test(int argc, char *argv[]){
 
 #if 0
     if(argc < static_cast<int>(ARGV_CONSOLE::ARGV_MAX)){
@@ -295,19 +348,175 @@ int main(int argc, char *argv[]){
     //             samples_mod.size() * sizeof(VecSymbolMod::value_type) );
     DeviceTRX::deinitialization();
     
-    print_log(CONSOLE, "End program\n");
-
-    deinit_log();
+    print_log(CONSOLE, "End %s\n", __func__);
     return 0;
 }
 
 
+
+
+int test_TX(int argc, char *argv[]){
+
+#if 1
+    const char *ip_device = argv[static_cast<int>(ARGV_CONSOLE::ARGV_IP_DEVICE)];
+    const char *filename = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
+#else
+    const char *ip_device = "ip:192.168.3.1";
+    const char *filename = "../data/data_test.txt";
+
+#endif
+    print_log(LOG, "address dev: %s\n", ip_device);
+
+#if 1
+    char test_data[] = "Test message";
+#else    
+    char test_data[310];
+    for(int i = 0; i < (int)sizeof(test_data); ++i){
+        // test_data[i] = (rand() % 200);
+        test_data[i] = (rand() % 20) + 70;
+    }
+    test_data[sizeof(test_data) - 1] = 0;
+#endif
+    write_file_bin_data(filename, test_data, sizeof(test_data));
+
+    // Sleep(4 * 1000);
+    bit_sequence data;
+
+    data.buffer = read_file_data(filename, &data.size);
+    if(data.size == 0){
+        print_log(CONSOLE, "[ERROR] [main.cpp] main: empty data_bin, EXIT\n");
+        return -1;
+    }
+    OFDM_params param_ofdm = {
+
+    };
+    ParamsPhy param_phy = {
+        .type_modulation = TypeModulation::QPSK,
+        .param_ofdm = param_ofdm,
+    };
+    print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
+    VecSymbolMod samples = generate_frame_phy(data, param_phy);
+    // exit(0);
+
+    config_device cfg1 = {
+        ip_device,
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
+        1024 * 1024,
+    };
+    print_cfg1(cfg1.tx_cfg);
+    // return -1;
+    if(DeviceTRX::initialization(cfg1)){
+        print_log(CONSOLE, "[%s:%d] Error: initialization, exit program\n",
+            __func__, __LINE__);
+
+        deinit_log();
+        return -1;
+    }
+    int result;
+#if 0
+    result = DeviceTRX::send_samples((void*)&samples[0], samples.size());
+
+    print_log(LOG, "[%s:%d] TX: result = %d\n", __func__, __LINE__, result);
+#endif
+    DeviceTRX::while_send_samples((void*)&samples[0], samples.size());
+    while(1){}
+    DeviceTRX::deinitialization();
+    
+    print_log(CONSOLE, "End %s\n", __func__);
+
+    return 0;
+}
+
+
+int test_RX(int argc, char *argv[]){
+
+#if 1
+    const char *ip_device = argv[static_cast<int>(ARGV_CONSOLE::ARGV_IP_DEVICE)];
+    const char *filename = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
+#else
+    const char *ip_device = "ip:192.168.3.1";
+    const char *filename = "../data/data_test.txt";
+
 #endif
 
+#if 1
+    char test_data[] = "Test message";
+#else    
+    char test_data[310];
+    for(int i = 0; i < (int)sizeof(test_data); ++i){
+        // test_data[i] = (rand() % 200);
+        test_data[i] = (rand() % 20) + 70;
+    }
+    test_data[sizeof(test_data) - 1] = 0;
+#endif
+    write_file_bin_data(filename, test_data, sizeof(test_data));
+
+    // Sleep(4 * 1000);
+    bit_sequence data;
+
+    data.buffer = read_file_data(filename, &data.size);
+    if(data.size == 0){
+        print_log(CONSOLE, "[ERROR] [main.cpp] main: empty data_bin, EXIT\n");
+        return -1;
+    }
+    OFDM_params param_ofdm = {
+
+    };
+    ParamsPhy param_phy = {
+        .type_modulation = TypeModulation::QPSK,
+        .param_ofdm = param_ofdm,
+    };
+    print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
+    VecSymbolMod samples = generate_frame_phy(data, param_phy);
+    // exit(0);
+
+    config_device cfg1 = {
+        ip_device,
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
+        1024 * 1024,
+    };
+    print_cfg1(cfg1.tx_cfg);
+    // return -1;
+    if(DeviceTRX::initialization(cfg1)){
+        print_log(CONSOLE, "[%s:%d] Error: initialization, exit program\n",
+            __func__, __LINE__);
+
+        deinit_log();
+        return -1;
+    }
+    int result;
+
+#if 1
+    VecSymbolMod samples_rx;
+    while(1) {
+        result = DeviceTRX::recv_samples(NULL, 0);
+    }
+    print_log(LOG, "[%s:%d] RX: result = %d\n", __func__, __LINE__, result);
+#endif
+
+#if 0
+
+    bit_sequence *read_data = decode_frame_phy(samples, param_phy);
+    print_log(LOG_DATA, "read_data: size = %d, data: %s\n", read_data->size, read_data->buffer);
+    print_log(CONSOLE, "input size: %d, output size: %d\n", data.size, read_data->size);
+    delete[] read_data;
+#endif
+    // write_file_bin_data(
+    //             FILE_NAME_SAVE_MODULATION, &samples_mod[0], 
+    //             samples_mod.size() * sizeof(VecSymbolMod::value_type) );
+    DeviceTRX::deinitialization();
+    
+    print_log(CONSOLE, "End %s\n", __func__);
+    return 0;
+}
+
+int realtime_RX(int argc, char *argv[]) {
 
 
 
-
+}
 
 
 
@@ -576,9 +785,9 @@ int main (int argc, char **argv)
 		p_inc = iio_buffer_step(rxbuf);
 		p_end = (char*)iio_buffer_end(rxbuf);
 		for (p_dat = (char *)iio_buffer_first(rxbuf, rx0_i); p_dat < p_end; p_dat += p_inc) {
-			// Example: swap I and Q
-			const int16_t i = ((int16_t*)p_dat)[0]; // Real (I)
-			const int16_t q = ((int16_t*)p_dat)[1]; // Imag (Q)
+			// Example: swap i and q
+			const int16_t i = ((int16_t*)p_dat)[0]; // Real (i)
+			const int16_t q = ((int16_t*)p_dat)[1]; // Imag (q)
 			// ((int16_t*)p_dat)[0] = q;
 			// ((int16_t*)p_dat)[1] = i;
             printf("%d %d\n", i, q);
@@ -591,8 +800,8 @@ int main (int argc, char **argv)
 			// Example: fill with zeros
 			// 12-bit sample needs to be MSB aligned so shift by 4
 			// https://wiki.analog.com/resources/eval/user-guides/ad-fmcomms2-ebz/software/basic_iq_datafiles#binary_format
-			((int16_t*)p_dat)[0] = 0 << 4; // Real (I)
-			((int16_t*)p_dat)[1] = 0 << 4; // Imag (Q)
+			((int16_t*)p_dat)[0] = 0 << 4; // Real (i)
+			((int16_t*)p_dat)[1] = 0 << 4; // Imag (q)
 		}
 
 		// Sample counter increment and status output

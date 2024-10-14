@@ -6,6 +6,7 @@ project(CE_OFDM_signal_correction)
 
 
 
+
 set(COMPILE_FLAGS 
 "-Bstatic -static-libgcc -static-libstdc++ -lm -g -Wall -pthread"
 )
@@ -13,11 +14,7 @@ set(COMPILE_FLAGS
 add_definitions(${COMPILE_FLAGS})
 
 
-set (CONDITION_SDR no_sdr) #sdr or no_sdr
-
-
-
-
+set (CONDITION_SDR sdr) #sdr or no_sdr
 
 
 if(CONDITION_SDR STREQUAL "sdr")
@@ -27,11 +24,11 @@ if(CONDITION_SDR STREQUAL "sdr")
 # configure_file(src/config.hpp.in
 #                   src/config.hpp)
 # include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(src)
-add_definitions(-DCONDITION_TARGET_PROGRAM=2 -DM_FOUND_LIBIIO)
+# include_directories(src)
+add_definitions(-DCONDITION_TARGET_PROGRAM=4 -DM_FOUND_LIBIIO)
 
 set(SOURCE 
-    src/main.cpp
+    src/main.cpp  
     
     src/trx/device_api.cpp
     src/trx/ad9361/device_ad9361.cpp
@@ -45,6 +42,7 @@ set(SOURCE
     src/model/modelling.cpp
 
     src/loaders/load_data.cpp
+    src/ipc/managment_ipc.cpp
 )
 else()
 
@@ -66,6 +64,8 @@ set(SOURCE
     src/model/modelling.cpp
 
     src/loaders/load_data.cpp
+    src/ipc/managment_ipc.cpp
+
 )
 
 
@@ -85,7 +85,20 @@ add_executable(program ${SOURCE})
 
 
 if(CONDITION_SDR STREQUAL "sdr")
-target_link_libraries(program iio)
+# target_link_libraries(program iio)
+# target_link_libraries(program iio)
+
+# include_directories(/home/andrey/Документы/libiio/include)
+# link_directories(/home/andrey/Документы/libiio/build)
+# target_link_libraries(program iio)
+
+
+add_library(iio_26 SHARED IMPORTED) # or STATIC instead of SHARED
+set_target_properties(iio_26 PROPERTIES
+  IMPORTED_LOCATION "/home/andrey/Документы/libiio/build/libiio.so"
+  INTERFACE_INCLUDE_DIRECTORIES "/home/andrey/Документы/libiio/include"
+)
+target_link_libraries(program iio_26)
 endif()
 
 target_link_libraries(program output)
