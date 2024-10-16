@@ -16,7 +16,7 @@ enum class COMMAND_IPC_MSG {
 enum class TYPE_ARRAY {
     TYPE_INT = 0b1,
     TYPE_FLOAT,
-    TYPE_COMPLEX
+    TYPE_COMPLEX_FLOAT
 };
 
 struct data_array {

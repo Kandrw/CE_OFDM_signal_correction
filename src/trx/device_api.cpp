@@ -16,7 +16,8 @@ static int end_while_send_samples = true;
 
 int DeviceTRX::initialization(config_device &cfg_param){
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
-    return init_device_TRX(cfg_param);
+    int status = init_device_TRX(cfg_param);
+    return status;
 }
 
 int DeviceTRX::deinitialization(){
@@ -68,6 +69,14 @@ int DeviceTRX::recv_samples(void *samples, size_t size){
     return read_to_device_buffer(samples, size);
 }
 
-
+int DeviceTRX::recv_samples(VecSymbolMod &samples, size_t size){
+    if(size == 0) {
+        read_to_device_buffer(nullptr, 0);
+    }
+    if(samples.size() < size) {
+        samples.resize(size);
+    }
+    return read_to_device_buffer((void*)&samples[0], size);
+}
 
 

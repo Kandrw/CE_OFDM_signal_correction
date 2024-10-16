@@ -140,15 +140,15 @@ VecSymbolMod modulation_QPSK(bit_sequence &bits){
                 exit(-1);
             }
             mod_symbol t1 = table_QPSK[val];
-            t1.i += 4000.f;
-            t1.q += 4000.f;
+            // t1.i += 4000.f;
+            // t1.q += 4000.f;
             samples.push_back(t1);
             mask >>=2;
             shift -= 2;
         }
         ++step;
     }
-    time_counting_end(CONSOLE);
+    time_counting_end(CONSOLE, __func__);
     for(i = 0; i < (int)samples.size(); ++i){
         print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
     }
@@ -227,7 +227,7 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
         samples.push_back(t1);
     }
     // print_log(CONSOLE, "\n");
-    time_counting_end(CONSOLE);
+    time_counting_end(CONSOLE, __func__);
     for(i = 0; i < (int)samples.size(); ++i){
         // print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
     }
@@ -301,7 +301,7 @@ VecSymbolMod modulation_QAM64(bit_sequence &bits){
     }
 
     
-    time_counting_end(CONSOLE);
+    time_counting_end(CONSOLE, __func__);
     for(i = 0; i < (int)samples.size(); ++i){
         print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
     }
@@ -472,7 +472,7 @@ bit_sequence *demodulation_QAM64(VecSymbolMod &samples){
         }
     }
     print_log(LOG, "[end %s:%d]\n", __func__, __LINE__);
-    time_counting_end(CONSOLE);
+    time_counting_end(CONSOLE, __func__);
     return bits;
 }
 
@@ -523,7 +523,7 @@ bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
     
     
     print_log(LOG, "[end %s:%d]\n", __func__, __LINE__);
-    time_counting_end(CONSOLE);
+    time_counting_end(CONSOLE, __func__);
     return bits;
 }
 

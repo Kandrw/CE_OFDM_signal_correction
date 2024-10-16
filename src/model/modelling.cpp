@@ -474,7 +474,7 @@ int test_base(){
         .param_ofdm = param_ofdm,
     };
     print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
-    VecSymbolMod samples = generate_frame_phy(data, param_phy);
+    // VecSymbolMod samples = generate_frame_phy(data, param_phy);
     return 0;
 }
 

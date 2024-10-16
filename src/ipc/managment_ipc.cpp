@@ -23,7 +23,9 @@
 
 #define FILE_SEM "semaphore"
 #define FILE_SHARED_MEMORY "."
-#define SIZE_MEMORY 20000
+// #define SIZE_MEMORY 20000
+#define SIZE_MEMORY (int)1e7
+
 
 // #define ID 1234
 // #define ID_SERVER 5678
@@ -64,6 +66,11 @@ int init_ipc() {
         return -1;
     }
     int shmid = shmget(key, SIZE_MEMORY, 0666|IPC_CREAT); 
+    if(shmid < 0) {
+        print_log(ERROR_OUT, "Error create shared memory\n");
+        perror("shmget");
+        return -1;
+    }
     segment_shared_memory = (u_char*) shmat(shmid, (void*)0, 0); 
 
     // control_ipc_sm = (msg_control_sm*)segment_shared_memory;
@@ -192,7 +199,7 @@ int full_data_arrays(std::string str,
         size_curr += 1 + arrays[i]->size_str + 4 + 1 + arrays[i]->size_array;
         if(size_curr >= SIZE_MEMORY) {
             print_log(ERROR_OUT, "The record size is larger than possible:"
-                " size shared memory = %d\n", SIZE_MEMORY);
+                " size shared memory = %d, write - %d\n", SIZE_MEMORY, size_curr);
             return size_curr;
         }
         print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
