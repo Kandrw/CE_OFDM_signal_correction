@@ -1,7 +1,7 @@
 #include "types.hpp"
 
 #include <complex.h>
-
+#if 1
 VecSymbolMod operator * (const VecSymbolMod &A, const VecSymbolMod &B) {
     VecSymbolMod C;
     if(A.size() != B.size()) {
@@ -10,8 +10,8 @@ VecSymbolMod operator * (const VecSymbolMod &A, const VecSymbolMod &B) {
     }
     for(int i = 0; i < (int)A.size(); ++i) {
         
-        mod_symbol s = {(A[i].i * B[i].i) - (A[i].q * B[i].q),
-                        (A[i].q * B[i].i) + (A[i].i * B[i].q)
+        mod_symbol s = {(A[i].real() * B[i].real()) - (A[i].imag() * B[i].imag()),
+                        (A[i].imag() * B[i].real()) + (A[i].real() * B[i].imag())
         };
         C.push_back(s);
     }
@@ -27,8 +27,8 @@ VecSymbolMod operator + (const VecSymbolMod &A, const VecSymbolMod &B) {
     }
     for(int i = 0; i < (int)A.size(); ++i) {
         
-        mod_symbol s = {A[i].i + B[i].i,
-                        A[i].q + B[i].q };
+        mod_symbol s = {A[i].real() + B[i].real(),
+                        A[i].imag() + B[i].imag() };
         C.push_back(s);
     }
     return C;
@@ -42,7 +42,7 @@ VecSymbolMod operator * (const VecSymbolMod &A, const std::vector<float> &B) {
     }
     for(int i = 0; i < (int)A.size(); ++i) {
         
-        mod_symbol s = {A[i].i * B[i], A[i].q * B[i]};
+        mod_symbol s = {A[i].real() * B[i], A[i].imag() * B[i]};
         C.push_back(s);
     }
     return C;
@@ -56,10 +56,10 @@ VecSymbolMod operator / (const VecSymbolMod &A, const VecSymbolMod &B) {
     }
     for(int i = 0; i < (int)A.size(); ++i) {
         
-        float r = ((A[i].i*B[i].i) + (A[i].q*B[i].q)) /\
-            (B[i].i*B[i].i + B[i].q*B[i].q);
-        float im = ((A[i].q*B[i].i) - (A[i].i*B[i].q)) /\
-            (B[i].i*B[i].i + B[i].q*B[i].q);
+        float r = ((A[i].real()*B[i].real()) + (A[i].imag()*B[i].imag())) /\
+            (B[i].real()*B[i].real() + B[i].imag()*B[i].imag());
+        float im = ((A[i].imag()*B[i].real()) - (A[i].real()*B[i].imag())) /\
+            (B[i].real()*B[i].real() + B[i].imag()*B[i].imag());
         
         mod_symbol s = {r, im
         };
@@ -75,7 +75,7 @@ VecSymbolMod operator / (const VecSymbolMod &A, const std::vector<float> &B) {
         exit(-1);
     }
     for(int i = 0; i < (int)A.size(); ++i) {
-        std::complex<float> a(A[i].i, A[i].q);
+        std::complex<float> a(A[i].real(), A[i].imag());
         std::complex<float> b(B[i], 0.0f);
         std::complex<float> c = a / b;
         mod_symbol s = {c.real(), c.imag()};
@@ -83,3 +83,4 @@ VecSymbolMod operator / (const VecSymbolMod &A, const std::vector<float> &B) {
     }
     return C;
 }
+#endif

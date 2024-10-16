@@ -27,7 +27,7 @@ bool check_correct_param(OFDM_params &param) {
 
 static void print_VecSymbolMod( VecSymbolMod &vec) {
     for(int i = 0; i < (int)vec.size(); ++i) {
-        print_log(CONSOLE, "%f + %fi  ", vec[i].i, vec[i].q);
+        print_log(CONSOLE, "%f + %fi  ", vec[i].real(), vec[i].q);
     }
     print_log(CONSOLE, "\n");
 }

@@ -30,7 +30,7 @@ static void print_VecSymbolMod( VecSymbolMod &vec) {
         if(i != 0 && i % 8 == 0) {
             print_log(CONSOLE,"\n");
         }
-        print_log(CONSOLE, "%f + %fi  ", vec[i].i, vec[i].q);
+        print_log(CONSOLE, "%f + %fi  ", vec[i].real(), vec[i].imag());
         
     }
     print_log(CONSOLE, "\n");
@@ -196,7 +196,7 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param) {
         }
         print_log(CONSOLE, "ofdm.size() = %d, count pilots = %d\n", ofdm.size(), pilots.size());
         print_VecSymbolMod(pilots);
-        
+
         //Добавить коррекцию канала
         
     }

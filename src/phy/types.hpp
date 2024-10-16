@@ -1,10 +1,14 @@
 #pragma once
 
+#include <complex>
 
 #include "../header.hpp"
 #include <output.hpp>
 
+
 #define CODE_GREY "../data/practice5/code_grey.bin"
+
+
 
 enum class TypeModulation{
     BPSK = 1,
@@ -15,13 +19,13 @@ enum class TypeModulation{
     // QAM1024,
     // COUNT_TYPES_MODULATION
 };
+typedef std::complex<float> mod_symbol;
 
-
-struct mod_symbol{
-    float i;/*real*/
-    float q;/*imag*/
-};
-typedef std::vector<mod_symbol> VecSymbolMod;
+// struct mod_symbol{
+//     float i;/*real*/
+//     float q;/*imag*/
+// };
+typedef std::vector<std::complex<float>> VecSymbolMod;
 
 
 struct OFDM_params{

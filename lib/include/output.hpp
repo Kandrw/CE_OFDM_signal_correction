@@ -33,8 +33,8 @@ int deinit_log();
 int write_file_bin_data(const char *filename, const void *data, const int size);
 
 void time_counting_start();
-void time_counting_end(int out);
-
+// void time_counting_end(int out);
+void time_counting_end(int out, const char *target);
 
 void print_to_file(const char *filename, 
                 const char* key, 

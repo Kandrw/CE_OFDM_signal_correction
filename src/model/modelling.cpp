@@ -48,8 +48,8 @@ VecSymbolMod add_Gaussian_noise(VecSymbolMod &samples, float dispersion){
     std::normal_distribution<float> d(0.0, dispersion);
     VecSymbolMod samples_noise;
     for (int i = 0 ; i < (int)samples.size(); i++){
-        mod_symbol t1 = {d(gen) + samples[i].i, 
-                            d(gen) + samples[i].q};
+        mod_symbol t1 = {d(gen) + samples[i].real(), 
+                            d(gen) + samples[i].imag()};
         samples_noise.push_back(t1);
     }
     return samples_noise;
@@ -91,7 +91,7 @@ float calc_Ps(int N, VecSymbolMod &S) {
 
     float sum = 0.f;
     for(int i = 0; i < (int)S.size(); ++i){
-        sum += (S[i].i * S[i].i + S[i].q * S[i].q);
+        sum += (S[i].real() * S[i].real() + S[i].imag() * S[i].imag());
     }
 
     return (float)(1.0 / (float(N))) * sum;
@@ -127,10 +127,10 @@ int calc_error(VecSymbolMod &tx, VecSymbolMod &rx) {
     float im, re;
     float interval = 1.1;
     for(int i = 0; i < (int)tx.size(); ++i) {        
-        float dist = sqrt(powf(tx[i].i - rx[i].i, 2) + powf(tx[i].q - rx[i].q, 2));
+        float dist = sqrt(powf(tx[i].real() - rx[i].real(), 2) + powf(tx[i].imag() - rx[i].imag(), 2));
         if(dist > interval) {
             // print_log(CONSOLE, "tx: %f %f, rx: %f %f\n", 
-            //     tx[i].i, tx[i].q, rx[i].i, rx[i].q);
+            //     tx[i].real(), tx[i].imag(), rx[i].real(), rx[i].imag());
 
             ce += 1;
         }
@@ -143,9 +143,9 @@ int calc_error1(VecSymbolMod &tx, VecSymbolMod &rx) {
     float im, re;
     float interval = 0.4;
     for(int i = 0; i < (int)tx.size(); ++i) {
-        im = tx[i].i - rx[i].i;
-        re = tx[i].q - rx[i].q;
-        // print_log(CONSOLE, "tx: %f %f, rx: %f %f\n", tx[i].i, tx[i].q, rx[i].i, rx[i].q);
+        im = tx[i].real() - rx[i].real();
+        re = tx[i].imag() - rx[i].imag();
+        // print_log(CONSOLE, "tx: %f %f, rx: %f %f\n", tx[i].real(), tx[i].imag(), rx[i].real(), rx[i].imag());
         // print_log(CONSOLE, "i: %f, q: %f\n", i, q);
         if( !(im < interval && im > interval * -1.0f) ) {
             ce += 1;
@@ -160,7 +160,7 @@ int calc_error1(VecSymbolMod &tx, VecSymbolMod &rx) {
 
 void print_VecSymbolMod( VecSymbolMod &vec) {
     for(int i = 0; i < (int)vec.size(); ++i) {
-        print_log(CONSOLE, "%f + %fi  ", vec[i].i, vec[i].q);
+        print_log(CONSOLE, "%f + %fi  ", vec[i].real(), vec[i].imag());
     }
     print_log(CONSOLE, "\n");
 }
@@ -188,7 +188,7 @@ void model_calc_P_SER() {
         VecSymbolMod r = samples + n;
    
         print_log(CONSOLE, "%d\n", i);
-        print_log(CONSOLE, "Ps: %f, s: %f %f\n", Ps, samples[0].i, samples[0].q);
+        print_log(CONSOLE, "Ps: %f, s: %f %f\n", Ps, samples[0].real(), samples[0].imag());
         
         print_log(CONSOLE, "h2 = %f\n", h2);        
         
@@ -298,14 +298,14 @@ bit_sequence *decode_soft_solutions(VecSymbolMod &samples_rx, float Q2, bool deb
     for(int i = 0; i < N; ++i) {
 
         u_char bits = 0;
-        float B0_r0 = calc_P_y_b(-3.f, 1.f, samples_rx[i].i, 0, Q2);
-        float B0_r1 = calc_P_y_b(-1.f, 3.f, samples_rx[i].i, 1, Q2);
-        float B1_r0 = calc_P_y_b(-3.f, -1.f, samples_rx[i].i, 0, Q2);
-        float B1_r1 = calc_P_y_b(1.f, 3.f, samples_rx[i].i, 1, Q2);
-        float B2_r0 = calc_P_y_b(1.f, -3.f, samples_rx[i].q, 0, Q2);
-        float B2_r1 = calc_P_y_b(3.f, -1.f, samples_rx[i].q, 1, Q2);
-        float B3_r0 = calc_P_y_b(-1.f, -3.f, samples_rx[i].q, 0, Q2);
-        float B3_r1 = calc_P_y_b(1.f, 3.f, samples_rx[i].q, 1, Q2);
+        float B0_r0 = calc_P_y_b(-3.f, 1.f, samples_rx[i].real(), 0, Q2);
+        float B0_r1 = calc_P_y_b(-1.f, 3.f, samples_rx[i].real(), 1, Q2);
+        float B1_r0 = calc_P_y_b(-3.f, -1.f, samples_rx[i].real(), 0, Q2);
+        float B1_r1 = calc_P_y_b(1.f, 3.f, samples_rx[i].real(), 1, Q2);
+        float B2_r0 = calc_P_y_b(1.f, -3.f, samples_rx[i].imag(), 0, Q2);
+        float B2_r1 = calc_P_y_b(3.f, -1.f, samples_rx[i].imag(), 1, Q2);
+        float B3_r0 = calc_P_y_b(-1.f, -3.f, samples_rx[i].imag(), 0, Q2);
+        float B3_r1 = calc_P_y_b(1.f, 3.f, samples_rx[i].imag(), 1, Q2);
 
         if(B0_r0 > B0_r1) bits = 0b0000;
         else bits = 0b1000;
@@ -329,7 +329,7 @@ bit_sequence *decode_soft_solutions(VecSymbolMod &samples_rx, float Q2, bool deb
         }
         if(debug && 0) {
             print_log(CONSOLE, "[%d] r[i](i,q) = (%f %f)\n", 
-                i, samples_rx[i].i, samples_rx[i].q);
+                i, samples_rx[i].real(), samples_rx[i].imag());
             print_log(CONSOLE, "B0=0: %f, B0=1: %f\n", B0_r0, B0_r1);
             print_log(CONSOLE, "B1=0: %f, B1=1: %f\n", B1_r0, B1_r1);
             print_log(CONSOLE, "B2=0: %f, B2=1: %f\n", B2_r0, B2_r1);
@@ -393,7 +393,7 @@ void model_soft_solutions() {
         VecSymbolMod n = generate_noise_by_SNR(samples.size(), Q2);
         VecSymbolMod r = samples + n;
         // print_log(CONSOLE, "%f %f - %f %f\n",
-        //     samples[0].i, samples[0].q, r[0].i, r[0].q);
+        //     samples[0].real(), samples[0].imag(), r[0].real(), r[0].imag());
 #if 0
         write_file_bin_data(
                     "../data/practiec5/s.bin", &samples[0], 
@@ -506,7 +506,7 @@ int model_relay_channel() {
         VecSymbolMod r3 = r2 / h;
         r2.clear();
         print_log(CONSOLE, "%d\n", i);
-        print_log(CONSOLE, "Ps: %f, s: %f %f\n", Ps, samples[0].i, samples[0].q);
+        print_log(CONSOLE, "Ps: %f, s: %f %f\n", Ps, samples[0].real(), samples[0].imag());
         
         print_log(CONSOLE, "h2 = %f\n", h2);        
         count_err = calc_error(samples, r);

@@ -129,9 +129,12 @@ int write_file_bin_data(const char *filename, const void *data, const int size){
 void time_counting_start(){
     start = time(NULL);
 }
-void time_counting_end(int out){
+void time_counting_end(int out, const char *target){
     double seconds_time = difftime(time(NULL), start);
-    print_log(out, "[seconds = %f]\n", seconds_time);
+    if(target)
+        print_log(out, "[seconds = %f] %s\n", seconds_time, target);
+    else
+        print_log(out, "[seconds = %f]\n", seconds_time);
 }
 
 void print_to_file(const char *filename, const char* key, const char* format, ...){

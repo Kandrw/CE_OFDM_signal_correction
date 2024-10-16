@@ -15,7 +15,7 @@ import socket
 import struct
 
 
-
+import matplotlib.animation as animation
 
 def EXIT(show = 0):
     #plt.ion()
@@ -268,15 +268,13 @@ TYPE_COMPLEX 3
 
 TYPES_ARRAYS = {
     1 : np.int32,
-    2 : np.float32
-
+    2 : np.float32,
+    3 : np.complex64
 }
 
 
 def parse_shared_memory():
     data = shm.read()
-    # print("Данные: ", data.decode('utf-8'))
-    print("Данные: ", data[:60])
     header = []
     header.append(struct.unpack("=I",data[:4])[0])
     
@@ -302,24 +300,15 @@ def parse_shared_memory():
         step += arrays_data[2]
 
         header.append(arrays_data)
-    print("header:", header)
+    # print("header:", header)
 
 
     return header
-    # header.append(struct.unpack(">c",data[4:int(header[0])] ))
-    
-    # header.append(int(data[4:header[0]]))
-    # header.append(int(data[1]))
-
-
-    print("header:", header)
 
 
 def processing_commands_test():
 
     init_ipc()
-    
-    # fd_socket.connect((SERVER_ADDRESS, PORT))
     while(1):
         recv_ipc()
         parse_shared_memory()
@@ -356,15 +345,70 @@ def VIEW_DATA_PLOT_XY(param):
     
     plt.show()
 
+
+def command_ListenData(param):
+    
+    fig = plt.figure(1, figsize=(10, 10))
+    ax1 = fig.add_subplot(1, 1, 1)
+    def init():
+        pass
+    send_ipc(18, 0, 0, 0)
+    def ListenData(e):
+
+
+        msg_control = recv_ipc()
+        if(msg_control[0] == 10):
+            command_end(None)
+        arr = parse_shared_memory()
+        
+        title = arr[1]
+        count_arr = arr[2]
+
+        ax1.clear()
+        plt.title(title)
+        if(count_arr == 1):
+            arry = arr[3]
+            plt.ylabel(arry[1])
+            # if()
+            # print("type arr: ", type(arry[4]))
+            if( np.iscomplexobj(arry[4])):
+                plt.plot(arry[4].real)
+            else:
+
+                plt.plot(arry[4])
+        if(count_arr == 2):
+            arrx = arr[3]
+            arry = arr[4]
+            plt.ylabel(arry[1])
+            plt.xlabel(arrx[1])
+            
+            plt.plot(arrx[4], arry[4])
+        send_ipc(18, 0, 0, 0)
+        
+    # ani = animation.FuncAnimation(fig, ListenData, interval=100,frames=None)
+    ani = animation.FuncAnimation(fig, ListenData,
+        interval=1,cache_frame_data=False)
+    # ani.save("test.png")
+
+    plt.show()
+
+
 list_commands = {
     10 : command_end,
-    11 : VIEW_DATA_PLOT_XY
+    11 : VIEW_DATA_PLOT_XY,
+    12 : command_ListenData
 }
 
 
 
-def processing_commands():
+    
 
+
+def processing_commands():
+    # if 1:
+
+
+    #     return 
     init_ipc()
     # fd_socket.connect((SERVER_ADDRESS, PORT))
     while(1):
@@ -375,7 +419,7 @@ def processing_commands():
         # time.sleep(1)
         # send_ipc(123, 32, 44, "f")
 
-    
+ 
 
 
 

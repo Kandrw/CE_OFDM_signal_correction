@@ -25,7 +25,7 @@ while getopts "dcma:r:vo:" OPTION; do
         cmake $BUILD_FLAGS ..
     ;;
     m)
-        cd $BUILD_DIR
+        # cd $BUILD_DIR
         make $COUNT_THREAD
         # exit;
     ;;

@@ -140,8 +140,8 @@ VecSymbolMod modulation_QPSK(bit_sequence &bits){
                 exit(-1);
             }
             mod_symbol t1 = table_QPSK[val];
-            // t1.i += 4000.f;
-            // t1.q += 4000.f;
+            // t1.real() += 4000.f;
+            // t1.imag() += 4000.f;
             samples.push_back(t1);
             mask >>=2;
             shift -= 2;
@@ -150,7 +150,7 @@ VecSymbolMod modulation_QPSK(bit_sequence &bits){
     }
     time_counting_end(CONSOLE, __func__);
     for(i = 0; i < (int)samples.size(); ++i){
-        print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
+        print_log(LOG_DATA, "%f + %fi\t", samples[i].real(), samples[i].imag());
     }
     print_log(LOG, "\n");
     print_log(LOG, "vector size = %d\n", samples.size());
@@ -214,22 +214,22 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
         
         mod_symbol t1 = {Y * 2.f - 3.f, q * 2.f - 3.f};
 
-        // print_log(LOG, "\t%f %f\n", t1.i, t1.q);
+        // print_log(LOG, "\t%f %f\n", t1.real(), t1.imag());
         // print_log( CONSOLE, "0b%d%d%d%d,\n", g1, g2, g3, g4);
         // if(i %  == 0){
         //     print_log(CONSOLE, "\n");
         // }
         // print_log( CONSOLE, "%d%d%d%d - %f + %f\n", 
-        //     g1, g2, g3, g4, t1.i, t1.q);
+        //     g1, g2, g3, g4, t1.real(), t1.imag());
         // print_log( CONSOLE, "{ %f, %f },\n", 
-        //     g1, g2, g3, g4, t1.i, t1.q);
+        //     g1, g2, g3, g4, t1.real(), t1.imag());
 
         samples.push_back(t1);
     }
     // print_log(CONSOLE, "\n");
     time_counting_end(CONSOLE, __func__);
     for(i = 0; i < (int)samples.size(); ++i){
-        // print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
+        // print_log(LOG_DATA, "%f + %fi\t", samples[i].real(), samples[i].imag());
     }
     // print_log(LOG, "\n");
     // print_log(LOG, "vector size = %d\n", samples.size());
@@ -303,7 +303,7 @@ VecSymbolMod modulation_QAM64(bit_sequence &bits){
     
     time_counting_end(CONSOLE, __func__);
     for(i = 0; i < (int)samples.size(); ++i){
-        print_log(LOG_DATA, "%f + %fi\t", samples[i].i, samples[i].q);
+        print_log(LOG_DATA, "%f + %fi\t", samples[i].real(), samples[i].imag());
     }
     print_log(LOG, "\n");
     print_log(LOG, "vector size = %d\n", samples.size());
@@ -325,8 +325,10 @@ bool symbol_cmp(float a, float b, float error){
 /*comparison taking into account the error*/
 bool mod_symbol_cmp(mod_symbol &A, mod_symbol &B, float error){
     // print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
-    return symbol_cmp(A.i, B.i, error) && symbol_cmp(A.q, B.q, error);
+    return symbol_cmp(A.real(), B.real(), error) && symbol_cmp(A.imag(), B.imag(), error);
 }
+
+
 
 bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
     bit_sequence *data = new bit_sequence;
@@ -342,9 +344,9 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
         int pos = 0;
         for(int i2 = 0; i2 < (int)ARRAY_SIZE(table_QAM16); ++i2) {
             
-            float dist = sqrt(powf(table_QAM16[i2].i - samples[i].i, 2) + powf(table_QAM16[i2].q - samples[i].q, 2));
+            float dist = sqrt(powf(table_QAM16[i2].real() - samples[i].real(), 2) + powf(table_QAM16[i2].imag() - samples[i].imag(), 2));
             // print_log(CONSOLE, "dist: %f, %f %f - %f - %f\n", dist,
-            //     samples[i].i, samples[i].q, table_QAM16[i2].i, table_QAM16[i2].q);
+            //     samples[i].real(), samples[i].imag(), table_QAM16[i2].real(), table_QAM16[i2].imag());
             // if(mod_symbol_cmp(samples[i], table_QAM16[i2], err_interval)) {
             if(dist <= min_dist) {
                 conD = 1;
@@ -352,13 +354,13 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
                 pos = i2;
             } else {
                 // print_log(CONSOLE, "%f %f - %f - %f\n", 
-                // samples[i].i, samples[i].q, table_QAM16[i2].i, table_QAM16[i2].q);
+                // samples[i].real(), samples[i].imag(), table_QAM16[i2].real(), table_QAM16[i2].imag());
                 // print_log(CONSOLE, "dist: %f, %f %f - %f - %f\n", dist,
-                // samples[i].i, samples[i].q, table_QAM16[i2].i, table_QAM16[i2].q);
+                // samples[i].real(), samples[i].imag(), table_QAM16[i2].real(), table_QAM16[i2].imag());
             }
         }
         // print_log(CONSOLE, "min_dist: %f, pos - %d, %f %f - %f - %f\n", min_dist, pos,
-        //         samples[i].i, samples[i].q, table_QAM16[pos].i, table_QAM16[pos].q);
+        //         samples[i].real(), samples[i].imag(), table_QAM16[pos].real(), table_QAM16[pos].imag());
         // if(min_dist <= err_interval) {
             conD = 1;       
             switch(con_state) {
@@ -426,6 +428,8 @@ bit_sequence *demodulation_QAM64(VecSymbolMod &samples){
     for(i = 0; i < (int)samples.size(); ++i){
         if_decode_symbol = 0;
         for(j = 0; j < (int)ARRAY_SIZE(table_QAM64); ++j){
+#if 0
+            нужно переделать сравнение
             if(mod_symbol_cmp(samples[i], table_QAM64[j], error_cmp)){
                 u_char bits_data = j;
                 if_decode_symbol = 1;
@@ -466,9 +470,10 @@ bit_sequence *demodulation_QAM64(VecSymbolMod &samples){
                 }
                 break;
             }
+#endif
         }
         if(!if_decode_symbol){
-            print_log(CONSOLE, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].i, samples[i].q);
+            print_log(CONSOLE, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].real(), samples[i].imag());
         }
     }
     print_log(LOG, "[end %s:%d]\n", __func__, __LINE__);
@@ -516,7 +521,7 @@ bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
             }
         }
         if(!if_decode_symbol){
-            print_log(ERROR_OUT, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].i, samples[i].q);
+            print_log(ERROR_OUT, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].real(), samples[i].imag());
         }
 
     }

@@ -269,7 +269,7 @@ void print_cfg1(stream_cfg &txcfg){
 }
 void print_VecSymbolMod1( VecSymbolMod &vec) {
     for(int i = 0; i < (int)vec.size(); ++i) {
-        print_log(CONSOLE, "%f + %fi  ", vec[i].i, vec[i].q);
+        print_log(CONSOLE, "%f + %fi  ", vec[i].real(), vec[i].imag());
     }
     print_log(CONSOLE, "\n");
 }
