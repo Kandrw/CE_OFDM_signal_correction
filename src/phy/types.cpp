@@ -9,11 +9,7 @@ VecSymbolMod operator * (const VecSymbolMod &A, const VecSymbolMod &B) {
         exit(-1);
     }
     for(int i = 0; i < (int)A.size(); ++i) {
-        
-        mod_symbol s = {(A[i].real() * B[i].real()) - (A[i].imag() * B[i].imag()),
-                        (A[i].imag() * B[i].real()) + (A[i].real() * B[i].imag())
-        };
-        C.push_back(s);
+        C.push_back(A[i] * B[i]);
     }
     
     return C;
@@ -26,10 +22,7 @@ VecSymbolMod operator + (const VecSymbolMod &A, const VecSymbolMod &B) {
         exit(-1);
     }
     for(int i = 0; i < (int)A.size(); ++i) {
-        
-        mod_symbol s = {A[i].real() + B[i].real(),
-                        A[i].imag() + B[i].imag() };
-        C.push_back(s);
+        C.push_back(A[i] + B[i]);
     }
     return C;
 }
@@ -41,9 +34,7 @@ VecSymbolMod operator * (const VecSymbolMod &A, const std::vector<float> &B) {
         exit(-1);
     }
     for(int i = 0; i < (int)A.size(); ++i) {
-        
-        mod_symbol s = {A[i].real() * B[i], A[i].imag() * B[i]};
-        C.push_back(s);
+        C.push_back(A[i] * B[i]);
     }
     return C;
 }
@@ -55,15 +46,7 @@ VecSymbolMod operator / (const VecSymbolMod &A, const VecSymbolMod &B) {
         exit(-1);
     }
     for(int i = 0; i < (int)A.size(); ++i) {
-        
-        float r = ((A[i].real()*B[i].real()) + (A[i].imag()*B[i].imag())) /\
-            (B[i].real()*B[i].real() + B[i].imag()*B[i].imag());
-        float im = ((A[i].imag()*B[i].real()) - (A[i].real()*B[i].imag())) /\
-            (B[i].real()*B[i].real() + B[i].imag()*B[i].imag());
-        
-        mod_symbol s = {r, im
-        };
-        C.push_back(s);
+        C.push_back(A[i] / B[i]);
     }
     return C;
 }
@@ -75,12 +58,21 @@ VecSymbolMod operator / (const VecSymbolMod &A, const std::vector<float> &B) {
         exit(-1);
     }
     for(int i = 0; i < (int)A.size(); ++i) {
-        std::complex<float> a(A[i].real(), A[i].imag());
-        std::complex<float> b(B[i], 0.0f);
-        std::complex<float> c = a / b;
-        mod_symbol s = {c.real(), c.imag()};
-        C.push_back(s);
+        mod_symbol B_c = mod_symbol(B[i], 0);
+        C.push_back(A[i] / B_c);
     }
     return C;
 }
+
+void print_VecSymbolMod( VecSymbolMod &vec, int log_level) {
+    for(int i = 0; i < (int)vec.size(); ++i) {
+        if(i != 0 && i % 8 == 0) {
+            print_log(log_level, "\n");
+        }
+        print_log(log_level, "%f + %fi  ", vec[i].real(), vec[i].imag());
+        
+    }
+    print_log(log_level, "\n");
+}
+
 #endif

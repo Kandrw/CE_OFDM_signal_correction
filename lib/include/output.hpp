@@ -6,6 +6,8 @@
 #define ERROR_OUT 5
 #define LOG_DEVICE 6
 
+#define DEBUG_LINE print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+
 // class Output{
 // public:
 //     Output();
@@ -39,6 +41,7 @@ void time_counting_end(int out, const char *target);
 void print_to_file(const char *filename, 
                 const char* key, 
                 const char* format, ...);
+
 
 
 

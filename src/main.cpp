@@ -37,6 +37,7 @@
 #include "model/modelling.hpp"
 #include "loaders/load_data.hpp"
 #include "ipc/managment_ipc.hpp"
+#include "phy/ofdm_modulation.hpp"
 
 #endif
 
@@ -49,6 +50,7 @@ enum class ARGV_CONSOLE: int {
     ARGV_IP_DEVICE = 1,
     ARGV_FILE_DATA,
     ARGV_TARGET_PROGRAM,
+    ARGV_FILE_CONFIG,
     ARGV_MAX
 };
 
@@ -57,13 +59,45 @@ enum class ARGV_CONSOLE: int {
 
 // };
 
+
+
+struct config_program {
+    std::string file_log;
+
+};
 void print_input_param() {
-    print_log(CONSOLE,
+    printf(
         "ARGV: "
         "<ip> <filename data> <target>"
         "\n"
     );
 }
+
+config_program configure(int argc, char *argv[]) {
+    if(argc < static_cast<int>(ARGV_CONSOLE::ARGV_MAX)){
+        print_input_param();
+        exit(0);
+    }
+    const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
+    std::ifstream file(file_conf);
+    config_program param; 
+    if(!file.is_open()) {
+        printf("Error open: %s\n", file_conf);
+        return param;
+    }
+    std::string buffer;
+    file >> buffer;
+    if(buffer == "log_file") {
+        file >> param.file_log;
+        std::cout<<param.file_log<<"\n";
+    }
+    file.close();
+    return param;
+}
+
+
+
+
 
 int target(int argc, char *argv[]) {
     if(argc == static_cast<int>(ARGV_CONSOLE::ARGV_MAX) + 1) {
@@ -83,8 +117,10 @@ int test_ipc(int argc, char *argv[]);
 
 
 int main(int argc, char *argv[]){
+    config_program param = configure(argc, argv);
     srand(time(NULL));
-    init_log(LOG_FILE);
+
+    init_log(param.file_log.c_str());
 
     std::map<std::string, std::function<int(int, char**)>> target_exec = {
         {"model_practice", target},
@@ -98,10 +134,7 @@ int main(int argc, char *argv[]){
         {"test_ipc", test_ipc}
     };
 
-    if(argc < static_cast<int>(ARGV_CONSOLE::ARGV_MAX)){
-        print_input_param();
-        return -1;
-    }
+
     auto find_taget_exec = target_exec.find(
         argv[static_cast<int>(ARGV_CONSOLE::ARGV_TARGET_PROGRAM)]);
     if(find_taget_exec != target_exec.end()) {
@@ -128,9 +161,11 @@ int ofdm_model(int argc, char *argv[]){
     // }
     const char filename[] = "../data/data_test.txt";// = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
 
-#define TEST_DATA 2
+#define TEST_DATA 0
+
 #if TEST_DATA == 0
-    char test_data[] = "Test message ";
+    char test_data[] = "Test m";
+    
 #elif TEST_DATA == 1   
     char test_data[90];
     for(int i = 0; i < sizeof(test_data); ++i){
@@ -165,10 +200,10 @@ int ofdm_model(int argc, char *argv[]){
     OFDM_params param_ofdm = {
         .count_subcarriers = 64,
         .pilot = {5, 5},
-        .step_RS = 3,
-        .def_interval = 10,
-        .cyclic_prefix = 20,
-
+        .step_RS = 8,
+        .def_interval = 16,
+        .cyclic_prefix = 15,
+        .power = 3000,
     };
     ParamsPhy param_phy = {
         .type_modulation = TypeModulation::QPSK,
@@ -177,10 +212,24 @@ int ofdm_model(int argc, char *argv[]){
     print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
     OFDM_symbol samples = generate_frame_phy(data, param_phy);
     // exit(0);
+    // addPowerOFDM(samples, param_ofdm.power);
+    VecSymbolMod s = OFDM_convertion_one_thread(samples);
+    // modelling_channel(s);
+    samples = samples_join_OFDM(s, 
+        param_ofdm.count_subcarriers + param_ofdm.cyclic_prefix, s.size());
+
+    VecSlotsOFDM slots = create_slots(samples);
+
+
 
     bit_sequence *read_data = decode_frame_phy(samples, param_phy);
     
     if(read_data) {
+        for(int i = 0; i < data.size; ++i) {
+            print_log(CONSOLE, "%u - %u\n", data.buffer[i], read_data->buffer[i]);
+        }
+        int count_error = calc_bit_error(data, *read_data);
+        print_log(CONSOLE, "count error = %d/%d\n", count_error, read_data->size * 8);
         print_log(LOG_DATA, "read_data: size = %d, data: %s\n", read_data->size, read_data->buffer);
         print_log(CONSOLE, "input size: %d, output size: %d\n", data.size, read_data->size);
         print_log(CONSOLE, "End %s\n", __func__);
@@ -401,7 +450,12 @@ int test_TX(int argc, char *argv[]){
         return -1;
     }
     OFDM_params param_ofdm = {
-
+        .count_subcarriers = 64,
+        .pilot = {5, 5},
+        .step_RS = 8,
+        .def_interval = 16,
+        .cyclic_prefix = 15,
+        .power = 3000,
     };
     ParamsPhy param_phy = {
         .type_modulation = TypeModulation::QPSK,
@@ -410,6 +464,7 @@ int test_TX(int argc, char *argv[]){
     print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
     OFDM_symbol samples = generate_frame_phy(data, param_phy);
     // exit(0);
+    VecSlotsOFDM slots = create_slots(samples);
 
     config_device cfg1 = {
         ip_device,
@@ -432,6 +487,8 @@ int test_TX(int argc, char *argv[]){
     print_log(LOG, "[%s:%d] TX: result = %d\n", __func__, __LINE__, result);
 #endif
     // DeviceTRX::while_send_samples((void*)&samples[0], samples.size());
+    DeviceTRX::while_send_samples(slots);
+    
     while(1){}
     DeviceTRX::deinitialization();
     
@@ -603,7 +660,7 @@ int realtime_RX(int argc, char *argv[]) {
 
         data.buffer = read_file_data(filename, &data.size);
         std::vector<data_array*> arr;
-        OFDM_symbol samples = generate_frame_phy(data, param_phy);
+        // OFDM_symbol samples = generate_frame_phy(data, param_phy);
         std::string str = "Test complex";
         data_array d2;// = data_array(str.size(), (const u_char*)str.c_str(), 8 * samples.size(), 
             //static_cast<u_char>(TYPE_ARRAY::TYPE_COMPLEX_FLOAT), (u_char*)&samples[0]);

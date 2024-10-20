@@ -330,6 +330,7 @@ def VIEW_DATA_PLOT_XY(param):
     title = arr[1]
     count_arr = arr[2]
     plt.title(title)
+    # plt.ylim(-2000, 2000)
     if(count_arr == 1):
         arry = arr[3]
         plt.ylabel(arry[1])
@@ -350,6 +351,9 @@ def command_ListenData(param):
     
     fig = plt.figure(1, figsize=(10, 10))
     ax1 = fig.add_subplot(1, 1, 1)
+    # ax.set_xlim(0, 2 * np.pi)  # Ограничиваем ось x от 0 до 2π
+    # ax.set_ylim(-1.5, 1.5) 
+    
     def init():
         pass
     send_ipc(18, 0, 0, 0)
@@ -366,6 +370,7 @@ def command_ListenData(param):
 
         ax1.clear()
         plt.title(title)
+        plt.ylim(-2000, 2000)
         if(count_arr == 1):
             arry = arr[3]
             plt.ylabel(arry[1])
@@ -373,6 +378,8 @@ def command_ListenData(param):
             # print("type arr: ", type(arry[4]))
             if( np.iscomplexobj(arry[4])):
                 plt.plot(arry[4].real)
+                # plt.plot(arry[4].real, arry[4].imag)
+
             else:
 
                 plt.plot(arry[4])

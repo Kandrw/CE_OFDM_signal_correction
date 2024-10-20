@@ -101,7 +101,7 @@ set_target_properties(iio_26 PROPERTIES
 target_link_libraries(program iio_26)
 endif()
 
-target_link_libraries(program output)
+target_link_libraries(program output fftw3f)
 
 
 

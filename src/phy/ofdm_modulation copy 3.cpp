@@ -8,7 +8,6 @@
 
 #define FAILED exit(-1)
 
-#define PI 3.141592
 bool check_correct_param(OFDM_params &param) {
     u_int16_t sub_no_def = param.count_subcarriers - param.def_interval;
     if(param.count_subcarriers == 0) {
@@ -29,7 +28,16 @@ bool check_correct_param(OFDM_params &param) {
     // }
 }
 
-
+static void print_VecSymbolMod( VecSymbolMod &vec) {
+    for(int i = 0; i < (int)vec.size(); ++i) {
+        if(i != 0 && i % 8 == 0) {
+            print_log(CONSOLE,"\n");
+        }
+        print_log(CONSOLE, "%f + %fi  ", vec[i].real(), vec[i].imag());
+        
+    }
+    print_log(CONSOLE, "\n");
+}
 
 #define TO_INT(x) (static_cast<int>(x))
 
@@ -100,12 +108,10 @@ OFDM_symbol OFDM_modulator(VecSymbolMod samples, OFDM_params &param) {
     VecSymbolMod ofdm;
     int pos_def_interval = BEGIN;
     int index_step_data = 0;
-    int count_rs = count_sub_no_defi / (param.step_RS + 1) + 1;
+    int count_rs = count_sub_no_defi / (param.step_RS + 1);
     // int size_block_data = (count_sub_no_defi - count_rs) + 
     //     (count_sub_no_defi % param.step_RS);
     int size_block_data = count_sub_no_defi - count_rs;
-    print_log(LOG_DATA, "tx data [ %d ]:\n", samples.size());
-    print_VecSymbolMod(samples);
     print_log(CONSOLE, "count_rs = %d, count_sub_no_defi = %d"
         ", size_block_data = %d\n", 
         count_rs, count_sub_no_defi, size_block_data);
@@ -113,13 +119,12 @@ OFDM_symbol OFDM_modulator(VecSymbolMod samples, OFDM_params &param) {
     bool fill_symbol_and_end = false;
     int step;
     int block;
-    int con_add = 0;
     fftwf_complex* out;
     fftwf_complex* in;
     fftwf_plan plan;
     VecSymbolMod ofdm_ifft(count_sub_no_defi);
     while(running) {
-        print_log(LOG_DATA, "[%s:%d] con state = %d\n", __func__, __LINE__, con);
+        print_log(LOG, "[%s:%d] con state = %d\n", __func__, __LINE__, con);
         switch (con)
         {
         case TO_INT(OFDM_STATE::EXIT):
@@ -149,81 +154,46 @@ OFDM_symbol OFDM_modulator(VecSymbolMod samples, OFDM_params &param) {
             con = TO_INT(OFDM_STATE::FILL_SYMBOL);
             break;
         case TO_INT(OFDM_STATE::ADD_DEF_INTERVAL):
-            print_log(LOG_DATA, "[%d] No def interval:\n", __LINE__);
-            print_VecSymbolMod(ofdm);
             ofdm.insert(ofdm.begin(), def_interval.begin(), def_interval.end());
-            print_log(LOG_DATA, "add def size = %d\n", ofdm.size());
+            
             ofdm.insert(ofdm.end(), 
                 def_interval.begin(), def_interval.end());
             con = TO_INT(OFDM_STATE::ADD_OFDM_SYMBOL_TO_LIST_AND_CLEAR);
-            print_log(LOG_DATA, "add def 2 size = %d\n", ofdm.size());
+            // switch (pos_def_interval)
+            // {
+            // case BEGIN:
+            //     con = TO_INT(OFDM_STATE::FILL_SYMBOL);
+            //     pos_def_interval = END;
+            //     break;
+            // case END:
+            //     con = TO_INT(OFDM_STATE::ADD_OFDM_SYMBOL_TO_LIST_AND_CLEAR);
+            //     pos_def_interval = BEGIN;
+            //     break;
+            // default:
+            //     break;
+            // }
             break;
         case TO_INT(OFDM_STATE::FILL_SYMBOL):
             block = size_block_data;
-            
-            con_add = 0;
-            while(ofdm.size() < count_sub_no_defi) {
-                switch (con_add)
-                {
-                case 0:
-                    
-                    ofdm.push_back(param.pilot);
-                    print_log(CONSOLE, "add pilot - %d\n", ofdm.size());
-                    con_add = 1;
-                    break;
-                case 1:
-                
-                    // if(block < param.step_RS) {
-                    //     step = block;
-                    // } else {
-                    //     step = param.step_RS;
-                    // }
-                    // if(step > 0) {
-                    //     ofdm.insert(ofdm.end(), 
-                    //         samples.begin() + index_step_data, 
-                    //         samples.begin() + index_step_data + step);
-                    // }
-                    // index_step_data += step;
-                    // block -= (step );
-                    if(count_sub_no_defi - ofdm.size() < param.step_RS) {
-                        step = count_sub_no_defi - ofdm.size();
-                    } else {
-                        step = param.step_RS;
-                    }
-                    if(step > 0) {
-                        ofdm.insert(ofdm.end(), 
-                            samples.begin() + index_step_data, 
-                            samples.begin() + index_step_data + step);
-                        index_step_data += step;
-                        block -= (step );
-                    }
-                    print_log(CONSOLE, "add data[%d] - %d\n", step, ofdm.size());
-                    con_add = 0;
-                    break;
-                default:
-                    break;
+            for(int i = 0; i < count_rs; ++i) {
+                print_log(LOG, "\tblock = %d, step = %d, ofdm.size() = %d\n",
+                block, step, ofdm.size());
+                ofdm.push_back(param.pilot);
+                if(block < param.step_RS) {
+                    step = block;
+                } else {
+                    step = param.step_RS;
                 }
+                if(step > 0) {
+                    ofdm.insert(ofdm.end(), 
+                        samples.begin() + index_step_data, 
+                        samples.begin() + index_step_data + step);
+                }
+                print_log(LOG, "\t[%d]step = %d, ofdm.size() = %d\n", i, step, ofdm.size());
+                index_step_data += step;
+                block -= (step );
             }
-
-            // for(int i = 0; i < count_rs; ++i) {
-            //     print_log(LOG, "\tblock = %d, step = %d, ofdm.size() = %d\n",
-            //     block, step, ofdm.size());
-            //     ofdm.push_back(param.pilot);
-            //     if(block < param.step_RS) {
-            //         step = block;
-            //     } else {
-            //         step = param.step_RS;
-            //     }
-            //     if(step > 0) {
-            //         ofdm.insert(ofdm.end(), 
-            //             samples.begin() + index_step_data, 
-            //             samples.begin() + index_step_data + step);
-            //     }
-            //     print_log(LOG, "\t[%d]step = %d, ofdm.size() = %d\n", i, step, ofdm.size());
-            //     index_step_data += step;
-            //     block -= (step );
-            // }
-            print_log(LOG_DATA, "new size = %d\n", ofdm.size());
+            print_log(LOG, "new size = %d\n", ofdm.size());
             // ofdm_ifft
             out = fftwf_alloc_complex(ofdm.size());
             in = reinterpret_cast<fftwf_complex*>(ofdm.data());
@@ -232,14 +202,16 @@ OFDM_symbol OFDM_modulator(VecSymbolMod samples, OFDM_params &param) {
             fftwf_execute(plan);
 
             for (int i = 0; i < ofdm.size(); ++i) {
+                // out[i][0] /= ofdm.size();
+                // out[i][1] /= ofdm.size();
                 ofdm_ifft[i] = mod_symbol(out[i][0] /= ofdm.size(),
                                           out[i][1] /= ofdm.size());
                 // ofdm_ifft[i] = mod_symbol(out[i][0],
                 //                           out[i][1]);
-                print_log(LOG_DATA, "%f %f\n", ofdm_ifft[i].real(), ofdm_ifft[i].imag());
+                print_log(CONSOLE, "%f %f\n", ofdm_ifft[i].real(), ofdm_ifft[i].imag());
             }
-            print_log(LOG_DATA, "orig: %d, new: %d\n", ofdm.size(), ofdm_ifft.size());
-            ofdm = ofdm_ifft;
+            print_log(CONSOLE, "orig: %d, new: %d\n", ofdm.size(), ofdm_ifft.size());
+            // ofdm = ofdm_ifft;
             fftwf_destroy_plan(plan);
             fftwf_free(out);
             con = TO_INT(OFDM_STATE::ADD_DEF_INTERVAL);
@@ -253,6 +225,7 @@ OFDM_symbol OFDM_modulator(VecSymbolMod samples, OFDM_params &param) {
             }
             ofdms.size += 1;
             add_cyclic_prefix(ofdm, param.cyclic_prefix);
+            print_log(CONSOLE, "=========ofdm.size() = %d\n", ofdm.size());
             ofdms.symbol.push_back(ofdm);
             print_VecSymbolMod(ofdm);
             ofdm.clear();
@@ -293,14 +266,10 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param) {
     // delete_cyclic_prefix(samples)
     int count_sub_no_defi = 
         param.count_subcarriers - param.def_interval * 2;
-    int count_rs = count_sub_no_defi / (param.step_RS + 1) + 1;
+    int count_rs = count_sub_no_defi / (param.step_RS + 1);
     int size_block_data = count_sub_no_defi - count_rs;
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
     VecSymbolMod rx;
-    fftwf_complex* out;
-    fftwf_complex* in;
-    fftwf_plan plan;
-    VecSymbolMod ofdm_fft(count_sub_no_defi);
     for(int i = 0; i < samples.size; ++i) {
         VecSymbolMod &ofdm = samples.symbol[i];
         delete_cyclic_prefix(ofdm, param.cyclic_prefix);
@@ -310,23 +279,6 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param) {
         VecSymbolMod pilots_tx(count_rs, param.pilot);
         VecSymbolMod pilots_rx;
         int step_pilot = 1 + param.step_RS;
-
-        out = fftwf_alloc_complex(ofdm.size());
-        in = reinterpret_cast<fftwf_complex*>(ofdm.data());
-        plan = fftwf_plan_dft_1d(ofdm.size(),
-                in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-        fftwf_execute(plan);
-        for (int i = 0; i < ofdm.size(); ++i) {
-            ofdm_fft[i] = mod_symbol(out[i][0] /= ofdm.size(),
-                                        out[i][1] /= ofdm.size());
-            print_log(LOG_DATA, "%f %f\n", 
-            ofdm_fft[i].real(), ofdm_fft[i].imag());
-        }
-        print_log(LOG_DATA, "orig: %d, new: %d\n", 
-            ofdm.size(), ofdm_fft.size());
-        ofdm = ofdm_fft;
-        fftwf_destroy_plan(plan);
-        fftwf_free(out);
         // for(int j = 0; j < ofdm.size(); j += step_pilot) {
             
         //     pilots_rx.push_back(ofdm[j]);
@@ -344,58 +296,29 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param) {
         int block = size_block_data;
         int step;
         int index = 1;
-        // for(int j = 0; j < ofdm_eq.size(); j += step_pilot) {
-        //     if(block < param.step_RS) {
-        //         step = block;
-        //     } else {
-        //         step = param.step_RS;
-        //     }
-        //     if(step > 0)
-        //         sample_rx.insert(
-        //             sample_rx.end(), ofdm_eq.begin() + j + 1, 
-        //             ofdm_eq.begin() + j + step);
-        //         // sample_rx.insert(
-        //         //     sample_rx.end(), ofdm_eq.begin() + index, 
-        //         //     ofdm_eq.begin() + index + step);
-        //     block -= (step );
-        //     // index += 
-        // }
-/*
-
-1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0
-
-0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0
-
-
-
-
-
-
-*/
-        for(int j = 1; sample_rx.size() < size_block_data; ) {
-            step = param.step_RS;
-            if(ofdm.size() - j < param.step_RS) {
-                step = ofdm.size() - j;
-            }
-            if(step > 0) {
-                sample_rx.insert(
-                    sample_rx.end(), ofdm_eq.begin() + j, 
-                    ofdm_eq.begin() + j + step);
-                    
+        for(int j = 0; j < ofdm_eq.size(); j += step_pilot) {
+            if(block < param.step_RS) {
+                step = block;
             } else {
-                break;
+                step = param.step_RS;
             }
-            j += step + 1;
-            print_log(CONSOLE, "j = %d, sample_rx.size() = %d, step = %d\n", j, sample_rx.size(), step);
+            if(step > 0)
+                sample_rx.insert(
+                    sample_rx.end(), ofdm_eq.begin() + j + 1, 
+                    ofdm_eq.begin() + j + step);
+                // sample_rx.insert(
+                //     sample_rx.end(), ofdm_eq.begin() + index, 
+                //     ofdm_eq.begin() + index + step);
+            block -= (step );
+            // index += 
         }
-
-        print_log(LOG, "rx data [ %d ]:\n", sample_rx.size());
+        print_log(LOG, "rx data:\n");
         print_VecSymbolMod(sample_rx);
         rx.insert(rx.end(), sample_rx.begin(), sample_rx.end());
         
     }
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
-    print_VecSymbolMod(rx);
+
     return rx;
 
 
@@ -403,55 +326,6 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param) {
 
 
 
-
-VecSymbolMod generateZadoffChuSequence(int cellId, int N) {
-    VecSymbolMod pss(N);
-    int q = 1;
-    for (int n = 0; n < N; ++n) {
-        double realPart = cos(PI * q * n * (n + 1) / N);
-        double imagPart = sin(PI * q * n * (n + 1) / N);
-        pss[n] = mod_symbol(realPart, imagPart);
-    }
-    for (int n = 0; n < N; ++n) {
-        int shift = (n * (cellId + 1)) % N;
-        pss[n] = mod_symbol(cos(2 * PI * shift / N), sin(2 * PI * shift / N)) * pss[n];
-    }
-
-    return pss;
-}
-
-void create_PSS(slot_ofdms &slot, u_char count_symbol) {
-    static VecSymbolMod pss = generateZadoffChuSequence(0, 127);
-    slot.PSS.insert(slot.PSS.end(), pss.begin(), pss.end());
-}
-
-
-VecSlotsOFDM create_slots(OFDM_symbol ofdms) {
-    VecSlotsOFDM slots;
-    slot_ofdms slot;
-    create_PSS(slot, 0);
-    slot.ofdms = ofdms;
-    slots.push_back(slot);
-    return slots;
-}
-
-
-
-
-
-// void correlate_PSS()
-
-
-
-
-
-
-
-
-
-// void receiver_OFDM(VecSymbolMod &samples) {
-    
-// }
 
 
 

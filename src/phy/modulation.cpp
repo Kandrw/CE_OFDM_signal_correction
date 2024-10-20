@@ -328,7 +328,9 @@ bool mod_symbol_cmp(mod_symbol &A, mod_symbol &B, float error){
     return symbol_cmp(A.real(), B.real(), error) && symbol_cmp(A.imag(), B.imag(), error);
 }
 
-
+float calc_dist(mod_symbol &A, mod_symbol &B) {
+    return sqrt(powf(A.real() - B.real(), 2) + powf(A.imag() - B.imag(), 2));
+}
 
 bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
     bit_sequence *data = new bit_sequence;
@@ -344,19 +346,11 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
         int pos = 0;
         for(int i2 = 0; i2 < (int)ARRAY_SIZE(table_QAM16); ++i2) {
             
-            float dist = sqrt(powf(table_QAM16[i2].real() - samples[i].real(), 2) + powf(table_QAM16[i2].imag() - samples[i].imag(), 2));
-            // print_log(CONSOLE, "dist: %f, %f %f - %f - %f\n", dist,
-            //     samples[i].real(), samples[i].imag(), table_QAM16[i2].real(), table_QAM16[i2].imag());
-            // if(mod_symbol_cmp(samples[i], table_QAM16[i2], err_interval)) {
+            float dist = calc_dist(table_QAM16[i2], samples[i]);
             if(dist <= min_dist) {
                 conD = 1;
                 min_dist = dist;
                 pos = i2;
-            } else {
-                // print_log(CONSOLE, "%f %f - %f - %f\n", 
-                // samples[i].real(), samples[i].imag(), table_QAM16[i2].real(), table_QAM16[i2].imag());
-                // print_log(CONSOLE, "dist: %f, %f %f - %f - %f\n", dist,
-                // samples[i].real(), samples[i].imag(), table_QAM16[i2].real(), table_QAM16[i2].imag());
             }
         }
         // print_log(CONSOLE, "min_dist: %f, pos - %d, %f %f - %f - %f\n", min_dist, pos,
@@ -500,26 +494,55 @@ bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
     int if_decode_symbol;
     for(i = 0, k = 0; i < (int)samples.size(); ++i){
         if_decode_symbol = 0;
+        float min_dist = 999.f;
+        int pos = 0;
         for(j = 0; j < (int)ARRAY_SIZE(table_QPSK); ++j){
-            if(mod_symbol_cmp(samples[i], table_QPSK[j], error_cmp)){
-                if_decode_symbol = 1;
-                u_char bits_data = j;
-                print_log(LOG_DATA, "[%s:%d] i = %d, j = %d, shit = %d, mask = %d\n", __func__, __LINE__, i, j, shift, mask);
-                *step = (*step | (bits_data << shift));
-                if(k == 3){
-                    k = 0;
-                    ++step;
-                    mask = 0b11000000;
-                    shift = 6;
-                }
-                else{
-                    k++;
-                    mask >>= 2;
-                    shift -= 2;
-                }
-                break;
+
+            
+            float dist = calc_dist(table_QPSK[j], samples[i]);
+            if(dist <= min_dist) {
+                // conD = 1;
+                min_dist = dist;
+                pos = j;
             }
+            // if(mod_symbol_cmp(samples[i], table_QPSK[j], error_cmp)){
+            //     if_decode_symbol = 1;
+            //     u_char bits_data = j;
+            //     print_log(LOG_DATA, "[%s:%d] i = %d, j = %d, shit = %d, mask = %d\n", __func__, __LINE__, i, j, shift, mask);
+            //     *step = (*step | (bits_data << shift));
+            //     if(k == 3){
+            //         k = 0;
+            //         ++step;
+            //         mask = 0b11000000;
+            //         shift = 6;
+            //     }
+            //     else{
+            //         k++;
+            //         mask >>= 2;
+            //         shift -= 2;
+            //     }
+            //     break;
+            // }
         }
+        u_char bits_data = pos;
+        print_log(LOG_DATA, "[%s:%d] i = %d, j = %d, shit = %d, mask = %d\n", __func__, __LINE__, i, j, shift, mask);
+        *step = (*step | (bits_data << shift));
+        if(k == 3){
+            k = 0;
+            ++step;
+            mask = 0b11000000;
+            shift = 6;
+        }
+        else{
+            k++;
+            mask >>= 2;
+            shift -= 2;
+        }
+        
+    
+
+
+
         if(!if_decode_symbol){
             print_log(ERROR_OUT, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].real(), samples[i].imag());
         }

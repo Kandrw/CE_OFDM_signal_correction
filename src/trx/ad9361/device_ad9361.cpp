@@ -319,23 +319,37 @@ int write_to_device_buffer(const void *data, int size){
 	ptrdiff_t p_inc;
 	const struct iio_block *txblock;
 	int err = 0;
-	print_log(CONSOLE, "%s:%d - txstream - %p\n", __func__, __LINE__, txstream);
+	// print_log(CONSOLE, "%s:%d - txstream - %p\n", __func__, __LINE__, txstream);
 	txblock = iio_stream_get_next_block(txstream);
-	print_log(CONSOLE, "%s:%d - %p\n", __func__, __LINE__, txblock);
+	// print_log(CONSOLE, "%s:%d - %p\n", __func__, __LINE__, txblock);
 	err = iio_err(txblock);
 	if (err) {
 		print_log(LOG_DEVICE, "ERROR: Unable to send block");
 		return -1;
 	}
+	DEBUG_LINE
 	p_inc = tx_sample_sz;
-	print_log(CONSOLE, "tx_sample_sz = %d\n", tx_sample_sz);
+	// print_log(CONSOLE, "tx_sample_sz = %d\n", tx_sample_sz);
 	p_end = (int16_t*)iio_block_end(txblock);
-	for (p_dat = (int16_t*)iio_block_first(txblock, tx0_i); p_dat < p_end;
-			p_dat += p_inc / sizeof(*p_dat)) {
-		p_dat[0] = 4000; /* Real (i) */
-		p_dat[1] = 4000; /* Imag (q) */
+	int iter = 0;
+	float *dataf = (float*)data; 
+	for (p_dat = (int16_t*)iio_block_first(txblock, tx0_i); p_dat < p_end, iter < size;
+			p_dat += p_inc / sizeof(*p_dat), iter += 2) {
+		// p_dat[0] = 4000; /* Real (i) */
+		// p_dat[1] = 4000; /* Imag (q) */
+		// print_log(CONSOLE, "[%d] %f %f\n", iter, dataf[iter], dataf[iter + 1]);
+#if 0
+		p_dat[0] = dataf[iter];
+		p_dat[1] = dataf[iter + 1];
+#else
+		p_dat[0] = dataf[iter] + 4000;
+		p_dat[1] = dataf[iter + 1] + 4000;
+		
+
+#endif
+		// DEBUG_LINE
 	}
-	print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
+	// print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
 	return 0;
 }
 

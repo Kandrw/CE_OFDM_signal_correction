@@ -34,7 +34,7 @@ struct OFDM_params{
     u_int16_t step_RS;
     u_int16_t def_interval;
     u_int16_t cyclic_prefix;
-
+    float power;
 };
 
 struct ParamsPhy{
@@ -46,6 +46,13 @@ struct OFDM_symbol {
     u_int16_t size = 0;
     std::vector<VecSymbolMod> symbol;
 };
+
+struct slot_ofdms {
+    VecSymbolMod PSS;
+    OFDM_symbol ofdms;
+};
+
+typedef std::vector<slot_ofdms> VecSlotsOFDM;
 
 
 struct bit_sequence{
@@ -63,7 +70,7 @@ struct qam_sequence{
 };
 
 
-
+void print_VecSymbolMod( VecSymbolMod &vec, int log_level = LOG_DATA);
 
 
 // struct out_modulation {

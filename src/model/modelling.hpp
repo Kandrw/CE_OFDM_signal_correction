@@ -9,3 +9,5 @@
 // void model_soft_solutions();
 
 int modelling_signal(char target);
+void modelling_channel(VecSymbolMod &samples);
+int calc_bit_error(bit_sequence &tx, bit_sequence &rx);

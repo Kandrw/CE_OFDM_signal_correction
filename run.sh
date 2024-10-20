@@ -13,8 +13,10 @@ cd $BUILD_DIR
 
 ADDRESS_DEV="ip:192.168.3.1"
 SPECIFIC_OPTION="4"
+FILE_CONFIG=../configs/config.txt
 
-while getopts "dcma:r:vo:" OPTION; do
+
+while getopts "dcma:l:r:vo:" OPTION; do
     case $OPTION in
     d)
         BUILD_FLAGS=-DCMAKE_BUILD_TYPE=Debug 
@@ -32,12 +34,15 @@ while getopts "dcma:r:vo:" OPTION; do
     a)
         ADDRESS_DEV=${OPTARG}
     ;;
+    l)
+        FILE_CONFIG=${OPTARG}
+    ;;
     o)
         SPECIFIC_OPTION=${OPTARG}
     ;;
 	r)
         TARGET=${OPTARG}
-        ./program $ADDRESS_DEV ../data/data_test.txt $TARGET $SPECIFIC_OPTION
+        ./program $ADDRESS_DEV ../data/data_test.txt $TARGET $FILE_CONFIG $SPECIFIC_OPTION
 	;;
 	v) 
         python3 ../visual_signal.py

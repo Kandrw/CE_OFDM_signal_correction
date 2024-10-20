@@ -186,18 +186,3 @@ OFDM_symbol OFDM_modulator(VecSymbolMod &samples, OFDM_params &param) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

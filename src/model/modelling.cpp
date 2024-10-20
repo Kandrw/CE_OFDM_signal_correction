@@ -158,12 +158,12 @@ int calc_error1(VecSymbolMod &tx, VecSymbolMod &rx) {
     return ce;
 }
 
-void print_VecSymbolMod( VecSymbolMod &vec) {
-    for(int i = 0; i < (int)vec.size(); ++i) {
-        print_log(CONSOLE, "%f + %fi  ", vec[i].real(), vec[i].imag());
-    }
-    print_log(CONSOLE, "\n");
-}
+// void print_VecSymbolMod( VecSymbolMod &vec) {
+//     for(int i = 0; i < (int)vec.size(); ++i) {
+//         print_log(CONSOLE, "%f + %fi  ", vec[i].real(), vec[i].imag());
+//     }
+//     print_log(CONSOLE, "\n");
+// }
 
 /*3 Практика*/
 void model_calc_P_SER() {
@@ -532,6 +532,17 @@ int model_relay_channel() {
     }
     return 0;
 }
+
+void modelling_channel(VecSymbolMod &samples) {
+    float SNR = 14;
+    float Ps = calc_Ps(samples.size(), samples);
+    float h2 = pow(10, SNR * 0.1);
+    float Q2 = Ps / h2;
+
+    VecSymbolMod n = generate_noise_by_SNR(samples.size(), Q2);
+    samples = samples + n;
+}
+
 int modelling_signal(char target) {
 
     switch (target)
