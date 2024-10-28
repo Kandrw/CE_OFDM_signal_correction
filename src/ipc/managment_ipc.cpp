@@ -2,6 +2,7 @@
 
 #include <sys/socket.h>
 
+#include <iostream>
 #include <string>
 #include <cstdarg>
 #include <cstdio>
@@ -219,3 +220,67 @@ int full_data_arrays(std::string str,
 
 
 
+int test_ipc(int argc, char *argv[]) {
+
+
+
+#ifdef ACTIVATE_IPC
+    if(init_ipc()) {
+        print_log(CONSOLE, "Exit\n");
+        return -1;
+    }
+#endif
+    float FF[] = {12, 2, 21, 3};
+    int FF2[] = {10, 20, 30, 40};
+    
+    std::vector<data_array*> arr;
+    char df[] = "asd";
+    data_array d1 = data_array((int)3, (const u_char*)df, (unsigned int)sizeof(FF), 
+            static_cast<u_char>(TYPE_ARRAY::TYPE_FLOAT), (u_char*)FF);
+    data_array d2 = data_array((int)3, (const u_char*)df, (unsigned int)sizeof(FF), 
+            static_cast<u_char>(TYPE_ARRAY::TYPE_INT), (u_char*)FF2);
+     
+    arr.push_back(&d2);                        
+    arr.push_back(&d1);
+    // data_array d1(3, (u_char*)df, sizeof(FF), TYPE_ARRAY::TYPE_FLOAT, (u_char*)FF);
+    // data_array d1;// = {3, (u_char*)df, sizeof(FF), TYPE_ARRAY::TYPE_FLOAT, (u_char*)FF};
+    // d1.array = (u_char*)FF;
+    // d1.size_array = sizeof(FF);
+    // d1.size_str = 3;
+    // d1.str = (const u_char*)df;
+    // d1.type = TYPE_ARRAY::TYPE_FLOAT;
+    time_counting_start();
+    full_data_arrays("asd", arr);
+    time_counting_end(CONSOLE, __func__);
+    print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
+    // return 0;
+    while(1) {
+        int command;
+        print_log(CONSOLE, "%s:%d: input:", __func__, __LINE__);
+        std::cin >> command;
+
+        if(command) {
+            print_log(CONSOLE, "send\n");
+            std::string asd = "asdfasfdsdf";
+            send_ipc(command, 4, 12, (u_char*)asd.c_str());
+            if(command == 10) {
+                break;
+            }
+#if 0
+            msg_header msg;
+            recv_ipc(&msg, 0, NULL);
+            for(int i = 0; i < sizeof(msg); ++i) {
+        print_log(CONSOLE, "%d) %x %d\n",i,
+         *((char*)(&msg) + i),  *((char*)(&msg) + i));
+    }
+    print_log(CONSOLE, "\nsizeof(msg_con) = %d\n", sizeof(msg));
+            print_log(CONSOLE, "c = %d, t = %d, s = %d\n", msg.command, msg.type, msg.size_data_shm);
+#endif
+        }
+    }
+    deinit_ipc();
+
+
+
+    return 0;
+}

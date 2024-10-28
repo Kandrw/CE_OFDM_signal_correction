@@ -122,10 +122,36 @@ std::vector<float> generate_channel_relay_channel(float mat, float Q2, int N) {
     return h;
 }
 
+VecSymbolMod convolve1(VecSymbolMod s, VecSymbolMod h) {
+    VecSymbolMod r(s.size());
+    for(int i = 0; i < s.size(); ++i) {
+        for(int j = 0; j < h.size(); ++j) {
+            if (i-j >= 0 && i-j < s.size()){
+                r[i] += s[i-j] * h[j];
+            }
+        }
+    }
+    VecSymbolMod zeros(h);
+    r.insert(r.end(), h.begin(), h.end());
+    return r;
+}
+static VecSymbolMod convolve(const VecSymbolMod& x, const VecSymbolMod& h) {
+    int n = x.size();
+    int m = h.size();
+    VecSymbolMod result(n + m - 1, mod_symbol(0, 0));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            // result[i + j] += x[i] * std::conj(h[j]);
+            result[i + j] += x[i] * h[j];
+            
+        }
+    }
+    return result;
+}
 int calc_error(VecSymbolMod &tx, VecSymbolMod &rx) {
     int ce = 0;
     float im, re;
-    float interval = 1.1;
+    float interval = 1.5;
     for(int i = 0; i < (int)tx.size(); ++i) {        
         float dist = sqrt(powf(tx[i].real() - rx[i].real(), 2) + powf(tx[i].imag() - rx[i].imag(), 2));
         if(dist > interval) {
@@ -392,6 +418,7 @@ void model_soft_solutions() {
         float Q2 = Ps / h2;
         VecSymbolMod n = generate_noise_by_SNR(samples.size(), Q2);
         VecSymbolMod r = samples + n;
+        
         // print_log(CONSOLE, "%f %f - %f %f\n",
         //     samples[0].real(), samples[0].imag(), r[0].real(), r[0].imag());
 #if 0
@@ -533,14 +560,357 @@ int model_relay_channel() {
     return 0;
 }
 
+void toeplitz1(VecSymbolMod h, int n) {
+    std::vector<VecSymbolMod> h_matrix;
+    VecSymbolMod sl(n);
+    int c = 1;
+    // return;
+    for(int i = 0; i < n; i++){
+        int r = 0;
+        for(int j = 0; j < (h.size() / 2) - c; ++j) {
+            print_log(CONSOLE, "[%s:%d] j = %d\n", __func__, __LINE__, j);
+            sl[j] = mod_symbol(0, 0);
+        }
+        for(int j = (h.size() / 2), k = 0; j < n, k < h.size(); ++j, ++k, r++) {
+            print_log(CONSOLE, "[%s:%d] j = %d\n", __func__, __LINE__, j);
+            sl[j] = h[k];
+            
+        }
+        for(int j = r; j < n; ++j) {
+            print_log(CONSOLE, "[%s:%d] j = %d\n", __func__, __LINE__, j);
+            sl[j] = mod_symbol(0, 0);
+            
+        }
+        c--;
+        h_matrix.push_back(sl);
+    }
+    print_log(CONSOLE, "h_matrix:\n");
+    for(int i = 0; i < n; ++i) {
+        print_VecSymbolMod(h_matrix[i]);
+    }
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+}
+
+void toeplitz2(VecSymbolMod h, int n) {
+    std::vector<VecSymbolMod> h_matrix;
+    VecSymbolMod sl(n);
+    int c = 1;
+    // return;
+    for(int i = 0; i < n; i++){
+        int r = 0;
+
+
+        for(int j = n - 1; j >= 0; --j) {
+
+        }
+        for(int j = (h.size() / 2); j >= 0; --j) {
+            print_log(CONSOLE, "[%s:%d] j = %d\n", __func__, __LINE__, j);
+
+        }
+
+        // for(int j = 0; j < (h.size() / 2); ++j) {
+        //     print_log(CONSOLE, "[%s:%d] j = %d\n", __func__, __LINE__, j);
+        //     sl[j] = mod_symbol(0, 0);
+        // }
+        // for(int j = (h.size() / 2), k = 0; j < n, k < h.size(); ++j, ++k, r++) {
+        //     print_log(CONSOLE, "[%s:%d] j = %d\n", __func__, __LINE__, j);
+        //     sl[j] = h[k];
+            
+        // }
+        // for(int j = r; j < n; ++j) {
+        //     print_log(CONSOLE, "[%s:%d] j = %d\n", __func__, __LINE__, j);
+        //     sl[j] = mod_symbol(0, 0);
+            
+        // }
+        c--;
+        h_matrix.push_back(sl);
+    }
+    print_log(CONSOLE, "h_matrix:\n");
+    for(int i = 0; i < n; ++i) {
+        print_VecSymbolMod(h_matrix[i]);
+    }
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+}
+
+
+void toeplitz3(const VecSymbolMod& h, int n) {
+    // Создаем матрицу Топлица размером n x n 
+    std::vector<VecSymbolMod> matrix(n, VecSymbolMod(n, mod_symbol(0, 0)));
+
+    // Заполняем матрицу Топлица
+    // for (int i = 0; i < n; ++i) {
+    //     for (int j = n - 1; j >= 0; --j) {
+    //         if (i - j >= 0) {
+    //             matrix[i][j] = h[i - j]; // Заполняем значениями из h
+    //         } else {
+    //             matrix[i][j] = h[n + (i - j)]; // Заполняем для отрицательных индексов
+    //         }
+    //     }
+    // }
+    for (int i = n - 1; i >= 0; --i) {
+        for (int j = n - 1; j >= 0; --j) {
+            if (i - j >= 0) {
+                matrix[i][j] = h[i - j]; // Заполняем значениями из h
+            } else {
+                matrix[i][j] = h[n + (i - j)]; // Заполняем для отрицательных индексов
+            }
+        }
+    }
+    print_log(CONSOLE, "h_matrix:\n");
+    for(int i = 0; i < n; ++i) {
+        print_VecSymbolMod(matrix[i]);
+    }
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+
+}
+
+void toeplitz(const VecSymbolMod& h, int n) {
+    // Создаем матрицу Топлица размером n x n
+    // std::vector<std::vector<std::complex<float>>> matrix(n, std::vector<std::complex<float>>(n, std::complex<float>(0, 0)));
+    std::vector<VecSymbolMod> matrix(n, VecSymbolMod(n, mod_symbol(0, 0)));
+
+    // Заполняем матрицу Топлица
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (i - j >= 0) {
+                matrix[i][j] = h[i - j];
+            } else {
+                matrix[i][j] = h[n + (i - j)]; 
+            }
+        }
+    }
+    print_log(CONSOLE, "h_matrix:\n");
+    for(int i = 0; i < n; ++i) {
+        print_VecSymbolMod(matrix[i]);
+    }
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+
+}
+std::vector<VecSymbolMod> toeplitz4(const VecSymbolMod& h, int n) {
+    std::vector<VecSymbolMod> matrix;//(n, VecSymbolMod(n, mod_symbol(0, 0)));
+    VecSymbolMod rt = {h[1], h[0], mod_symbol(0, 0)};
+    VecSymbolMod rt1 = {h[2], h[1], h[0]};
+    VecSymbolMod rt2 = {mod_symbol(0, 0), h[2], h[1]};
+    
+    matrix.push_back(rt);
+    matrix.push_back(rt1);
+    matrix.push_back(rt2);
+    print_log(CONSOLE, "h_matrix:\n");
+    for(int i = 0; i < n; ++i) {
+        print_VecSymbolMod(matrix[i]);
+    }
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+
+    return matrix;
+    
+}
+
+std::vector<VecSymbolMod> inverseMatrix(const std::vector<VecSymbolMod>& matrix) {
+    const int N = 3;
+    std::vector<VecSymbolMod> augmented(N, VecSymbolMod(2 * N, {0.0f, 0.0f})); // Увеличенная матрица
+
+    // Заполняем увеличенную матрицу
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            augmented[i][j] = matrix[i][j];
+        }
+        augmented[i][i + N] = {1.0f, 0.0f}; // Добавляем единичную матрицу
+    }
+
+    // Применяем метод Гаусса-Жордана для приведения к единичной матрице
+    for (int i = 0; i < N; ++i) {
+        // Нормализуем строку
+        std::complex<float> diag = augmented[i][i];
+        if (diag == std::complex<float>(0.0f, 0.0f)) {
+            throw std::runtime_error("Матрица вырождена и не имеет обратной.");
+        }
+        for (int j = 0; j < 2 * N; ++j) {
+            augmented[i][j] /= diag;
+        }
+
+        // Обнуляем остальные строки
+        for (int k = 0; k < N; ++k) {
+            if (k != i) {
+                std::complex<float> factor = augmented[k][i];
+                for (int j = 0; j < 2 * N; ++j) {
+                    augmented[k][j] -= factor * augmented[i][j];
+                }
+            }
+        }
+    }
+
+    // Извлекаем обратную матрицу
+    std::vector<VecSymbolMod> inverse(N, VecSymbolMod(N));
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            inverse[i][j] = augmented[i][j + N];
+        }
+    }
+
+    return inverse;
+}
+
+
+// Функция для нахождения обратной матрицы 3x3
+std::vector<VecSymbolMod> inverseMatrix2(const std::vector<VecSymbolMod>& matrix) {
+    const int N = 3; // Размерность матрицы
+    std::vector<VecSymbolMod> augmented(N, VecSymbolMod(2 * N, {0.0f, 0.0f})); // Увеличенная матрица
+
+    // Заполняем увеличенную матрицу
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            augmented[i][j] = matrix[i][j];
+        }
+        augmented[i][i + N] = {1.0f, 0.0f}; // Добавляем единичную матрицу
+    }
+
+    // Применяем метод Гаусса-Жордана для приведения к единичной матрице
+    for (int i = 0; i < N; ++i) {
+        // Нормализуем строку
+        std::complex<float> diag = augmented[i][i];
+        if (diag == std::complex<float>(0.0f, 0.0f)) {
+            throw std::runtime_error("Матрица вырождена и не имеет обратной.");
+        }
+        for (int j = 0; j < 2 * N; ++j) {
+            augmented[i][j] /= diag;
+        }
+
+        // Обнуляем остальные строки
+        for (int k = 0; k < N; ++k) {
+            if (k != i) {
+                std::complex<float> factor = augmented[k][i];
+                for (int j = 0; j < 2 * N; ++j) {
+                    augmented[k][j] -= factor * augmented[i][j];
+                }
+            }
+        }
+    }
+
+    // Извлекаем обратную матрицу
+    std::vector<VecSymbolMod> inverse(N, VecSymbolMod(N));
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            inverse[i][j] = augmented[i][j + N];
+        }
+    }
+
+    return inverse;
+}
+
+VecSymbolMod matrixVectorMultiply(const std::vector<VecSymbolMod>& matrix, const VecSymbolMod& vector) {
+    if (matrix.empty() || matrix[0].size() != vector.size()) {
+        throw std::invalid_argument("Размеры матрицы и вектора не совместимы для умножения.");
+    }
+
+    VecSymbolMod result(matrix.size(), {0.0f, 0.0f}); // Инициализируем результат
+
+    for (size_t i = 0; i < matrix.size(); ++i) {
+        for (size_t j = 0; j < matrix[0].size(); ++j) {
+            result[i] += matrix[i][j] * vector[j];
+        }
+    }
+
+    return result;
+}
+
+void multipath_channel() {
+    VecSymbolMod h = {(0.5, 0.5), (0.7, 0.7), (0.1, 0.1)};
+    // VecSymbolMod h = {(0.5, 0.), (0.7, 0.), (0.1, 0.)};
+    
+    int N = 3;
+    int snr_start = 30;
+    int snr_end = 30;
+    int i;
+    float h2;
+    print_to_file(FILE_SER, "w", "");
+    for(i = snr_start; i <= snr_end; ++i) {
+        int count_err = 0;
+        int count_err2 = 0;
+        
+        int SNR = i;
+        print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+        VecSymbolMod samples = generate_random_QAM16(N);
+        // VecSymbolMod samples2 = samples;
+        float Ps = calc_Ps(N, samples);
+        h2 = pow(10, SNR * 0.1);
+        float Q2 = Ps / h2;
+        print_log(LOG_DATA, "samples:\n");
+        print_VecSymbolMod(samples);
+        
+        // std::vector<float> h = generate_channel_relay_channel(0, 0.5, N);
+        // VecSymbolMod r = samples + n;
+        VecSymbolMod zer = {mod_symbol(0, 0), mod_symbol(1, 0), mod_symbol(0, 0)};
+        // VecSymbolMod r = convolve(samples, h);
+        VecSymbolMod r = convolve(h, samples);
+        
+        print_log(LOG_DATA, "samples convolve h:\n");
+        print_VecSymbolMod(r);
+        VecSymbolMod n = generate_noise_by_SNR(r.size(), Q2);
+        VecSymbolMod r2 = r;// + n;
+        // VecSymbolMod r3 = r2 / h;
+        auto matrix = toeplitz4(h, 3);
+        auto matrix2 = inverseMatrix(matrix);
+        print_log(CONSOLE, "h_matrix:\n");
+        for(int i = 0; i < 3; ++i) {
+            print_VecSymbolMod(matrix2[i]);
+        }
+        print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+        VecSymbolMod ck = matrixVectorMultiply(matrix2, zer);
+        print_log(CONSOLE, "c:\n");
+        print_VecSymbolMod(ck);
+        VecSymbolMod r3 = convolve(r2, ck);
+        print_log(CONSOLE, "r3:\n");
+        print_VecSymbolMod(r3);
+        VecSymbolMod r4 = VecSymbolMod(r3.begin() + 2, r3.begin() + N + 2);
+        print_log(CONSOLE, "r4[%d]:\n", r4.size());
+        print_VecSymbolMod(r4);  
+        
+#if 1
+        // print_log(CONSOLE, "%d\n", i);
+        // print_log(CONSOLE, "Ps: %f, s: %f %f\n", Ps, samples[0].real(), samples[0].imag());
+        // print_log(CONSOLE, "h2 = %f\n", h2);        
+        // count_err = calc_error(samples, r);
+        float Pser;
+        // float Pser = (float)count_err / (float)N;
+        // print_log(CONSOLE, "Pser = %f, count_err = %d\n", Pser, count_err);
+        count_err2 = calc_error(samples, r4);
+        float Pser2 = (float)count_err2 / (float)N;
+        print_log(CONSOLE, "Pser2 = %f, count_err2 = %d\n", Pser2, count_err2);
+        
+        print_to_file(FILE_SER, "a", "%f %d %f\n", Pser, SNR, Pser2);
+#endif
+#if 1
+        char filename[30];
+        memset(filename, 0, sizeof(filename));
+        sprintf(filename, "../data/samples/rx_%d", (int)SNR);
+        write_file_bin_data(
+                filename, &r4[0], 
+                r4.size() * sizeof(VecSymbolMod::value_type) );
+#endif     
+        // samples.clear();
+
+    }
+
+}
+
+
 void modelling_channel(VecSymbolMod &samples) {
-    float SNR = 14;
+    float SNR = 25;
+    VecSymbolMod zeros(100);
+    samples.insert(samples.begin(), zeros.begin(), zeros.end());
+    samples.insert(samples.end(), zeros.begin(), zeros.end());
+    
+    write_file_bin_data("../data/orig_sample.bin",
+     (void*)&samples[0], samples.size() * sizeof(mod_symbol));
+
     float Ps = calc_Ps(samples.size(), samples);
     float h2 = pow(10, SNR * 0.1);
     float Q2 = Ps / h2;
 
     VecSymbolMod n = generate_noise_by_SNR(samples.size(), Q2);
     samples = samples + n;
+    write_file_bin_data("../data/model_sample.bin",
+     (void*)&samples[0], samples.size() * sizeof(mod_symbol));
 }
 
 int modelling_signal(char target) {
@@ -558,7 +928,10 @@ int modelling_signal(char target) {
         break;
     case '5':
         model_relay_channel();
-        break;;
+        break;
+    case '6':
+        multipath_channel();
+        break;
     default:
         print_log(CONSOLE, "No target for program\n");
         break;

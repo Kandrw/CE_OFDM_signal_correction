@@ -83,4 +83,38 @@ data = np.array(data)
 plt.plot(data.real)
 plt.plot(data.imag)
 
-plt.show()
+# plt.show()
+
+
+print("----------")
+
+data = [1 + 1j, 3 + 3j]
+
+# data = [1, 3]
+
+
+
+r1 = (data[0] * data[0] + data[1]*data[1])
+print(np.linalg.norm(data[0]))
+print(np.linalg.norm(data[1]))
+
+# r1 = (np.norm(data[0]) + np.norm(data[1]))
+
+
+r1 = np.sqrt(r1)
+
+r = np.linalg.norm(data)
+
+print(r, "|", r1)
+print(abs(r1))
+# print("Norm")
+
+# p = [1 + 3j, 1 + 4j]
+
+
+# p = np.array(p)
+
+# gg = np.norm(p)
+
+# print(gg)
+

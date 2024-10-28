@@ -25,9 +25,9 @@ OFDM_symbol generate_frame_phy(bit_sequence &bits, ParamsPhy &param){
 
 
 
-bit_sequence *decode_frame_phy(OFDM_symbol &samples, ParamsPhy &param){
+bit_sequence *decode_frame_phy(OFDM_symbol &samples, ParamsPhy &param, bool fprefix){
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
-    VecSymbolMod rx_sample = OFDM_demodulator(samples, param.param_ofdm);
+    VecSymbolMod rx_sample = OFDM_demodulator(samples, param.param_ofdm, fprefix);
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
 
     return demodulation_mapper(rx_sample, param.type_modulation);

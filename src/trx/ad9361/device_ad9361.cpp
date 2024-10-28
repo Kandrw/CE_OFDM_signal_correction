@@ -342,8 +342,8 @@ int write_to_device_buffer(const void *data, int size){
 		p_dat[0] = dataf[iter];
 		p_dat[1] = dataf[iter + 1];
 #else
-		p_dat[0] = dataf[iter] + 4000;
-		p_dat[1] = dataf[iter + 1] + 4000;
+		p_dat[0] = dataf[iter] * 2000;
+		p_dat[1] = dataf[iter + 1] * 2000;
 		
 
 #endif

@@ -29,6 +29,7 @@ add_definitions(-DCONDITION_TARGET_PROGRAM=4 -DM_FOUND_LIBIIO)
 
 set(SOURCE 
     src/main.cpp  
+    src/target.cpp
     
     src/trx/device_api.cpp
     src/trx/ad9361/device_ad9361.cpp
@@ -43,6 +44,7 @@ set(SOURCE
 
     src/loaders/load_data.cpp
     src/ipc/managment_ipc.cpp
+    
 )
 else()
 
@@ -54,6 +56,7 @@ add_definitions(-DCONDITION_TARGET_PROGRAM=4)
 
 set(SOURCE 
     src/main.cpp
+    src/target.cpp
     
     src/phy/phy.cpp
     src/phy/modulation.cpp

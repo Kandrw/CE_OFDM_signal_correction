@@ -44,10 +44,19 @@ int thread_send_samples_slots(void *data){
             write_to_device_buffer(pss, slots[i].PSS.size() * 2);
             // print_VecSymbolMod(slots[i].PSS);
             // write_to_device_buffer((void*)&slots[i].PSS[0], slots[i].PSS.size() * 2);
-            
-            for(int j = 0; j < slots[i].ofdms.size; ++j) {
-                void *sample = slots[i].ofdms.symbol[j].data();
-                write_to_device_buffer(sample, slots[i].ofdms.symbol[j].size() * 2);
+            for(int k = 0; k < 1; ++k) {
+                for(int j = 0; j < slots[i].ofdms.size; ++j) {
+
+                    // void *sample = slots[i].ofdms.symbol[j].data();
+                    // write_to_device_buffer(sample, slots[i].ofdms.symbol[j].size() * 2);
+                    VecSymbolMod asd;
+                    for(int f = 0; f < 1000; ++f) {
+                        asd.insert(asd.end(), slots[i].ofdms.symbol[j].begin(), slots[i].ofdms.symbol[j].end());
+                    }
+                    
+                    void *sample = asd.data();
+                    write_to_device_buffer(sample, asd.size() * 2);
+                }
             }
         }
 

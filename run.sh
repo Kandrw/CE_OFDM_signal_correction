@@ -16,11 +16,13 @@ SPECIFIC_OPTION="4"
 FILE_CONFIG=../configs/config.txt
 
 
-while getopts "dcma:l:r:vo:" OPTION; do
+while getopts "dcma:l:r:v:o:" OPTION; do
     case $OPTION in
     d)
         BUILD_FLAGS=-DCMAKE_BUILD_TYPE=Debug 
         #echo $BUILD_FLAGS
+        echo ./program $ADDRESS_DEV ../data/data_test.txt $TARGET $FILE_CONFIG $SPECIFIC_OPTION
+	
     ;;
 	c)
         #echo $BUILD_FLAGS
@@ -28,6 +30,7 @@ while getopts "dcma:l:r:vo:" OPTION; do
     ;;
     m)
         # cd $BUILD_DIR
+        rm ./program
         make $COUNT_THREAD
         # exit;
     ;;
@@ -45,7 +48,7 @@ while getopts "dcma:l:r:vo:" OPTION; do
         ./program $ADDRESS_DEV ../data/data_test.txt $TARGET $FILE_CONFIG $SPECIFIC_OPTION
 	;;
 	v) 
-        python3 ../visual_signal.py
+        python3 ../visual_signal.py ${OPTARG}
 	;;
 	*)
 		echo "Incorrect option"

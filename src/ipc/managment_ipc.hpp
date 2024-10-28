@@ -57,6 +57,8 @@ int full_data_arrays(
     std::vector<data_array*> &arrays);
 
 
+int test_ipc(int argc, char *argv[]);
+
 // 1) 1 - lock 0 - unlock
 // 2) 0        1
 

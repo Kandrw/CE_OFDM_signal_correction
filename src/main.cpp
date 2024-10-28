@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <cstring>
 
 #include <fstream>
 #include <vector>
@@ -34,6 +35,7 @@
 #include "trx/device_api.hpp"
 #endif
 
+#include "target.hpp"
 #include "model/modelling.hpp"
 #include "loaders/load_data.hpp"
 #include "ipc/managment_ipc.hpp"
@@ -95,10 +97,6 @@ config_program configure(int argc, char *argv[]) {
     return param;
 }
 
-
-
-
-
 int target(int argc, char *argv[]) {
     if(argc == static_cast<int>(ARGV_CONSOLE::ARGV_MAX) + 1) {
         return modelling_signal(argv[static_cast<int>(ARGV_CONSOLE::ARGV_MAX)][0]);
@@ -125,6 +123,7 @@ int main(int argc, char *argv[]){
     std::map<std::string, std::function<int(int, char**)>> target_exec = {
         {"model_practice", target},
         {"ofdm_model", ofdm_model},
+        {"fpss", finding_pss},
 #if M_FOUND_LIBIIO
         {"trx", trx_test},
         {"rx", test_RX},
@@ -153,155 +152,9 @@ int main(int argc, char *argv[]){
 
 
 
-int ofdm_model(int argc, char *argv[]){
-
-    // if(argc < static_cast<int>(ARGV_CONSOLE::ARGV_MAX)){
-    //     print_log(CONSOLE, "Error: Not enough arguments: <ip> <filename data>\n");
-    //     return -1;
-    // }
-    const char filename[] = "../data/data_test.txt";// = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
-
-#define TEST_DATA 0
-
-#if TEST_DATA == 0
-    char test_data[] = "Test m";
-    
-#elif TEST_DATA == 1   
-    char test_data[90];
-    for(int i = 0; i < sizeof(test_data); ++i){
-        test_data[i] = (rand() % 200);
-        // test_data[i] = (rand() % 20) + 70;
-    }
-    test_data[sizeof(test_data) - 1] = 0;
-#elif TEST_DATA == 2
-    char test_data[9] = {
-        (char)0b00000001,
-        (char)0b00100011,
-        (char)0b01000101,
-        (char)0b01100111,
-        (char)0b10001001,
-        (char)0b10101011,
-        (char)0b11001101,
-        (char)0b11101111
-    };
-
-    test_data[sizeof(test_data) - 1] = 0;
-#endif
-    write_file_bin_data(filename, test_data, sizeof(test_data));
-
-    // Sleep(4 * 1000);
-    bit_sequence data;
-
-    data.buffer = read_file_data(filename, &data.size);
-    if(data.size == 0){
-        print_log(CONSOLE, "[ERROR] [main.cpp] main: empty data_bin, EXIT\n");
-        return -1;
-    }
-    OFDM_params param_ofdm = {
-        .count_subcarriers = 64,
-        .pilot = {5, 5},
-        .step_RS = 8,
-        .def_interval = 16,
-        .cyclic_prefix = 15,
-        .power = 3000,
-    };
-    ParamsPhy param_phy = {
-        .type_modulation = TypeModulation::QPSK,
-        .param_ofdm = param_ofdm,
-    };
-    print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
-    OFDM_symbol samples = generate_frame_phy(data, param_phy);
-    // exit(0);
-    // addPowerOFDM(samples, param_ofdm.power);
-    VecSymbolMod s = OFDM_convertion_one_thread(samples);
-    // modelling_channel(s);
-    samples = samples_join_OFDM(s, 
-        param_ofdm.count_subcarriers + param_ofdm.cyclic_prefix, s.size());
-
-    VecSlotsOFDM slots = create_slots(samples);
 
 
 
-    bit_sequence *read_data = decode_frame_phy(samples, param_phy);
-    
-    if(read_data) {
-        for(int i = 0; i < data.size; ++i) {
-            print_log(CONSOLE, "%u - %u\n", data.buffer[i], read_data->buffer[i]);
-        }
-        int count_error = calc_bit_error(data, *read_data);
-        print_log(CONSOLE, "count error = %d/%d\n", count_error, read_data->size * 8);
-        print_log(LOG_DATA, "read_data: size = %d, data: %s\n", read_data->size, read_data->buffer);
-        print_log(CONSOLE, "input size: %d, output size: %d\n", data.size, read_data->size);
-        print_log(CONSOLE, "End %s\n", __func__);
-    }
-    return 0;
-}
-
-
-int test_ipc(int argc, char *argv[]) {
-
-
-
-#ifdef ACTIVATE_IPC
-    if(init_ipc()) {
-        print_log(CONSOLE, "Exit\n");
-        return -1;
-    }
-#endif
-    float FF[] = {12, 2, 21, 3};
-    int FF2[] = {10, 20, 30, 40};
-    
-    std::vector<data_array*> arr;
-    char df[] = "asd";
-    data_array d1 = data_array((int)3, (const u_char*)df, (unsigned int)sizeof(FF), 
-            static_cast<u_char>(TYPE_ARRAY::TYPE_FLOAT), (u_char*)FF);
-    data_array d2 = data_array((int)3, (const u_char*)df, (unsigned int)sizeof(FF), 
-            static_cast<u_char>(TYPE_ARRAY::TYPE_INT), (u_char*)FF2);
-     
-    arr.push_back(&d2);                        
-    arr.push_back(&d1);
-    // data_array d1(3, (u_char*)df, sizeof(FF), TYPE_ARRAY::TYPE_FLOAT, (u_char*)FF);
-    // data_array d1;// = {3, (u_char*)df, sizeof(FF), TYPE_ARRAY::TYPE_FLOAT, (u_char*)FF};
-    // d1.array = (u_char*)FF;
-    // d1.size_array = sizeof(FF);
-    // d1.size_str = 3;
-    // d1.str = (const u_char*)df;
-    // d1.type = TYPE_ARRAY::TYPE_FLOAT;
-    time_counting_start();
-    full_data_arrays("asd", arr);
-    time_counting_end(CONSOLE, __func__);
-    print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
-    // return 0;
-    while(1) {
-        int command;
-        print_log(CONSOLE, "%s:%d: input:", __func__, __LINE__);
-        std::cin >> command;
-
-        if(command) {
-            print_log(CONSOLE, "send\n");
-            std::string asd = "asdfasfdsdf";
-            send_ipc(command, 4, 12, (u_char*)asd.c_str());
-            if(command == 10) {
-                break;
-            }
-#if 0
-            msg_header msg;
-            recv_ipc(&msg, 0, NULL);
-            for(int i = 0; i < sizeof(msg); ++i) {
-        print_log(CONSOLE, "%d) %x %d\n",i,
-         *((char*)(&msg) + i),  *((char*)(&msg) + i));
-    }
-    print_log(CONSOLE, "\nsizeof(msg_con) = %d\n", sizeof(msg));
-            print_log(CONSOLE, "c = %d, t = %d, s = %d\n", msg.command, msg.type, msg.size_data_shm);
-#endif
-        }
-    }
-    deinit_ipc();
-
-
-
-    return 0;
-}
 
 /*Убрать*/
 #ifndef M_FOUND_LIBIIO
@@ -430,7 +283,7 @@ int test_TX(int argc, char *argv[]){
     print_log(LOG, "address dev: %s\n", ip_device);
 
 #if 1
-    char test_data[] = "Test message";
+    char test_data[] = "Test m";
 #else    
     char test_data[310];
     for(int i = 0; i < (int)sizeof(test_data); ++i){
@@ -449,9 +302,17 @@ int test_TX(int argc, char *argv[]){
         print_log(CONSOLE, "[ERROR] [main.cpp] main: empty data_bin, EXIT\n");
         return -1;
     }
+    // OFDM_params param_ofdm = {
+    //     .count_subcarriers = 64,
+    //     .pilot = {5, 5},
+    //     .step_RS = 8,
+    //     .def_interval = 16,
+    //     .cyclic_prefix = 15,
+    //     .power = 3000,
+    // };
     OFDM_params param_ofdm = {
         .count_subcarriers = 64,
-        .pilot = {5, 5},
+        .pilot = {0.7, 0.7},
         .step_RS = 8,
         .def_interval = 16,
         .cyclic_prefix = 15,
@@ -465,7 +326,7 @@ int test_TX(int argc, char *argv[]){
     OFDM_symbol samples = generate_frame_phy(data, param_phy);
     // exit(0);
     VecSlotsOFDM slots = create_slots(samples);
-
+    // addPower(s, 4000);
     config_device cfg1 = {
         ip_device,
         {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
@@ -641,6 +502,7 @@ int realtime_RX(int argc, char *argv[]) {
 
     // }
     int command = 0;
+    int attemps;
     while(1) {
         
 
@@ -669,17 +531,31 @@ int realtime_RX(int argc, char *argv[]) {
         result = DeviceTRX::recv_samples(samples_rx, cfg1.block_size);
         data_array d3 = data_array(str.size(), (const u_char*)str.c_str(), 8 * samples_rx.size(), 
             static_cast<u_char>(TYPE_ARRAY::TYPE_COMPLEX_FLOAT), (u_char*)&samples_rx[0]);
-
+        print_log(LOG, "rx data: %d\n", samples_rx.size());
+        write_file_bin_data("../data/rx_sample.bin", 
+            (void*)&samples_rx[0], samples_rx.size() * 2 * 4);
         arr.push_back(&d3);
+
+        // receiver_OFDM(samples_rx, param_ofdm);
+        OFDM_symbol ofdms;
+        // result = receiver_OFDM(samples_rx, param_ofdm, ofdms);
 
         time_counting_start();
         full_data_arrays("realtime rx", arr);
         time_counting_end(CONSOLE, __func__);
 
+        if(attemps > 0) {
+            attemps--;
+        } else {
+            command = 0;
+        }
 
         if(command != 12) {
             print_log(CONSOLE, "%s:%d: input:", __func__, __LINE__);
             std::cin >> command;
+            if(command == 12) {
+                attemps = 10;
+            }
         } else {
             // sleep(1)
         }

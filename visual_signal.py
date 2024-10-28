@@ -50,11 +50,53 @@ def read_file_to_list_str(filename):
         data = data[0]
         return data.split(" ")
 
+def read_OFDM_slots(filename, size_type):
+    data = []
+    with open(filename, "rb") as file:
 
+        size = file.read(4)
+        if(size == ""):
+            return data
+        
+        slot = []
+        size = int.from_bytes(size, byteorder='little')
+        print("|size = ", size)
+        byte_array = file.read(size * size_type * 2)
+        numpy_array = np.frombuffer(byte_array, dtype=np.complex64)
+        slot.append(numpy_array)
+        size_sub = file.read(4)
+        size_sub = int.from_bytes(size_sub, byteorder='little')
+        print("||size = ", size_sub)
+        size = file.read(4)
+        size = int.from_bytes(size, byteorder='little')
+        print("|||size = ", size)
+        for i in range(0, size):
+            byte_array = file.read(size_sub * size_type * 2)
+            numpy_array = np.frombuffer(byte_array, dtype=np.complex64)
+            print("|||size numpy_array = ", len(numpy_array))
+            slot.append(numpy_array)
+        data.append(slot)
+    return data
+def read_OFDMs(filename, size_type):
+    data = []
+    with open(filename, "rb") as file:
 
+        size_sub = file.read(4)
+        if(size_sub == ""):
+            return data
+        size_sub = int.from_bytes(size_sub, byteorder='little')
+        print("||size = ", size_sub)
+        size = file.read(4)
+        size = int.from_bytes(size, byteorder='little')
+        print("|||size = ", size)
+        for i in range(0, size):
+            byte_array = file.read(size_sub * size_type * 2)
+            numpy_array = np.frombuffer(byte_array, dtype=np.complex64)
+            print("|||size numpy_array = ", len(numpy_array))
+            data.append(numpy_array)
+    return data
 #   Практика 3
 def view_graphic_ser():
-
     file = "../data/ser.txt"
     data = 0
     with open(file, "r") as file:
@@ -66,11 +108,8 @@ def view_graphic_ser():
         aa = (data[i][:-1]).split(" ")
         ser_list.append(float(aa[0]))
         db_list.append(int(aa[1]))
-        
     print(ser_list)
     print(db_list)
-    
-    
     plt.plot(db_list, ser_list)
     plt.title("SER")
     plt.xlabel("SNR")
@@ -79,22 +118,15 @@ def view_graphic_ser():
     for i in range(0, 25):
         filename = "../data/samples/rx_"+str(i)
         samples = array_float_to_np_complex(read_file_bin(filename, 4))
-        
-        # plt.subplot(2, 2, 1)
         plt.scatter(samples.real, samples.imag)
 
 # Практика 4
 def model_soft_solutions():
     filename_s = "../data/practice5/s.bin"
     filename_s_noise = "../data/practice5/s_noise.bin"
-
     samples = array_float_to_np_complex(read_file_bin(filename_s, 4))
     samples_noise = array_float_to_np_complex(read_file_bin(filename_s_noise, 4))
-    
-
-
     plt.figure(10, figsize = (10, 10))
-
     if 0:
         plt.subplot(2, 2, 1)
         plt.plot(samples)
@@ -103,9 +135,7 @@ def model_soft_solutions():
         plt.subplot(2, 2, 3)
         plt.scatter(samples.real, samples.imag)
         plt.subplot(2, 2, 4)
-        
         plt.scatter(samples_noise.real, samples_noise.imag)
-
     file = "../data/practice5/ber_soft.txt"
     data = 0
     with open(file, "r") as file:
@@ -119,21 +149,16 @@ def model_soft_solutions():
         soft_list.append(float(aa[0]))
         hard_list.append(float(aa[1]))
         db_list.append(int(aa[2]))
-        
     print(soft_list)
     print(hard_list)
     print(db_list)
     plt.semilogy(db_list, soft_list, label = "Softbit")
     plt.semilogy(db_list, hard_list, c="r", label = "Hardbit")
     plt.legend()
-
-    
-    #plt.plot(db_list, ser_list)
     plt.title("BER soft and hard for QAM16")
     plt.xlabel("SNR")
     plt.ylabel("error")
     plt.figure(10, figsize=(10, 10))
-
     return 0
 #   Практика 5
 def view_graphic_ser_and_relay_channel():
@@ -159,9 +184,9 @@ def view_graphic_ser_and_relay_channel():
     
     # plt.plot(db_list, ser_list, label = "Noise channel")
     # plt.plot(db_list, ser_relay, c="r", label="Relay channel")
-    plt.plot(db_list, ser_list, label = "Noise channel")
+    plt.semilogy(db_list, ser_list, label = "Noise channel")
     con = 0
-    if 1:
+    if 0:
         for i in range(len(db_list)):
             if(i > 30 and i < 35):
                 db_list[i] -= con#math.cos(con)
@@ -171,7 +196,7 @@ def view_graphic_ser_and_relay_channel():
                 db_list[i] -= con#math.cos(con)
                 con -= 5.5
                 ser_relay[i] += math.tan(con)
-    plt.plot(db_list, ser_relay, c="r", label="Relay channel")
+    plt.semilogy(db_list, ser_relay, c="r", label="Relay channel")
     
     plt.title("SER")
     plt.xlabel("SNR")
@@ -186,28 +211,151 @@ def view_graphic_ser_and_relay_channel():
         # plt.subplot(2, 2, 1)
         # plt.scatter(samples.real, samples.imag)
 
-class MsgHeader:
-    def __init__(self, command: int, type_: int, size_data_shm: int):
-        self.command = command
-        self.type = type_
-        self.size_data_shm = size_data_shm
+def view_graphic_ser_multipath_channel():
 
-    def pack(self):
-        # Упаковка данных в бинарный формат
-        return struct.pack('BBI', self.command, self.type, self.size_data_shm)
+    filename_s = "../data/samples/rx_50"
+    samples = array_float_to_np_complex(read_file_bin(filename_s, 4))
 
-    @classmethod
-    def unpack(cls, data):
-        # Распаковка данных из бинарного формата
-        command, type_, size_data_shm = struct.unpack('BBI', data)
-        return cls(command, type_, size_data_shm)
+    plt.scatter(samples.real, samples.imag)
 
-FILE_SEM = "semaphore"
+def view_data_1():
+    filename_corr = "../data/corr_array3.bin"
+    filename_corr = "../data/corr_array_convolve.bin" 
+    filename_corr2 = "../data/corr_array2.bin"
+    
+    filename_slots = "../data/slots.bin"
+
+    filename_rx_data = "../data/rx_sample.bin"
+    id_f = 10
+    if 0:
+        plt.figure(id_f-1, figsize=(10,10))
+        plt.subplot(2, 2, 1)
+        pss = array_float_to_np_complex(read_file_bin("../data/pss.bin", 4))
+        plt.scatter(pss.real, pss.imag)
+
+    # corr = read_file_bin(filename_corr, 4)
+    corr = array_float_to_np_complex(read_file_bin(filename_corr, 4))
+    
+    corr = np.array(corr)
+
+    plt.figure(id_f, figsize=(10,10))
+    plt.subplot(2, 2, 1)
+    corr = np.abs(corr)
+    plt.plot(corr)
+    print("len corr = ", len(corr))
+
+    corr2 = read_file_bin(filename_corr2, 4)
+    corr2 = np.array(corr2)
+
+    plt.subplot(2, 2, 2)
+    corr2 = np.abs(corr2)
+    plt.plot(corr2, "r")
+    # import numpy as np
+
+    # dx, dy = 0.05, 0.05
+
+    # y, x = np.mgrid[slice(1, 5 + dy, dy),
+    #                 slice(1, 5 + dx, dx)]
+
+    # z = np.sin(x)**10 + np.cos(10 + y*x) * np.cos(x)
+
+    data = read_OFDM_slots(filename_slots, 4)
+    data = data[0]
+    print("size pss = ",len(data[0]),"count ofdm = ", len(data[1]))
+    # print("PSS:\n",data[0])
+    print("1 ofdm:\n", data[1])
+
+    # return -1
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin("../data/orig_sample.bin", 4))
+        samples_noise = array_float_to_np_complex(read_file_bin("../data/model_sample.bin", 4))
+        plt.subplot(2, 2, 3)
+        plt.plot(samples)
+        plt.subplot(2, 2, 4)
+        plt.plot(samples_noise)
+    if 1:
+        plt.figure(id_f+4, figsize=(10,10))
+        plt.subplot(2, 2, 1)
+        # c1 = array_float_to_np_complex(read_file_bin("../data/auto_corr.bin", 4))
+        # plt.plot(abs(c1))
+        # plt.subplot(2, 2, 2)
+        # c1 = array_float_to_np_complex(read_file_bin("../data/norm_corr.bin", 4))
+        # plt.plot(abs(c1))
+        # plt.subplot(2, 2, 3)
+        c1 = read_file_bin("../data/norm_corr_ofdm.bin", 4)
+        c1 = np.array(c1)
+        plt.plot(abs(c1))
+
+        ofdms = read_OFDMs("../data/read_ofdms.bin", 4)
+        print("kkk", len(ofdms), ofdms)
+        
+        ofdm = np.fft.fft(ofdms)
+        print("kkk", len(ofdm), ofdm)
+        ofdm = np.array([ofdm]).T
+        # Проверка на пустой массив
+        if ofdm.size == 0:
+            print("Массив мощности пуст.")
+        else:
+            # Получение амплитуды
+            power_amplitude = np.abs(ofdm)
+            # plt.figure(id_f + 5, figsize=(10,10))
+            plt.subplot(2, 2, 2)
+            # Визуализация plt.figure(figsize=(12, 6))
+            plt.imshow(power_amplitude, aspect='auto', cmap='viridis', origin='lower')
+            plt.colorbar(label='Мощность (амплитуда)')
+            plt.title('Мощность каждой поднесущей в OFDM')
+            plt.ylabel('Поднесущие')
+            plt.xlabel('Временные символы')
+            # plt.xticks(np.arange(0, num_subcarriers, step=8))  # Установка меток по оси X
+            # plt.yticks(np.arange(0, num_symbols, step=2))      # Установка меток по оси Y
+            plt.grid(False)
+            # plt.show()
+        
+        if 1:
+            samples = array_float_to_np_complex(read_file_bin(filename_rx_data, 4))
+            plt.subplot(2, 2, 3)
+            plt.plot(abs(samples))
+
+    if 0:
+
+        # Параметры OFDM
+        # num_subcarriers = 64  # Количество поднесущих
+        # num_symbols = 10      # Количество временных символов
+
+        # # Генерация случайной комплексной мощности для каждой поднесущей
+        # power = np.random.rand(num_symbols, num_subcarriers) + 1j * np.random.rand(num_symbols, num_subcarriers)
+        # print("kkk", len(power), power[0])
+        power = data[1][15:]
+        print("kkk", len(power), power)
+        
+        power = np.fft.fft(power)
+        print("kkk", len(power), power)
+        power = np.array([power]).T
+        # Проверка на пустой массив
+        if power.size == 0:
+            print("Массив мощности пуст.")
+        else:
+            # Получение амплитуды
+            power_amplitude = np.abs(power)
+            plt.figure(id_f + 5, figsize=(10,10))
+            plt.subplot(2, 2, 1)
+            # Визуализация plt.figure(figsize=(12, 6))
+            plt.imshow(power_amplitude, aspect='auto', cmap='viridis', origin='lower')
+            plt.colorbar(label='Мощность (амплитуда)')
+            plt.title('Мощность каждой поднесущей в OFDM')
+            plt.ylabel('Поднесущие')
+            plt.xlabel('Временные символы')
+            # plt.xticks(np.arange(0, num_subcarriers, step=8))  # Установка меток по оси X
+            # plt.yticks(np.arange(0, num_symbols, step=2))      # Установка меток по оси Y
+            plt.grid(False)
+            plt.show()
+
+
+
+    
+
 FILE_SHARED_MEMORY = "."
 SIZE_MEMORY = 20000
-
-# ID_SERVER = 1234
-# ID = 5678
 
 
 key = 0
@@ -234,9 +382,7 @@ def deinit_ipc():
 
 def send_ipc(command, type_, size, data):
     global fd_socket 
-    # shm.write("345345")
-    # msg = MsgHeader(command, type_, size)
-    # fd_socket.sendall(msg.pack())
+
 
     packed_data = struct.pack('=BBI', command, type_, size)
     print(packed_data)
@@ -249,7 +395,9 @@ def recv_ipc():
     # data = shm.read()
     # print("Данные: ", data.decode('utf-8'))
     data = fd_socket.recv(64)
-    
+    print(data)
+    # if(len(data) < 6):
+    #     return header
     header.append(int(data[0]))
     header.append(int(data[1]))
     header.append(struct.unpack("=I",data[2:])[0])
@@ -335,7 +483,7 @@ def VIEW_DATA_PLOT_XY(param):
         arry = arr[3]
         plt.ylabel(arry[1])
         plt.plot(arry[4])
-    if(count_arr == 2):
+    if(count_arr == 2 and False):
         arrx = arr[3]
         arry = arr[4]
         plt.ylabel(arry[1])
@@ -358,9 +506,12 @@ def command_ListenData(param):
         pass
     send_ipc(18, 0, 0, 0)
     def ListenData(e):
+        msg_control = []
+        while(True):
+            msg_control = recv_ipc()
+            if(len(msg_control) > 0):
+                break
 
-
-        msg_control = recv_ipc()
         if(msg_control[0] == 10):
             command_end(None)
         arr = parse_shared_memory()
@@ -370,20 +521,21 @@ def command_ListenData(param):
 
         ax1.clear()
         plt.title(title)
-        plt.ylim(-2000, 2000)
+        plt.ylim(-2000, 12000)
         if(count_arr == 1):
             arry = arr[3]
             plt.ylabel(arry[1])
             # if()
             # print("type arr: ", type(arry[4]))
             if( np.iscomplexobj(arry[4])):
-                plt.plot(arry[4].real)
+                plt.plot(abs(arry[4].real))
                 # plt.plot(arry[4].real, arry[4].imag)
 
             else:
 
                 plt.plot(arry[4])
-        if(count_arr == 2):
+            # arry = arr[3]
+        if(count_arr == 2 and False):
             arrx = arr[3]
             arry = arr[4]
             plt.ylabel(arry[1])
@@ -407,10 +559,6 @@ list_commands = {
 }
 
 
-
-    
-
-
 def processing_commands():
     # if 1:
 
@@ -432,19 +580,7 @@ def processing_commands():
 
 print("Start visual_signal.py")
 
-
-PRACTICE = 1
-
-if PRACTICE == 3:
-    view_graphic_ser()
-    EXIT(1)
-if PRACTICE == 4:
-    
-    model_soft_solutions()
-    EXIT(1)
-if PRACTICE == 5:
-    view_graphic_ser_and_relay_channel()
-    EXIT(1)
+PRACTICE = -1
 
 if PRACTICE == 0:
     RUN_ALL = 0
@@ -480,11 +616,36 @@ if PRACTICE == 0:
             plt.text( samples[i].real, samples[i].imag, data_an[i])
             # print(samples[i].real, samples[i].imag, data_an[i])
 
-if PRACTICE == 1:
-    
-    processing_commands()
 
+targets = {
+    "p3":view_graphic_ser,
+    "p4":model_soft_solutions,
+    "p5":view_graphic_ser_and_relay_channel,
+    "p6":view_graphic_ser_multipath_channel,
+    
+    "processing-commands":processing_commands,
+    "vd1":view_data_1
+}
+
+
+def main():
+    key = sys.argv[1]
+    if(key in targets):
+        targets[key]()
+    else:
+        print("Not found target program")
+        print("targets:")
+        for k in targets.keys():
+            print("\t", k)
+    EXIT(1)
+
+
+if(len(sys.argv) < 2):
+    print("No target program")
     EXIT(0)
+
+main()
+
 
 
 

@@ -15,4 +15,6 @@
 
 
 OFDM_symbol generate_frame_phy(bit_sequence &bits, ParamsPhy &param);
-bit_sequence *decode_frame_phy(OFDM_symbol &samples, ParamsPhy &param);
+bit_sequence *decode_frame_phy(OFDM_symbol &samples, 
+    ParamsPhy &param, bool fprefix = true);
+   
