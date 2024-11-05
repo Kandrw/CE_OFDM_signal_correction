@@ -38,6 +38,27 @@ int DeviceTRX::send_samples(void *samples, size_t size){
 int thread_send_samples_slots(void *data){
     VecSlotsOFDM &slots = *(VecSlotsOFDM*)data;
     int i = 0;
+    VecSymbolMod samples;
+    
+    for(int i = 0; i < slots.size(); i++) {
+        samples.insert(samples.end(), slots[i].PSS.begin(), slots[i].PSS.end());
+        for(int j = 0; j < slots[i].ofdms.size; ++j) {
+            VecSymbolMod &s = slots[i].ofdms.symbol[j];
+            samples.insert(samples.end(), s.begin(), s.end());
+        }
+    }
+    void *ptr_sample = samples.data();
+    int size = samples.size();
+    while(run_while_send_samples){
+        write_to_device_buffer(ptr_sample, size);
+        print_log(LOG, "[%s:%d] [%d] send\n", __func__, __LINE__, i++);
+    }
+    end_while_send_samples = true;
+    return 0;
+}
+int thread_send_samples_slots2(void *data){
+    VecSlotsOFDM &slots = *(VecSlotsOFDM*)data;
+    int i = 0;
     while(run_while_send_samples){
         for(int i = 0; i < slots.size(); i++) {
             void *pss = slots[i].PSS.data();
@@ -67,7 +88,6 @@ int thread_send_samples_slots(void *data){
     end_while_send_samples = true;
     return 0;
 }
-
 int thread_send_samples(void *samples, size_t size){
     int i = 0;
     while(run_while_send_samples){

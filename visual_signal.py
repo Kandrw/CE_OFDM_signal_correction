@@ -352,6 +352,74 @@ def view_data_1():
 
 
 
+def view_resourse_grid(del_cyclic_prefix, data, \
+                          id_fig = 1, subplot = "None",\
+                          title = "Мощность каждой поднесущей в OFDM",\
+                          show = False,
+                          ):
+    table = []
+    for i in range(len(data)):
+        # if i > 1000 and i < 1200:
+        #     table.append( np.fft.fft(data[i][del_cyclic_prefix:] * 1.3) )
+        # else:
+        table.append( np.fft.fft(data[i][del_cyclic_prefix:]) )
+    table = np.array([table]).T
+    power_amplitude = np.abs(table)
+    plt.figure(id_fig, figsize=(10,10))
+    if subplot != "None":
+        plt.subplot(*subplot)
+    # plt.imshow(power_amplitude, aspect='auto', cmap='viridis', origin='lower')
+    plt.imshow(power_amplitude, aspect='auto', cmap='jet', origin='lower')
+    
+    plt.colorbar(label='Мощность (амплитуда)')
+    plt.title(title)
+    plt.ylabel('Поднесущие')
+    plt.xlabel('Временные символы')
+    # plt.xticks(np.arange(0, num_subcarriers, step=8))  # Установка меток по оси X
+    # plt.yticks(np.arange(0, num_symbols, step=2))      # Установка меток по оси Y
+    plt.grid(False)
+    if(show):
+        plt.show()
+def view_data_2():
+    filename_corr = "../data/corr_array3.bin"
+    filename_corr = "../data/corr_array_convolve.bin" 
+    filename_corr2 = "../data/corr_array2.bin"
+    
+    filename_slots = "../data/slots.bin"
+    filename_slots_tx = "../data/slots_tx.bin"
+    filename_rx_data = "../data/rx_sample.bin"
+    filename_rx_ofdms = "../data/read_ofdms.bin"
+    filename_test_rx_ofdms = "../data/test_ofdm_rx.bin"
+    
+    id_f = 10
+
+    if 1:
+        data = read_OFDM_slots(filename_slots_tx, 4)
+        print("len data - ", len(data))
+        for i in range(len(data)):
+            print(f"len data[{i}] - ", len(data[i]))
+        data0 = data[0]
+        print("size pss = ",len(data0[0]),"count ofdm = ", len(data0[1]))
+
+        view_resourse_grid(40, data0[1:], id_f, (2, 2, 1), "Отправленный")
+    if 1:
+        data = read_OFDMs(filename_rx_ofdms, 4)
+        print("len data - ", len(data))
+
+        view_resourse_grid(0, data[1:], id_f, (2, 2, 2), "Принятый")
+    if 1:
+        data = read_OFDMs(filename_test_rx_ofdms, 4)
+        print("len data - ", len(data))
+
+        view_resourse_grid(40, data[1:], id_f, (2, 2, 3), "Принятый 2")
+    
+    id_f += 1
+
+
+
+
+
+
     
 
 FILE_SHARED_MEMORY = "."
@@ -624,7 +692,9 @@ targets = {
     "p6":view_graphic_ser_multipath_channel,
     
     "processing-commands":processing_commands,
-    "vd1":view_data_1
+    "vd1":view_data_1,
+    "vd2":view_data_2
+
 }
 
 

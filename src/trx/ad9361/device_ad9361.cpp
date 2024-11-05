@@ -173,12 +173,39 @@ bool cfg_ad9361_streaming_ch(struct stream_cfg *cfg, enum iodev type, int chid)
 		errchk(iio_attr_write_string(attr, cfg->rfport), cfg->rfport);
 	wr_ch_lli(chn, "rf_bandwidth",       cfg->bw_hz);
 	wr_ch_lli(chn, "sampling_frequency", cfg->fs_hz);
-
+	// wr_ch_lli(chn, "hardware_cain", cfg->fs_hz);
+	
 	// Configure LO channel
 	print_log(LOG_DEVICE, "* Acquiring AD9361 %s lo channel\n", type == TX ? "TX" : "RX");
 	if (!get_lo_chan(type, &chn)) { return false; }
 	wr_ch_lli(chn, "frequency", cfg->lo_hz);
 	return true;
+}
+
+bool cfg_ad9361_streaming_ch2(struct stream_cfg *cfg, enum iodev type, int chid)
+{
+  struct iio_channel *chn = NULL;
+
+  // Configure phy and lo channels
+  printf("* Acquiring AD9361 phy channel %d\n", chid);
+  if (!get_phy_chan(type, chid, &chn)) {  return false; }
+  wr_ch_str(chn, "rf_port_select",     cfg->rfport);
+  wr_ch_lli(chn, "rf_bandwidth",       cfg->bw_hz);
+  wr_ch_lli(chn, "sampling_frequency", cfg->fs_hz);
+//   iio_channel_attr_write(chn, "gain_control_mode", "manual");
+  if (type == RX){   
+      wr_ch_lli(chn, "hardwaregain", 20); // RX gain
+  }
+
+  else {
+    wr_ch_lli(chn, "hardwaregain", 0);
+  }
+
+  // Configure LO channel
+  printf("* Acquiring AD9361 %s lo channel\n", type == TX ? "TX" : "RX");
+  if (!get_lo_chan(type, &chn)) { return false; }
+  wr_ch_lli(chn, "frequency", cfg->lo_hz);
+  return true;
 }
 
 void print_cfg(stream_cfg &txcfg){
@@ -338,7 +365,7 @@ int write_to_device_buffer(const void *data, int size){
 		// p_dat[0] = 4000; /* Real (i) */
 		// p_dat[1] = 4000; /* Imag (q) */
 		// print_log(CONSOLE, "[%d] %f %f\n", iter, dataf[iter], dataf[iter + 1]);
-#if 0
+#if 1
 		p_dat[0] = dataf[iter];
 		p_dat[1] = dataf[iter + 1];
 #else

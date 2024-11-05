@@ -24,8 +24,8 @@
 #include "loaders/load_data.hpp"
 #include "ipc/managment_ipc.hpp"
 #include "phy/ofdm_modulation.hpp"
-
-
+#include "phy/signal_processing.hpp"
+#include "config_parse.hpp"
 
 
 
@@ -176,6 +176,7 @@ int finding_pss(int argc, char *argv[]){
         print_log(CONSOLE, "[ERROR] [main.cpp] main: empty data_bin, EXIT\n");
         return -1;
     }
+#if 0
     OFDM_params param_ofdm = {
         .count_subcarriers = 64,
         .pilot = {0.7, 0.7},
@@ -187,6 +188,14 @@ int finding_pss(int argc, char *argv[]){
     ParamsPhy param_phy = {
         .type_modulation = TypeModulation::QPSK,
         .param_ofdm = param_ofdm,
+    };
+#endif
+    const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
+
+    config_program param = configure(file_conf);
+    ParamsPhy param_phy = {
+        .type_modulation = param.type_modulation,
+        .param_ofdm = param.ofdm_params,
     };
     config_device cfg1 = {
         "None",
@@ -232,11 +241,58 @@ int finding_pss(int argc, char *argv[]){
     int result = -1;
 #if 1
     OFDM_symbol ofdms;
-    result = receiver_OFDM(samples_rx, param_ofdm, ofdms);
+    result = receiver_OFDM(samples_rx, param_phy.param_ofdm, ofdms);
     // VecSymbolMod rx_ = OFDM_demodulator(ofdms, param_ofdm, false);
 #endif
 
 #if 1
+    bit_sequence *read_data = nullptr;
+    if(result == 0)
+        read_data = decode_frame_phy(ofdms, param_phy);
+    
+    if(read_data) {
+        for(int i = 0; i < data.size; ++i) {
+            print_log(CONSOLE, "%u - %u\n", data.buffer[i], read_data->buffer[i]);
+        }
+        int count_error = calc_bit_error(data, *read_data);
+        print_log(CONSOLE, "count error = %d/%d\n", count_error, read_data->size * 8);
+        print_log(LOG_DATA, "read_data: size = %d, data: %s\n", read_data->size, read_data->buffer);
+        print_log(CONSOLE, "input size: %d, output size: %d\n", data.size, read_data->size);
+        print_log(CONSOLE, "End %s\n", __func__);
+    }
+#endif
+    return 0;
+}
+
+int ofdm_reception(int argc, char *argv[]){
+    const char filename[] = "../data/module_ofdm_reception/data_test.txt";// = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
+
+    const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
+
+    config_program param = configure(file_conf);
+    ParamsPhy param_phy = {
+        .type_modulation = param.type_modulation,
+        .param_ofdm = param.ofdm_params,
+    };
+    config_device cfg1 = {
+        "None",
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
+        1024 * 1024,
+    };
+    VecSymbolMod samples_rx(cfg1.block_size);
+    int size_b;
+    u_char *buffer = read_file_data("../data/rx_sample.bin", &size_b);
+    memcpy(samples_rx.data(), buffer, size_b);
+    print_log(CONSOLE, "size samples_rx: %d\n", samples_rx.size());
+
+    int result = -1;
+#if 1
+    OFDM_symbol ofdms;
+    result = receiver_OFDM(samples_rx, param_phy.param_ofdm, ofdms);
+#endif
+
+#if 0
     bit_sequence *read_data = nullptr;
     if(result == 0)
         read_data = decode_frame_phy(ofdms, param_phy);
