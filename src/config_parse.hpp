@@ -24,8 +24,9 @@ struct config_program {
 void print_input_param();
 config_program configure(const char *file_conf);
 void print_configure(const config_program &cfg);
-
-
+void write_ofdm_param(const std::ofstream &file, 
+                            const OFDM_params &ofdm_params);
+void write_config_file(const char *filename, const config_program &param);
 
 
 

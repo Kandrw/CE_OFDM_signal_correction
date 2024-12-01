@@ -10,7 +10,11 @@
 #include <cmath>
 #include <stdexcept>
 
+#include "types.hpp"
+#include "../ipc/managment_ipc.hpp"
 #include "ofdm_modulation.hpp"
+#include "cfo_correct.hpp"
+
 
 
 std::vector<float> autoCorrelation1(const VecSymbolMod& signal, const VecSymbolMod& reference) {
@@ -208,28 +212,6 @@ VecSymbolMod autocorrelation(const VecSymbolMod& signal) {
 
     return result;
 }
-// int Correlation(int a[], int b[]) {
-//     double sum = 0;
-//     for (int i = 0; i < N; i++) {
-//         sum += a[i] * b[i];
-//     }
-//     return sum;
-// }
-
-// double NormalCorrelation1(int *a, int *b) {
-//     double sum_norm = 0;
-//     double sumA_squared = 0;
-//     double sumB_squared = 0;
-    
-//     for (int i = 0; i < N; i++) {
-//         sum_norm += a[i] * b[i];
-//         sumA_squared += pow(a[i], 2);
-//         sumB_squared += pow(b[i], 2);
-//     }
-    
-//     double normalization = sqrt(sumA_squared * sumB_squared);
-//     return sum_norm / normalization;
-// }
 
 float normalized_correlation1(const VecSymbolMod& signal1, const VecSymbolMod& signal2) {
     float sum_product = 0.0;
@@ -248,6 +230,37 @@ float normalized_correlation1(const VecSymbolMod& signal1, const VecSymbolMod& s
 }
 
 
+std::vector<float> correlation(const VecSymbolMod& y1, const VecSymbolMod& y2) {
+    size_t len1 = y1.size();
+    size_t len2 = y2.size();
+    size_t maxShift = len1 - len2 + 1;  // Максимальный сдвиг для корреляции
+    std::vector<float> result(maxShift, 0.0);
+
+    // Предварительные вычисления нормировочных коэффициентов
+    float normY2 = 0.0;
+    for (const auto& v : y2) {
+        normY2 += std::norm(v);
+    }
+    normY2 = std::sqrt(normY2);
+
+    // Цикл по сдвигам
+    for (size_t shift = 0; shift < maxShift; ++shift) {
+        std::complex<float> sum(0.0, 0.0);
+        float normY1 = 0.0;
+
+        // Вычисление корреляции на текущем сдвиге
+        for (size_t i = 0; i < len2; ++i) {
+            sum += y1[i + shift] * std::conj(y2[i]);
+            normY1 += std::norm(y1[i + shift]);
+        }
+
+        // Нормирование
+        float normFactor = std::sqrt(normY1) * normY2;
+        result[shift] = std::abs(sum) / normFactor;
+    }
+
+    return result;
+}
 
 
 int find_pss(VecSymbolMod &samples, VecSymbolMod &pss) {
@@ -293,139 +306,116 @@ float normalized_correlation(const VecSymbolMod& signal1, const VecSymbolMod& si
     return sum_product / (std::sqrt(sum_sq_signal1) * std::sqrt(sum_sq_signal2));
 }
 
-float normalized_correlation2(const VecSymbolMod& signal1, const VecSymbolMod& signal2) {
-    VecSymbolMod corr_array = convolve(signal1, signal2);
-    print_log(CONSOLE, "signal1 size - %d, corr_array size = %d\n", signal1.size(), corr_array.size());
-    write_file_bin_data(
-        "../data/corr_array_convolve.bin", 
-        (void*)&corr_array[0], 
-        sizeof(float) * corr_array.size() * 2);
-    return maxElement(corr_array);
-}
-
+enum class STATE_RECV_OFDM {
+    FIND_PSS,
+    FIND_OFDM,
+    EXIT,
+};
 
 int receiver_OFDM(VecSymbolMod &samples, 
     OFDM_params &param_ofdm, OFDM_symbol &ofdms) 
 {
+    float activate_find_pss = 0.7;
+    int count_send_ofdm = 7;
+    int pos_data = -1;
     VecSymbolMod pss = generateZadoffChuSequence(0, LENGTH_PSS);
-#if 0
-    std::vector<float> corr_array = correlate_PSS(samples, pss);
+
+#if 1
+    std::vector<float> corr_array = correlation(samples, pss);
     write_file_bin_data(
-            "../data/corr_array2.bin", 
+            "../data/corr_array_test.bin", 
             (void*)&corr_array[0], 
             sizeof(float) * corr_array.size());
 #endif
-    int pos_data;
-    //  = max_element(corr_array.begin(), corr_array.end()) - corr_array.begin();
-    // convolve(samples, pss);
+
     print_log(CONSOLE, "samples.size() = %d\n", samples.size() );
-    // pos_data = correlate(samples, pss);
-    pos_data = find_pss(samples, pss);
-#if 1
-    VecSymbolMod pss_rx(samples.begin() + pos_data - LENGTH_PSS, samples.begin() + pos_data);
-    print_VecSymbolMod(pss_rx);
 
-#endif
-#if 1
-    int pos_data2 = pos_data - 1000;
-    VecSymbolMod sofdms(samples.begin() + pos_data2, samples.begin() + pos_data2 + 3528);
-    OFDM_symbol f1 = samples_join_OFDM(sofdms, 168, samples.size());
-    print_log(LOG, "f1 = %d - %d\n", f1.size, f1.symbol.size());
-    write_OFDMs("../data/test_ofdm_rx.bin", f1, f1.size);
-
-#endif
-    print_log(LOG, "[%s:%d] pos data = %d\n", __func__, __LINE__, pos_data);
-    if(pos_data > samples.size() || pos_data < 0) {
-        print_log(ERROR_OUT, "Error find pss: %d out range(0, %d)\n", pos_data, samples.size());
-        return -1;
-    }
-    // return;
-    int count = 21;
-    // std::vector<float> norm_corr_ofdm;
-    // std::vector<int> indexes;
-    
-    // int iter_end = 3;
-    // pos_data -= 40;
-    // pos_data = 0;
-    float activate_sample = 0.3;
-    // OFDM_symbol ofdms;
-    for(int i = 0; i < count; ++i) {
-        // float max_corr = 0;
-        // float limit_activate = 0.017;
-        // int iter = 0;
-        std::vector<float> norm_corr_ofdm;
-        std::vector<int> indexes;
-        for(int j = pos_data; j < samples.size() - 
-            (param_ofdm.def_interval + param_ofdm.count_subcarriers); ++j) 
-        {
-
-            VecSymbolMod prefix(samples.begin() + j, samples.begin() + j + param_ofdm.def_interval);
-
-            VecSymbolMod s(samples.begin() + j + param_ofdm.def_interval, 
-                samples.begin() + j + param_ofdm.def_interval + param_ofdm.count_subcarriers);
-
-            VecSymbolMod postfix(samples.begin() + j + param_ofdm.count_subcarriers, 
-                samples.begin() + j + param_ofdm.def_interval + param_ofdm.count_subcarriers);
-                
-
-            float corr = normalized_correlation(prefix, postfix);
-            // print_log(CONSOLE, "corr = %f\n", corr);  
-            norm_corr_ofdm.push_back(corr);
-            indexes.push_back(j);
-            if(j > pos_data + 100) {
-                print_log(LOG, "limited\n");
-                break;
-            }
-#if 0     
-            if(corr >= activate_sample) {
-                VecSymbolMod ofdm(samples.begin() + j + param_ofdm.def_interval, 
-                    samples.begin() + j + param_ofdm.def_interval + param_ofdm.count_subcarriers);
-                // VecSymbolMod ofdm(samples.begin() + j + param_ofdm.def_interval, 
-                //     samples.begin() + j + param_ofdm.def_interval + 
-                //     param_ofdm.count_subcarriers + param_ofdm.cyclic_prefix);
-                
-                // print_log(CONSOLE, "size ofdm - %d\n", ofdm.size());
-                pos_data = j + param_ofdm.count_subcarriers;
-                ofdms.symbol.push_back(ofdm);
-                ofdms.size++;
-                break;
-            }
-#endif
-        }
-#if 1
-        auto max_corr = std::max_element(norm_corr_ofdm.begin(), norm_corr_ofdm.end());
-        int index_mc = std::distance(norm_corr_ofdm.begin(), max_corr);
-        index_mc = indexes[index_mc];
-        printf("max corr = %f, index_mc = %d\n", *max_corr, index_mc);
-        if(*max_corr >= activate_sample) {
-            VecSymbolMod ofdm(samples.begin() + index_mc + param_ofdm.def_interval, 
-                samples.begin() + index_mc + param_ofdm.def_interval + param_ofdm.count_subcarriers);
-            // VecSymbolMod ofdm(samples.begin() + j + param_ofdm.def_interval, 
-            //     samples.begin() + j + param_ofdm.def_interval + 
-            //     param_ofdm.count_subcarriers + param_ofdm.cyclic_prefix);
+    bool run = true;
+    STATE_RECV_OFDM state = STATE_RECV_OFDM::FIND_PSS;
+    int pos_iter = 0;
+    int status = 0;
+    int iter_pos_ofdm;
+    int slice;
+    int count_pss = 0;
+    while (run) {
+        print_log(LOG, "[%s:%d] \t\tstate: %d\n", __func__, __LINE__, static_cast<int>(state));
             
-            // print_log(CONSOLE, "size ofdm - %d\n", ofdm.size());
-            pos_data = index_mc + param_ofdm.count_subcarriers;
-            ofdms.symbol.push_back(ofdm);
-            ofdms.size++;
-            // break;
-        }
-#endif 
-    }
+        switch (state)
+        {
+        case STATE_RECV_OFDM::FIND_PSS:
+#if 1
+            if(count_pss == 1) {
+                run = false;
+                break;
+            }
 
-    // write_file_bin_data(
-    //         "../data/norm_corr_ofdm.bin", 
-    //         (void*)&norm_corr_ofdm[0], 
-    //         sizeof(float) * norm_corr_ofdm.size());
-    if(ofdms.size != count) {
-        print_log(CONSOLE, "Not all ofdms symbol are accepted - %d\n", ofdms.size);
+#endif
+
+            pos_data = -1;
+            print_log(CONSOLE, "[%s:%d] pos_iter - %d\n", __func__, __LINE__, pos_iter);
+            for(int i = pos_iter; i < corr_array.size(); ++i) {
+                if(corr_array[i] > activate_find_pss) {
+                    pos_data = i + pss.size();
+                    break;
+                }
+            }
+            print_log(LOG, "[%s:%d] pos_data: %d\n", __func__, __LINE__, pos_data);
+            if(pos_data == -1) {
+                state = STATE_RECV_OFDM::EXIT;
+            } else {
+                state = STATE_RECV_OFDM::FIND_OFDM;
+                count_pss++;
+            }
+            break;
+        case STATE_RECV_OFDM::FIND_OFDM:
+            iter_pos_ofdm = pos_data;
+            slice = -1;
+            state = STATE_RECV_OFDM::FIND_PSS;
+            for(int i = 0; i < count_send_ofdm; ++i) {
+                iter_pos_ofdm += param_ofdm.cyclic_prefix;
+                slice = iter_pos_ofdm + param_ofdm.count_subcarriers;
+                if(iter_pos_ofdm > samples.size() || slice > samples.size()) {
+                    print_log(CONSOLE, "Out of range buffer: slice [%d:%d], buffer size - %d\n",
+                        iter_pos_ofdm, slice, samples.size());
+                    state = STATE_RECV_OFDM::EXIT;
+                    break;
+                }
+                print_log(CONSOLE, "[%s:%d] add ofdm symbol - %d, [%d:%d]\n",
+                    __func__, __LINE__, ofdms.size(), iter_pos_ofdm, slice);
+                VecSymbolMod ofdm_symbol(samples.begin() + iter_pos_ofdm,
+                    samples.begin() + slice);
+                // evaluation_cfo_one(ofdm_symbol, param_ofdm);
+                ofdms.push_back(ofdm_symbol);
+                // ofdms.push_back(
+                //     VecSymbolMod(
+                //         samples.begin() + iter_pos_ofdm, 
+                //         samples.begin() + slice));
+                iter_pos_ofdm += param_ofdm.count_subcarriers;
+            }
+            pos_iter = iter_pos_ofdm; 
+            break;
+        case STATE_RECV_OFDM::EXIT:
+            run = false;
+            break;
+        default:
+            run = false;
+            break;
+        }
+        
+    }
+    if(ofdms.size() > 0) {
+        evaluation_cfo(ofdms, param_ofdm);
+    }
+    if(ofdms.size() != count_send_ofdm) {
+        print_log(CONSOLE, "Not all ofdms symbol are accepted - %d\n", ofdms.size());
+        if(ofdms.size() > 0) {
+            write_OFDMs("../data/read_ofdms.bin", ofdms, ofdms.size());
+        }
         return -1;
     } else {
-        write_OFDMs("../data/read_ofdms.bin", ofdms, ofdms.size);
+        write_OFDMs("../data/read_ofdms.bin", ofdms, ofdms.size());
         // VecSymbolMod rtert = OFDM_demodulator(ofdms, param_ofdm, false);
     }
-    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
-    print_log(CONSOLE, "count ofdms symbol = %d\n", ofdms.size);
     return 0;
 }
 

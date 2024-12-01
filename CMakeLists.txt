@@ -41,13 +41,18 @@ set(SOURCE
     src/phy/modulation.cpp
     src/phy/ofdm_modulation.cpp
     src/phy/signal_processing.cpp
-
+    src/trx/debug_trx.cpp
     src/phy/types.cpp
 
     src/model/modelling.cpp
 
     src/loaders/load_data.cpp
     src/ipc/managment_ipc.cpp
+    src/phy/cfo_correct.cpp    
+
+    src/bss_ue/bss.cpp
+    src/bss_ue/ue.cpp
+    src/bss_ue/components.cpp
     
 )
 else()
@@ -72,10 +77,10 @@ set(SOURCE
     src/phy/types.cpp
 
     src/model/modelling.cpp
-
+    
     src/loaders/load_data.cpp
     src/ipc/managment_ipc.cpp
-
+    src/phy/cfo_correct.cpp
 )
 
 

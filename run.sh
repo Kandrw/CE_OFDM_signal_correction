@@ -15,7 +15,6 @@ ADDRESS_DEV="ip:192.168.3.1"
 SPECIFIC_OPTION="4"
 FILE_CONFIG=../configs/config.txt
 
-
 while getopts "dcma:l:r:v:o:" OPTION; do
     case $OPTION in
     d)

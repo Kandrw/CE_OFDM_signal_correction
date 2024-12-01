@@ -37,19 +37,26 @@ void read_ofdm_parameters(std::ifstream &file, OFDM_params &ofdm_params) {
         } else if(buffer == "power:") {
             file >> buffer;
             ofdm_params.power = std::stof(buffer);
+        } else if(buffer == "count_ofdm_in_slot:") {
+            file >> buffer;
+            ofdm_params.count_ofdm_in_slot = std::stof(buffer);
         }
     }
 }
 
-typedef std::map<std::string, TypeModulation> map_TypeModulation;
-
-map_TypeModulation map_type_mod = {
+std::map<std::string, TypeModulation> map_type_mod = {
     {"BPSK", TypeModulation::BPSK},
     {"QPSK", TypeModulation::QPSK},
     {"QAM16", TypeModulation::QAM16},
     {"QAM64", TypeModulation::QAM64},
     {"QAM256", TypeModulation::QAM256},
-    
+};
+std::map<TypeModulation, std::string> map_type_str_mod = {
+    {TypeModulation::BPSK, "BPSK"},
+    {TypeModulation::QPSK, "QPSK"},
+    {TypeModulation::QAM16, "QAM16"},
+    {TypeModulation::QAM64, "QAM64"},
+    {TypeModulation::QAM256, "QAM256"},
 };
 
 static TypeModulation string_to_TypeModulation(const std::string &tm) {
@@ -74,7 +81,6 @@ config_program configure(const char *file_conf) {
     while(file >> buffer) {
         if(buffer == "log_file:") {
             file >> param.file_log;
-            std::cout<<param.file_log<<"\n";
         } else if(buffer == "address:") {
             file >> param.address;
         } else if(buffer == "type_modulation:") {
@@ -90,6 +96,41 @@ config_program configure(const char *file_conf) {
     return param;
 }
 
+void write_ofdm_param(std::ofstream &file, 
+                            const OFDM_params &ofdm_params) 
+{
+    /*без проверки*/
+    file<<"ofdm_parameters: {\n";
+    file<<"count_subcarriers: " << ofdm_params.count_subcarriers<<"\n";
+    file<<"pilot: " << ofdm_params.pilot.real() << " " << ofdm_params.pilot.imag() << "\n";
+    file<<"step_RS: " << ofdm_params.step_RS << "\n";
+    file<<"def_interval: " << ofdm_params.def_interval << "\n";
+    file<<"cyclic_prefix: " << ofdm_params.cyclic_prefix << "\n";
+    file<<"power: " << ofdm_params.power << "\n";
+    file<<"count_ofdm_in_slot: " << ofdm_params.count_ofdm_in_slot << "\n";
+    file<<"}\n";
+    
+}
+
+void write_config_file(const char *filename, const config_program &param) {
+    std::ofstream file(filename);
+    if(!file.is_open()) {
+        print_log(ERROR_OUT, "Error open %s\n", filename);
+        return;
+    }
+    file<<"log_file: "<<param.file_log<<"\n";
+    file<<"address: "<<param.address<<"\n";
+    auto tm = map_type_str_mod.find(param.type_modulation);
+    if(tm != map_type_str_mod.end())
+        file<<"type_modulation: "<<tm->second.c_str()<<"\n";
+    else {
+        print_log(ERROR_OUT, "Error: type modulation\n");
+        return;
+    }
+    write_ofdm_param(file, param.ofdm_params);    
+    
+    
+}
 
 void print_configure(const config_program &cfg) {
     std::cout<<"log_file:" << cfg.file_log << "\n";

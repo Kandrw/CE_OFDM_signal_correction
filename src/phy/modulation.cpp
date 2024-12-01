@@ -485,7 +485,7 @@ bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
     bit_sequence *bits = new bit_sequence;
     bits->size = samples.size() * bits_symbol / BITS_TO_BYTE;
     if( (samples.size() * bits_symbol) %  BITS_TO_BYTE != 0){
-        print_log(CONSOLE, "[%s:%d] Error: %d % 8 != 0\n", __func__, __LINE__, samples.size() * bits_symbol);
+        print_log(LOG_DATA, "[%s:%d] Error: %d % 8 != 0\n", __func__, __LINE__, samples.size() * bits_symbol);
     }
     bits->buffer = new u_char[bits->size]{0};
     u_char *step = bits->buffer;
@@ -544,7 +544,7 @@ bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
 
 
         if(!if_decode_symbol){
-            print_log(ERROR_OUT, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].real(), samples[i].imag());
+            print_log(LOG_DATA, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].real(), samples[i].imag());
         }
 
     }

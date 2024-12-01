@@ -215,14 +215,7 @@ void read_polinom(u_char *polinom, char *filename){
     polinom[3] = 18;
 #endif
 }
-//b main
-//r <аргументы>
-//disassemble
-//x/10bb $esp+0x10a
-//x/8bt $esp
-//x/10bt 0x61fe1c - адресс смотреть в регистрах
-//x/10 &buffer - или вывести напрямую
-//x/4ht &size
+
 
 bit_sequence *generate_packet(u_char *data, int size){
     printf("[generate_packet] size = %d\n", size);

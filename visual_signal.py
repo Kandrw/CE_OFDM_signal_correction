@@ -50,7 +50,7 @@ def read_file_to_list_str(filename):
         data = data[0]
         return data.split(" ")
 
-def read_OFDM_slots(filename, size_type):
+def read_OFDM_one_slot(filename, size_type):
     data = []
     with open(filename, "rb") as file:
 
@@ -77,6 +77,44 @@ def read_OFDM_slots(filename, size_type):
             slot.append(numpy_array)
         data.append(slot)
     return data
+
+def read_OFDM_slots(filename, size_type):
+    data = []
+    with open(filename, "rb") as file:
+
+        count_slots = file.read(4)
+        
+        count_slots = int.from_bytes(count_slots, byteorder='little')
+        print("count_slots =", count_slots)
+        for k in range(count_slots):
+
+
+            size = file.read(4)
+            if(size == ""):
+                return data
+            
+            slot = []
+            size = int.from_bytes(size, byteorder='little')
+            print("|size = ", size)
+            byte_array = file.read(size * size_type * 2)
+            numpy_array = np.frombuffer(byte_array, dtype=np.complex64)
+            slot.append(numpy_array)
+            size_sub = file.read(4)
+            size_sub = int.from_bytes(size_sub, byteorder='little')
+            print("||size = ", size_sub)
+            size = file.read(4)
+            size = int.from_bytes(size, byteorder='little')
+            print("|||size = ", size)
+            for i in range(0, size):
+                byte_array = file.read(size_sub * size_type * 2)
+                numpy_array = np.frombuffer(byte_array, dtype=np.complex64)
+                print("|||size numpy_array = ", len(numpy_array))
+                slot.append(numpy_array)
+            data.append(slot)
+    return data
+
+
+
 def read_OFDMs(filename, size_type):
     data = []
     with open(filename, "rb") as file:
@@ -210,13 +248,31 @@ def view_graphic_ser_and_relay_channel():
         
         # plt.subplot(2, 2, 1)
         # plt.scatter(samples.real, samples.imag)
-
+# 6
 def view_graphic_ser_multipath_channel():
+    ser_list = []
+    zero_forcing_list = []
+    snr_list = []
+    file = "../data/ser.txt"
+    data = 0
+    with open(file, "r") as file:
+        data = file.readlines()
+    for i in range(len(data)):
+        aa = (data[i][:-1]).split(" ")
+        ser_list.append(float(aa[0]))
+        snr_list.append(int(aa[1]))
+        zero_forcing_list.append(float(aa[2]))
 
-    filename_s = "../data/samples/rx_50"
-    samples = array_float_to_np_complex(read_file_bin(filename_s, 4))
+    plt.semilogy(snr_list, ser_list, label = "ser")
+    plt.semilogy(snr_list, zero_forcing_list, c="r", label = "Zero Forcing")
+    plt.legend()
+    plt.title("BER soft and hard for QAM16")
+    plt.xlabel("SNR")
+    plt.ylabel("error")
+    # filename_s = "../data/samples/rx_50"
+    # samples = array_float_to_np_complex(read_file_bin(filename_s, 4))
 
-    plt.scatter(samples.real, samples.imag)
+    # plt.scatter(samples.real, samples.imag)
 
 def view_data_1():
     filename_corr = "../data/corr_array3.bin"
@@ -362,13 +418,18 @@ def view_resourse_grid(del_cyclic_prefix, data, \
         # if i > 1000 and i < 1200:
         #     table.append( np.fft.fft(data[i][del_cyclic_prefix:] * 1.3) )
         # else:
-        table.append( np.fft.fft(data[i][del_cyclic_prefix:]) )
+        res = np.fft.fft(data[i][del_cyclic_prefix:])
+        res = np.fft.fftshift(res)
+        table.append( res )
     table = np.array([table]).T
     power_amplitude = np.abs(table)
     plt.figure(id_fig, figsize=(10,10))
     if subplot != "None":
         plt.subplot(*subplot)
     # plt.imshow(power_amplitude, aspect='auto', cmap='viridis', origin='lower')
+    if(len(power_amplitude) == 0):
+        print("view_resourse_grid: Error: len data = 0 ")
+        return
     plt.imshow(power_amplitude, aspect='auto', cmap='jet', origin='lower')
     
     plt.colorbar(label='Мощность (амплитуда)')
@@ -390,8 +451,127 @@ def view_data_2():
     filename_rx_data = "../data/rx_sample.bin"
     filename_rx_ofdms = "../data/read_ofdms.bin"
     filename_test_rx_ofdms = "../data/test_ofdm_rx.bin"
-    
+    filename_samples_tx = "../data/samples_tx.bin"
+    filename_corr_test = "../data/corr_array_test.bin"
+    config = read_config("../configs/config.txt")
+    print("config:\n", config)
+    cyclic_prefix = int(config["cyclic_prefix"])
+    count_subcarriers = int(config["count_subcarriers"])
     id_f = 10
+    plt.figure(id_f, figsize=(10,10))
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin(filename_rx_data, 4))
+        plt.subplot(2, 2, 1)
+        plt.title("Буфер")
+        plt.plot(abs(samples))
+        if 1:
+            data = read_OFDMs(filename_rx_ofdms, 4)
+            print("len data - ", len(data))
+            # fft = []
+            # for ofdm in data:
+            #     fft1 = np.fft.fft(ofdm)
+            #     fft += fft1
+            plt.subplot(2, 2, 2)
+            plt.title("Пример спектра одного OFDM символа")
+            plt.plot(abs(np.fft.fft(data[0])))
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin(filename_samples_tx, 4))
+        plt.subplot(2, 2, 3)
+        plt.title("Отправленный")
+        plt.plot(abs(samples))
+    if 1:
+        corr = read_file_bin(filename_corr_test, 4)
+        plt.subplot(2, 2, 4)
+        plt.title("Корреляция")
+        plt.plot(corr)
+
+    id_f += 1
+    plt.figure(id_f, figsize=(10,10))
+    if 1:
+        data = read_OFDM_slots(filename_slots_tx, 4)
+        
+        print("len data - ", len(data))
+        for i in range(len(data)):
+            print(f"len data[{i}] - ", len(data[i]))
+        data_ofdms_no_pss = []
+        for i in range(len(data)):
+            for j in range(1, len(data[i])):
+                # if(len(data[i][j]) < count_subcarriers):
+                #     f_len_arr = (count_subcarriers - len(data[i][j])) // 2
+                #     data[i][j] = np.concatenate((data[i][j], [0 for i in range(f_len_arr + 2 + cyclic_prefix)]))
+                #     data[i][j] = np.concatenate(([0 for i in range(f_len_arr)], data[i][j]))
+                #     data[i][j] = data[i][j][:count_subcarriers + cyclic_prefix]
+                # data_ofdms_no_pss.append(data[i][j])
+                # print(f"len s - {len(data[i][j])}")
+                data_ofdms_no_pss.append(data[i][j])
+        data0 = data[0]
+        print("size pss = ",len(data0[0]),"count ofdm = ", len(data0[1]))
+        print(type(data0[1:]))
+        view_resourse_grid(cyclic_prefix, data_ofdms_no_pss, id_f, (2, 2, 1), "Отправленный")
+    if 1:
+        data = read_OFDMs(filename_rx_ofdms, 4)
+        print("len data - ", len(data))
+
+        # view_resourse_grid(0, data[1:], id_f, (2, 2, 2), "Принятый")
+        view_resourse_grid(0, data, id_f, (2, 2, 2), "Принятый")
+        
+    if 0:
+        data = read_OFDMs(filename_test_rx_ofdms, 4)
+        print("len data - ", len(data))
+
+        view_resourse_grid(cyclic_prefix, data[1:], id_f, (2, 2, 3), "Принятый синхронизированный по PSS")
+    
+    id_f += 1
+
+
+
+def read_config(filename):
+    config = {}
+    with open(filename, "r") as file:
+        for line in file:
+            line = line[:-1]
+            line = line.split(":")
+            line[0] = line[0].lstrip()
+            if(len(line) > 1):
+                line[1] = line[1][1:]
+            if(len(line) > 1 and line[1] == "{"):
+                pass
+            elif len(line) == 1:
+                pass
+            else:
+                config[line[0]] = line[1]
+    print(config)
+    return config
+
+def ofdm_model_add_noise():
+    filename_corr_pss = "../data/corr_array_convolve.bin" 
+    filename_test_corr = "../data/corr_array2.bin"
+
+    filename_slots_tx = "../data/ofdm_model_add_noise/slots_tx.bin"
+    filename_signal_tx = "../data/ofdm_model_add_noise/signal_tx.bin"
+    filename_signal_rx = "../data/ofdm_model_add_noise/signal_rx.bin"
+    filename_test_ofdm_rx = "../data/test_ofdm_rx.bin"
+    filename_rx_ofdms = "../data/read_ofdms.bin"
+    filename_noise = "../data/noise.bin"
+
+    config = read_config("../data/ofdm_model_add_noise/config.txt")
+    cyclic_prefix = int(config["cyclic_prefix"])
+    id_f = 10
+    plt.figure(id_f, figsize=(10,10))
+
+    if 1:
+        pss = array_float_to_np_complex(read_file_bin(filename_corr_pss, 4))
+        plt.subplot(2, 2, 1)
+        plt.title("Корреляция PSS")
+        plt.plot(pss)
+        if 1:
+            pss = read_file_bin(filename_test_corr, 4)
+            plt.subplot(2, 2, 2)
+            plt.title("тестоввая корреляция PSS")
+            plt.plot(pss)
+
+    id_f += 1
+    plt.figure(id_f, figsize=(10,10))
 
     if 1:
         data = read_OFDM_slots(filename_slots_tx, 4)
@@ -401,26 +581,137 @@ def view_data_2():
         data0 = data[0]
         print("size pss = ",len(data0[0]),"count ofdm = ", len(data0[1]))
 
-        view_resourse_grid(40, data0[1:], id_f, (2, 2, 1), "Отправленный")
+        view_resourse_grid(cyclic_prefix, data0[1:], id_f, (2, 2, 1), "Отправленный OFDM")
     if 1:
         data = read_OFDMs(filename_rx_ofdms, 4)
         print("len data - ", len(data))
 
         view_resourse_grid(0, data[1:], id_f, (2, 2, 2), "Принятый")
     if 1:
-        data = read_OFDMs(filename_test_rx_ofdms, 4)
+        data = read_OFDMs(filename_test_ofdm_rx, 4)
         print("len data - ", len(data))
 
-        view_resourse_grid(40, data[1:], id_f, (2, 2, 3), "Принятый 2")
-    
+        view_resourse_grid(cyclic_prefix, data[1:], id_f, (2, 2, 3), "Принятый 2")
+    id_f += 1
+    plt.figure(id_f, figsize=(10,10))
+    if 1:
+        
+        samples = array_float_to_np_complex(read_file_bin(filename_signal_tx, 4))
+        samples100 = samples[:50]
+        print(samples100)
+        plt.subplot(2, 2, 3)
+        plt.title("Отправленный сигнал во временной области")
+        # plt.plot(abs(samples))
+        plt.plot(abs(samples))
+        
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin(filename_signal_rx, 4))
+        plt.subplot(2, 2, 4)
+        plt.title("Принятый сигнал во временной области")
+        plt.plot(abs(samples))
+    if 1:
+        noise = array_float_to_np_complex(read_file_bin(filename_noise, 4))
+        plt.subplot(2, 2, 1)
+        plt.title("Шум")
+        plt.plot(noise)
     id_f += 1
 
 
 
-
-
-
+def view_data_3():
+    filename_corr = "../data/corr_array3.bin"
+    filename_corr = "../data/corr_array_convolve.bin" 
+    filename_corr2 = "../data/corr_array2.bin"
     
+    filename_slots = "../data/slots.bin"
+    filename_slots_tx = "../data/slots_tx.bin"
+    filename_rx_data = "../data/rx_sample.bin"
+    filename_rx_ofdms = "../data/read_ofdms.bin"
+    filename_test_rx_ofdms = "../data/test_ofdm_rx.bin"
+    filename_samples_tx = "../data/samples_tx.bin"
+    filename_corr_test = "../data/corr_array_test.bin"
+    filename_mod_tx = "../data/samples_modulation_tx.bin"
+    filename_mod_rx = "../data/samples_modulation_rx.bin"
+    
+    config = read_config("../configs/config.txt")
+    print("config:\n", config)
+    cyclic_prefix = int(config["cyclic_prefix"])
+    count_subcarriers = int(config["count_subcarriers"])
+    id_f = 10
+    plt.figure(id_f, figsize=(10,10))
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin(filename_rx_data, 4))
+        plt.subplot(2, 2, 1)
+        plt.title("Буфер")
+        plt.plot(abs(samples))
+        if 1:
+            data = read_OFDMs(filename_rx_ofdms, 4)
+            print("len data - ", len(data))
+            plt.subplot(2, 2, 2)
+            plt.title("Пример спектра одного OFDM символа")
+            plt.plot(abs(np.fft.fft(data[0])))
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin(filename_samples_tx, 4))
+        plt.subplot(2, 2, 3)
+        plt.title("Отправленный")
+        plt.plot(abs(samples))
+    if 1:
+        corr = read_file_bin(filename_corr_test, 4)
+        plt.subplot(2, 2, 4)
+        plt.title("Корреляция")
+        plt.plot(corr)
+
+    id_f += 1
+    plt.figure(id_f, figsize=(10,10))
+    if 1:
+        data = read_OFDM_slots(filename_slots_tx, 4)
+        
+        print("len data - ", len(data))
+        for i in range(len(data)):
+            print(f"len data[{i}] - ", len(data[i]))
+        data_ofdms_no_pss = []
+        for i in range(len(data)):
+            for j in range(1, len(data[i])):
+                # if(len(data[i][j]) < count_subcarriers):
+                #     f_len_arr = (count_subcarriers - len(data[i][j])) // 2
+                #     data[i][j] = np.concatenate((data[i][j], [0 for i in range(f_len_arr + 2 + cyclic_prefix)]))
+                #     data[i][j] = np.concatenate(([0 for i in range(f_len_arr)], data[i][j]))
+                #     data[i][j] = data[i][j][:count_subcarriers + cyclic_prefix]
+                # data_ofdms_no_pss.append(data[i][j])
+                # print(f"len s - {len(data[i][j])}")
+                # data[i][j] = np.fft.fftshift(data[i][j])
+                data_ofdms_no_pss.append(data[i][j])
+        data0 = data[0]
+        print("size pss = ",len(data0[0]),"count ofdm = ", len(data0[1]))
+        print(type(data0[1:]))
+        view_resourse_grid(cyclic_prefix, data_ofdms_no_pss, id_f, (2, 2, 1), "Отправленный")
+    if 1:
+        data = read_OFDMs(filename_rx_ofdms, 4)
+        print("len data - ", len(data))
+
+        # view_resourse_grid(0, data[1:], id_f, (2, 2, 2), "Принятый")
+        view_resourse_grid(0, data, id_f, (2, 2, 2), "Принятый")
+        
+    if 0:
+        data = read_OFDMs(filename_test_rx_ofdms, 4)
+        print("len data - ", len(data))
+
+        view_resourse_grid(cyclic_prefix, data[1:], id_f, (2, 2, 3), "Принятый синхронизированный по PSS")
+    
+    # id_f += 1
+    # plt.figure(id_f, figsize=(10,10))
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin(filename_mod_tx, 4))
+        plt.subplot(2, 2, 3)
+        plt.title("Отправленные QPSK")
+        plt.scatter(samples.real, samples.imag)
+
+        samples = array_float_to_np_complex(read_file_bin(filename_mod_rx, 4))
+        plt.subplot(2, 2, 4)
+        plt.title("Принятые QPSK")
+        plt.scatter(samples.real, samples.imag)
+    id_f += 1
+
 
 FILE_SHARED_MEMORY = "."
 SIZE_MEMORY = 20000
@@ -589,7 +880,7 @@ def command_ListenData(param):
 
         ax1.clear()
         plt.title(title)
-        plt.ylim(-2000, 12000)
+        plt.ylim(-20, 5000)
         if(count_arr == 1):
             arry = arr[3]
             plt.ylabel(arry[1])
@@ -693,7 +984,9 @@ targets = {
     
     "processing-commands":processing_commands,
     "vd1":view_data_1,
-    "vd2":view_data_2
+    "vd2":view_data_2,
+    "vd3":view_data_3,
+    "ofdm_model_add_noise": ofdm_model_add_noise
 
 }
 

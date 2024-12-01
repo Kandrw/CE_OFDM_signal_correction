@@ -24,6 +24,13 @@ struct bit_sequence{
 };
 
 
+
+struct header_phy {
+    u_char command;
+    u_int16_t len;
+};
+
+
 struct bit_sequence *generate_packet(u_char *data, int size);
 
 #endif /*GENERATE_PACKET_H*/

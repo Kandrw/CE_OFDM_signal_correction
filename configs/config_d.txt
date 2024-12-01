@@ -3,11 +3,11 @@ log_file: ../log.log
 address: ip:192.168.2.1
 type_modulation: QPSK
 ofdm_parameters: {
-count_subcarriers: 64
+count_subcarriers: 128
 pilot: 0.7 0.7
 step_RS: 8
-def_interval: 16
-cyclic_prefix: 15
-power: 3000
+def_interval: 30
+cyclic_prefix: 40
+power: 16000
 count_ofdm_in_slot: 7
 }

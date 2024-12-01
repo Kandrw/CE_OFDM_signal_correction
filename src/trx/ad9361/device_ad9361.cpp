@@ -159,7 +159,7 @@ static bool get_lo_chan(enum iodev d, struct iio_channel **chn)
 
 
 /* applies streaming configuration through IIO */
-bool cfg_ad9361_streaming_ch(struct stream_cfg *cfg, enum iodev type, int chid)
+bool cfg_ad9361_streaming_ch1(struct stream_cfg *cfg, enum iodev type, int chid)
 {
 	const struct iio_attr *attr;
 	struct iio_channel *chn = NULL;
@@ -207,6 +207,54 @@ bool cfg_ad9361_streaming_ch2(struct stream_cfg *cfg, enum iodev type, int chid)
   wr_ch_lli(chn, "frequency", cfg->lo_hz);
   return true;
 }
+
+#define RX_GAIN 20
+#define TX_GAIN 0
+
+
+bool cfg_ad9361_streaming_ch(struct stream_cfg *cfg, enum iodev type, int chid)
+{
+  const struct iio_attr *attr,*attr_gain;
+  struct iio_channel *chn = NULL;
+
+  // Configure phy and lo channels
+  printf("* Acquiring AD9361 phy channel %d\n", chid);
+  if (!get_phy_chan(type, chid, &chn)) {  return false; }
+
+  attr = iio_channel_find_attr(chn, "rf_port_select");
+  attr_gain = iio_channel_find_attr(chn, "gain_control_mode");
+
+  if (attr)
+    errchk(iio_attr_write_string(attr, cfg->rfport), cfg->rfport);
+
+  if (attr_gain)
+    errchk(iio_attr_write_string(attr_gain, "manual"), "manual");
+
+  wr_ch_lli(chn, "rf_bandwidth",       cfg->bw_hz);
+  
+
+  wr_ch_lli(chn, "sampling_frequency", cfg->fs_hz);
+
+  
+
+  if(type == RX){
+    wr_ch_lli(chn, "hardwaregain",RX_GAIN);
+  }
+  else {
+    wr_ch_lli(chn, "hardwaregain", TX_GAIN);
+  }
+
+  // Configure LO channel
+  printf("* Acquiring AD9361 %s lo channel\n", type == TX ? "TX" : "RX");
+  if (!get_lo_chan(type, &chn)) { return false; }
+
+  wr_ch_lli(chn, "frequency", cfg->lo_hz);
+
+  //int ret = iio_channel_attr_write(chn,"gain_control_mode", "manual");
+
+  return true;
+}
+
 
 void print_cfg(stream_cfg &txcfg){
 	print_log(LOG_DEVICE, "bw_hz = %lld, fs_hz = %lld, lo_hz = %lld, rfport = %s\n", 
@@ -256,10 +304,21 @@ size_t rx_sample_sz, tx_sample_sz;
 int init_device_TRX(config_device &cfg) {
 	print_log(LOG_DEVICE, "* Acquiring IIO context\n");
 	
-	int BLOCK_SIZE = cfg.block_size;
 	const char *addr = cfg.ip;
 	struct stream_cfg *rxcfg = &cfg.rx_cfg;
 	struct stream_cfg *txcfg = &cfg.tx_cfg;
+	int BLOCK_SIZE_rx;
+	int BLOCK_SIZE_tx;
+
+	if(cfg.block_size > 0) {
+		BLOCK_SIZE_rx = cfg.block_size;
+		BLOCK_SIZE_tx = cfg.block_size;
+	} else {
+		BLOCK_SIZE_rx = rxcfg->block_size;
+		BLOCK_SIZE_tx = txcfg->block_size;
+	}
+	
+
 	int err;
 	print_log(LOG, "[%s:%d] addr = %s\n", __func__, __LINE__, addr);
 	
@@ -318,7 +377,7 @@ int init_device_TRX(config_device &cfg) {
 		shutdown();
 	}
 
-	rxstream = iio_buffer_create_stream(rxbuf, 4, BLOCK_SIZE);
+	rxstream = iio_buffer_create_stream(rxbuf, 4, BLOCK_SIZE_rx);
 	err = iio_err(rxstream);
 	if (err) {
 		rxstream = NULL;
@@ -326,7 +385,7 @@ int init_device_TRX(config_device &cfg) {
 		shutdown();
 	}
 
-	txstream = iio_buffer_create_stream(txbuf, 4, BLOCK_SIZE);
+	txstream = iio_buffer_create_stream(txbuf, 4, BLOCK_SIZE_tx);
 	err = iio_err(txstream);
 	if (err) {
 		txstream = NULL;
@@ -371,11 +430,10 @@ int write_to_device_buffer(const void *data, int size){
 #else
 		p_dat[0] = dataf[iter] * 2000;
 		p_dat[1] = dataf[iter + 1] * 2000;
-		
-
 #endif
 		// DEBUG_LINE
 	}
+	// txblock = iio_stream_get_next_block(txstream);
 	// print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
 	return 0;
 }
@@ -396,6 +454,7 @@ int read_to_device_buffer(const void *data, int size){
 	}
 	float *buffer = (float*)data;
 	int iter = 0;
+	print_log(LOG_DATA, "[%s:%d]\n", __func__, __LINE__);
 	for (p_dat = (int16_t*)iio_block_first(rxblock, rx0_i); p_dat < p_end, iter < size;
 			p_dat += p_inc / sizeof(*p_dat), iter++) {
 		/* Example: swap i and q */
@@ -404,7 +463,8 @@ int read_to_device_buffer(const void *data, int size){
 		buffer[0] = i;
 		buffer[1] = q;
 		buffer += 2;
-		// print_log(LOG_DATA, "%f, %f\n", (float)i, (float)q);
+		if(buffer[0] > 4000 || buffer[0] < -4000)
+			print_log(LOG_DATA, "%f, %f\n", (float)i, (float)q);
 		// print_log(CONSOLE, "%f, %f\n", (float)i, (float)q);
 	}
 	return 0;

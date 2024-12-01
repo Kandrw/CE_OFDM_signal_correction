@@ -87,7 +87,7 @@ VecSymbolMod generate_random_QAM16(int N) {
     return samples;
 }
 
-float calc_Ps(int N, VecSymbolMod &S) {
+float calc_Ps(int N, const VecSymbolMod &S) {
 
     float sum = 0.f;
     for(int i = 0; i < (int)S.size(); ++i){
@@ -812,14 +812,16 @@ VecSymbolMod matrixVectorMultiply(const std::vector<VecSymbolMod>& matrix, const
 
     return result;
 }
-
+/*  https://dsplog.com/2009/11/29/ber-bpsk-isi-channel-zero-forcing-equalization/   */
 void multipath_channel() {
-    VecSymbolMod h = {(0.5, 0.5), (0.7, 0.7), (0.1, 0.1)};
+    // VecSymbolMod h = {(0.5, 0.5), (0.7, 0.7), (0.1, 0.1)};
+    VecSymbolMod h = {(0.2, 0.2), (0.9, 0.9), (0.3, 0.3)};
+    
     // VecSymbolMod h = {(0.5, 0.), (0.7, 0.), (0.1, 0.)};
     
-    int N = 3;
-    int snr_start = 30;
-    int snr_end = 30;
+    int N = 10000;
+    int snr_start = 0;
+    int snr_end = 25;
     int i;
     float h2;
     print_to_file(FILE_SER, "w", "");
@@ -828,14 +830,15 @@ void multipath_channel() {
         int count_err2 = 0;
         
         int SNR = i;
-        print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+        // print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
         VecSymbolMod samples = generate_random_QAM16(N);
+
         // VecSymbolMod samples2 = samples;
         float Ps = calc_Ps(N, samples);
         h2 = pow(10, SNR * 0.1);
         float Q2 = Ps / h2;
-        print_log(LOG_DATA, "samples:\n");
-        print_VecSymbolMod(samples);
+        // print_log(LOG_DATA, "samples:\n");
+        // print_VecSymbolMod(samples);
         
         // std::vector<float> h = generate_channel_relay_channel(0, 0.5, N);
         // VecSymbolMod r = samples + n;
@@ -843,36 +846,39 @@ void multipath_channel() {
         // VecSymbolMod r = convolve(samples, h);
         VecSymbolMod r = convolve(h, samples);
         
-        print_log(LOG_DATA, "samples convolve h:\n");
-        print_VecSymbolMod(r);
-        VecSymbolMod n = generate_noise_by_SNR(r.size(), Q2);
-        VecSymbolMod r2 = r;// + n;
+        // print_log(LOG_DATA, "samples convolve h:\n");
+        // print_VecSymbolMod(r);
+        VecSymbolMod n = generate_noise_by_SNR(samples.size(), Q2);
+        VecSymbolMod n2 = generate_noise_by_SNR(r.size(), Q2);
+        
+        VecSymbolMod r2 = r + n2;
+        VecSymbolMod samples_noise = samples + n;
+        
         // VecSymbolMod r3 = r2 / h;
         auto matrix = toeplitz4(h, 3);
         auto matrix2 = inverseMatrix(matrix);
-        print_log(CONSOLE, "h_matrix:\n");
-        for(int i = 0; i < 3; ++i) {
-            print_VecSymbolMod(matrix2[i]);
-        }
-        print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+        // print_log(CONSOLE, "h_matrix:\n");
+        // for(int i = 0; i < 3; ++i) {
+        //     print_VecSymbolMod(matrix2[i]);
+        // }
+        // print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
         VecSymbolMod ck = matrixVectorMultiply(matrix2, zer);
-        print_log(CONSOLE, "c:\n");
-        print_VecSymbolMod(ck);
+        // print_log(CONSOLE, "c:\n");
+        // print_VecSymbolMod(ck);
         VecSymbolMod r3 = convolve(r2, ck);
-        print_log(CONSOLE, "r3:\n");
-        print_VecSymbolMod(r3);
+        // print_log(CONSOLE, "r3:\n");
+        // print_VecSymbolMod(r3);
         VecSymbolMod r4 = VecSymbolMod(r3.begin() + 2, r3.begin() + N + 2);
-        print_log(CONSOLE, "r4[%d]:\n", r4.size());
-        print_VecSymbolMod(r4);  
+        // print_log(CONSOLE, "r4[%d]:\n", r4.size());
+        // print_VecSymbolMod(r4);  
         
 #if 1
         // print_log(CONSOLE, "%d\n", i);
         // print_log(CONSOLE, "Ps: %f, s: %f %f\n", Ps, samples[0].real(), samples[0].imag());
         // print_log(CONSOLE, "h2 = %f\n", h2);        
-        // count_err = calc_error(samples, r);
-        float Pser;
-        // float Pser = (float)count_err / (float)N;
-        // print_log(CONSOLE, "Pser = %f, count_err = %d\n", Pser, count_err);
+        count_err = calc_error(samples, samples_noise);
+        float Pser = (float)count_err / (float)N;
+        print_log(CONSOLE, "Pser = %f, count_err = %d\n", Pser, count_err);
         count_err2 = calc_error(samples, r4);
         float Pser2 = (float)count_err2 / (float)N;
         print_log(CONSOLE, "Pser2 = %f, count_err2 = %d\n", Pser2, count_err2);
@@ -908,9 +914,16 @@ void modelling_channel(VecSymbolMod &samples) {
     float Q2 = Ps / h2;
 
     VecSymbolMod n = generate_noise_by_SNR(samples.size(), Q2);
+    // VecSymbolMod n = generate_noise_by_SNR(samples.size(), 30000);
+    
     samples = samples + n;
-    write_file_bin_data("../data/model_sample.bin",
-     (void*)&samples[0], samples.size() * sizeof(mod_symbol));
+    // operator_add(samples, n);
+    // samples = samples / mod_symbol(100.f, 0.f);
+    operator_div(samples, mod_symbol(100.f, 0.f));
+    // write_file_bin_data("../data/model_sample.bin",
+    //  (void*)&samples[0], samples.size() * sizeof(mod_symbol));
+    write_file_bin_data("../data/noise.bin",
+        (void*)&n[0], n.size() * sizeof(mod_symbol));
 }
 
 int modelling_signal(char target) {

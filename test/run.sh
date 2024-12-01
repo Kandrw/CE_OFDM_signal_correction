@@ -16,7 +16,7 @@ fname=$(basename $PROGRAM .$EXT)
 echo "file result: " $fname
 
 
-$CC -o $fname $PROGRAM 
+$CC -o0 -o $fname $PROGRAM 
 
-
+./$fname
 
