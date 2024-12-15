@@ -766,7 +766,7 @@ def view_data_3():
     
     # id_f += 1
     # plt.figure(id_f, figsize=(10,10))
-    if 1:
+    if 0:
         samples = array_float_to_np_complex(read_file_bin(filename_mod_tx, 4))
         plt.subplot(2, 2, 3)
         plt.title("Отправленные QPSK")

@@ -7,7 +7,14 @@
 #include <thread>
 
 #include "ad9361/device_ad9361.hpp"
+
 #include <output.hpp>
+#include <complex_container.hpp>
+#include <signal_processing.hpp>
+
+
+using namespace DIGITAL_SIGNAL_PROCESSING;
+using namespace DEVICE_PHY;
 
 static std::thread thr;
 

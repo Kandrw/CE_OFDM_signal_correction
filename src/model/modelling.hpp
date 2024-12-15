@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../phy/types.hpp"
+#include <complex_container.hpp>
+#include <signal_processing.hpp>
 
 // VecSymbolMod add_Gaussian_noise(VecSymbolMod &samples, float dispersion);
 
@@ -10,4 +11,4 @@
 
 int modelling_signal(char target);
 void modelling_channel(VecSymbolMod &samples);
-int calc_bit_error(bit_sequence &tx, bit_sequence &rx);
+int calc_bit_error(DIGITAL_SIGNAL_PROCESSING::bit_sequence &tx, DIGITAL_SIGNAL_PROCESSING::bit_sequence &rx);

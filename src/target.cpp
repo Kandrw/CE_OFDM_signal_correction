@@ -14,7 +14,11 @@
 #include <functional>
 
 #include "header.hpp"
-#include "phy/phy.hpp"
+
+#include <output.hpp>
+#include <complex_container.hpp>
+#include <signal_processing.hpp>
+
 #ifdef M_FOUND_LIBIIO
 
 #include "trx/device_api.hpp"
@@ -23,12 +27,30 @@
 #include "model/modelling.hpp"
 #include "loaders/load_data.hpp"
 #include "ipc/managment_ipc.hpp"
-#include "phy/ofdm_modulation.hpp"
-#include "phy/signal_processing.hpp"
-#include "config_parse.hpp"
-#include "phy/modulation.hpp"
+#include "configure/config_parse.hpp"
+#include "trx/receiver_ofdm.hpp"
 
+using namespace DIGITAL_SIGNAL_PROCESSING;
 
+static OFDM_symbol generate_frame_phy(bit_sequence &bits, ParamsPhy &param, VecSymbolMod &samples_tx){
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+    VecSymbolMod samples = modulation_mapper(bits, param.type_modulation);
+    samples_tx = samples;
+    // VecSymbolMod ofdm_samples = 
+    OFDM_symbol ofdms = OFDM_modulator(samples, param.param_ofdm);
+    print_log(LOG, "Create %d ofdm symbol\n", ofdms.size());
+     
+    
+    return ofdms;
+}
+
+static bit_sequence *decode_frame_phy(OFDM_symbol &samples, ParamsPhy &param, bool fprefix = true){
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+    VecSymbolMod rx_sample = OFDM_demodulator(samples, param.param_ofdm, fprefix);
+    print_log(CONSOLE, "[%s:%d] rx_sample - %d\n", __func__, __LINE__, rx_sample.size());
+    return demodulation_mapper(rx_sample, param.type_modulation);
+    // return nullptr;
+}
 
 int ofdm_model(int argc, char *argv[]){
 
@@ -457,7 +479,7 @@ int ofdm_model_add_noise(int argc, char *argv[]){
     print_log(LOG_DATA, "ofdms:\n");
     for(int i = 0; i < ofdms.size(); ++i) {
         print_log(LOG_DATA, "\t%d ofdm:\n", i + 1);
-        print_VecSymbolMod(ofdms[i]);
+        // print_VecSymbolMod(ofdms[i]);
     }
       
     // exit(0);

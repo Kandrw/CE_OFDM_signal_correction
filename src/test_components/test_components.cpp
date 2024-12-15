@@ -1,6 +1,6 @@
 #include "test_components.hpp"
 
-#include "../config_parse.hpp"
+#include "../configure/config_parse.hpp"
 
 
 void test_cfg(const char *filename) {

@@ -1,0 +1,25 @@
+
+log_file: string
+address: string
+type_modulation: string
+ofdm_parameters: {
+    count_subcarriers: int
+    pilot: complex<float> 
+    step_RS: int
+    def_interval: int
+    cyclic_prefix: int
+    power: float
+    count_ofdm_in_slot: int
+}
+
+device_phy: {
+    rx: rx_param
+    tx: tx_param
+}
+rx_param: {
+
+}
+tx_param: {
+
+}
+ 

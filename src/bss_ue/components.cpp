@@ -9,8 +9,9 @@ using namespace ATTR_SERVICE;
 #define TMP_BUFFER_RX 80000 * sizeof(mod_symbol)
 #define TMP_BUFFER_TX 20000 * sizeof(mod_symbol)
 
-
-
+#include <output.hpp>
+#include <complex_container.hpp>
+#include <signal_processing.hpp>
 
 int ATTR_SERVICE::init_config_com(int argc, char *argv[], config_com &cfg) {
     int status = STATUS_ACCESS;

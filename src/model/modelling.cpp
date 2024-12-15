@@ -9,12 +9,12 @@
 #include <fftw3.h>
 
 #include <complex>
-#include "../phy/types.hpp"
 #include "../loaders/load_data.hpp"
-#include "../phy/modulation.hpp"
-#include "../phy/ofdm_modulation.hpp"
-#include "../phy/cfo_correct.hpp"
 
+
+#include <output.hpp>
+#include <complex_container.hpp>
+#include <signal_processing.hpp>
 
 #define PI 3.1415926535
 
@@ -26,6 +26,9 @@
 (bits & mask) >> shift
 
 #define SHIFT 8
+
+using namespace DIGITAL_SIGNAL_PROCESSING;
+
 void print_bit_char(u_char a, int count_bit){
     int i;
     for(i = count_bit-1; i >= 0; --i){
@@ -374,7 +377,7 @@ bit_sequence *decode_soft_solutions(VecSymbolMod &samples_rx, float Q2, bool deb
     }
     return soft_result;
 }
-
+#define CODE_GREY "../data/practice5/code_grey.bin"
 void model_soft_solutions() {
 
 #define TEST_DATA 2
@@ -592,7 +595,7 @@ void toeplitz1(VecSymbolMod h, int n) {
     }
     print_log(CONSOLE, "h_matrix:\n");
     for(int i = 0; i < n; ++i) {
-        print_VecSymbolMod(h_matrix[i]);
+        // print_VecSymbolMod(h_matrix[i]);
     }
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
 }
@@ -633,7 +636,7 @@ void toeplitz2(VecSymbolMod h, int n) {
     }
     print_log(CONSOLE, "h_matrix:\n");
     for(int i = 0; i < n; ++i) {
-        print_VecSymbolMod(h_matrix[i]);
+        // print_VecSymbolMod(h_matrix[i]);
     }
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
 }
@@ -664,7 +667,7 @@ void toeplitz3(const VecSymbolMod& h, int n) {
     }
     print_log(CONSOLE, "h_matrix:\n");
     for(int i = 0; i < n; ++i) {
-        print_VecSymbolMod(matrix[i]);
+        // print_VecSymbolMod(matrix[i]);
     }
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
 
@@ -687,7 +690,7 @@ void toeplitz(const VecSymbolMod& h, int n) {
     }
     print_log(CONSOLE, "h_matrix:\n");
     for(int i = 0; i < n; ++i) {
-        print_VecSymbolMod(matrix[i]);
+        // print_VecSymbolMod(matrix[i]);
     }
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
 
@@ -703,7 +706,7 @@ std::vector<VecSymbolMod> toeplitz4(const VecSymbolMod& h, int n) {
     matrix.push_back(rt2);
     print_log(CONSOLE, "h_matrix:\n");
     for(int i = 0; i < n; ++i) {
-        print_VecSymbolMod(matrix[i]);
+        // print_VecSymbolMod(matrix[i]);
     }
     print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
 
@@ -939,7 +942,7 @@ VecSymbolMod OFDM_demodulator_no_correction(OFDM_symbol samples, OFDM_params &pa
     print_log(LOG_DATA, "ofdms:\n");
     for(int i = 0; i < samples.size(); ++i) {
         print_log(LOG_DATA, "\t%d ofdm:\n", i + 1);
-        print_VecSymbolMod(samples[i]);
+        // print_VecSymbolMod(samples[i]);
     }
         
 
@@ -1004,9 +1007,9 @@ VecSymbolMod OFDM_demodulator_no_correction(OFDM_symbol samples, OFDM_params &pa
         }
         print_log(LOG_DATA, "ofdm.size() = %d, count pilots = %d\n", ofdm.size(), pilots_rx.size());
         print_log(LOG_DATA, "pilot tx:\n");
-        print_VecSymbolMod(pilots_tx);
+        // print_VecSymbolMod(pilots_tx);
         print_log(LOG_DATA, "pilot rx:\n");
-        print_VecSymbolMod(pilots_rx);
+        // print_VecSymbolMod(pilots_rx);
         VecSymbolMod H = pilots_rx / pilots_tx;
 #endif
 #if 1
@@ -1034,11 +1037,11 @@ VecSymbolMod OFDM_demodulator_no_correction(OFDM_symbol samples, OFDM_params &pa
         }
 
         print_log(LOG_DATA, "rx data [ %d ]:\n", sample_rx.size());
-        print_VecSymbolMod(sample_rx);
+        // print_VecSymbolMod(sample_rx);
         rx.insert(rx.end(), sample_rx.begin(), sample_rx.end());
 #endif
     }
-    print_VecSymbolMod(rx);
+    // print_VecSymbolMod(rx);
     print_log(LOG_DATA, "\t[%s:%d]\n", __func__, __LINE__);
     return rx;
 }

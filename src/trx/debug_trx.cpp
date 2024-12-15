@@ -1,14 +1,38 @@
 #include "debug_trx.hpp"
 
+#include <output.hpp>
+#include <complex_container.hpp>
+#include <signal_processing.hpp>
 
 #include "../header.hpp"
-#include "../phy/phy.hpp"
 #include "../ipc/managment_ipc.hpp"
 #include "device_api.hpp"
-#include "../phy/ofdm_modulation.hpp"
-#include "../phy/signal_processing.hpp"
+
 #include "../loaders/load_data.hpp"
-#include "../config_parse.hpp"
+#include "../configure/config_parse.hpp"
+
+using namespace DIGITAL_SIGNAL_PROCESSING;
+using namespace DEVICE_PHY;
+
+static OFDM_symbol generate_frame_phy(bit_sequence &bits, ParamsPhy &param, VecSymbolMod &samples_tx){
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+    VecSymbolMod samples = modulation_mapper(bits, param.type_modulation);
+    samples_tx = samples;
+    // VecSymbolMod ofdm_samples = 
+    OFDM_symbol ofdms = OFDM_modulator(samples, param.param_ofdm);
+    print_log(LOG, "Create %d ofdm symbol\n", ofdms.size());
+     
+    
+    return ofdms;
+}
+
+static bit_sequence *decode_frame_phy(OFDM_symbol &samples, ParamsPhy &param, bool fprefix = true){
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+    VecSymbolMod rx_sample = OFDM_demodulator(samples, param.param_ofdm, fprefix);
+    print_log(CONSOLE, "[%s:%d] rx_sample - %d\n", __func__, __LINE__, rx_sample.size());
+    return demodulation_mapper(rx_sample, param.type_modulation);
+    // return nullptr;
+}
 
 void print_cfg_dev(stream_cfg &txcfg){
     print_log(LOG_DEVICE, "bw_hz = %lld, fs_hz = %lld, lo_hz = %lld, rfport = %s\n", 

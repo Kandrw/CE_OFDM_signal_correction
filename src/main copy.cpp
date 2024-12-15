@@ -13,10 +13,17 @@
 #include <map>
 #include <functional>
 
-#include <output.hpp>
-#include <complex_container.hpp>
-#include <signal_processing.hpp>
 
+#include "header.hpp"
+
+
+// #include "generate_packet/generate_packet.h"
+#include "phy/phy.hpp"
+
+#ifdef M_FOUND_LIBIIO
+
+#include "trx/device_api.hpp"
+#endif
 
 #include "target.hpp"
 #include "model/modelling.hpp"
@@ -28,9 +35,11 @@
 #include "test_components/test_components.hpp"
 #include "trx/debug_trx.hpp"
 
-// #include "bss_ue/service.hpp"
+#include "bss_ue/service.hpp"
 
 
+
+#if 0
 
 int target(int argc, char *argv[]) {
     
@@ -103,20 +112,40 @@ int main(int argc, char *argv[]){
 }
 
 
+/*Убрать*/
+#ifndef M_FOUND_LIBIIO
+#define M_FOUND_LIBIIO
+#endif
+
+#ifdef M_FOUND_LIBIIO
+
+
+// void print_VecSymbolMod1( VecSymbolMod &vec) {
+//     for(int i = 0; i < (int)vec.size(); ++i) {
+//         print_log(CONSOLE, "%f + %fi  ", vec[i].real(), vec[i].imag());
+//     }
+//     print_log(CONSOLE, "\n");
+// }
 
 
 
 
-#if 0
+
+
+
+#endif /*M_FOUND_LIBIIO*/
+
+#endif
+
+
+
 int main(int argc, char *argv[]){
 
-    VecSymbolMod sdf;
-    print_VecSymbolMod(stdout, sdf);
-    std::cout<<__cplusplus<<"\n";
+
 
     printf("End\n");
 }
-#endif
+
 
 
 
