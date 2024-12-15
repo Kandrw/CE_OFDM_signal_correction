@@ -19,10 +19,10 @@ int bss_program(int argc, char *argv[]) {
     EXIT_IF_FAIL(ATTR_SERVICE::init_log_system(cfg_bss));
     EXIT_IF_FAIL(ATTR_SERVICE::init_bss(cfg_bss));
 
-
-    
+    run_bss = RUN_BSS;
+    VecSymbolMod samples_rx(cfg_bss.block_size);
     while(run_bss) {
-        // result = DeviceTRX::recv_samples(samples_rx, cfg1.block_size);
+        result = DeviceTRX::recv_samples(samples_rx, cfg_bss.block_size);
 
     }
     print_log(CONSOLE, "End bss\n");

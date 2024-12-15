@@ -6,7 +6,9 @@
 #define ERROR_OUT 5
 #define LOG_DEVICE 6
 
-#define DEBUG_LINE print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+#define DEBUG_LINE printf("[%s:%d]\n", __func__, __LINE__);
+// #define DEBUG_LINE print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+// #define DEBUG_LINE print_log(LOG_DATA, "[%s:%d]\n", __func__, __LINE__);
 
 // class Output{
 // public:

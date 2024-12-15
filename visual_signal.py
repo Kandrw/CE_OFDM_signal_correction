@@ -274,6 +274,73 @@ def view_graphic_ser_multipath_channel():
 
     # plt.scatter(samples.real, samples.imag)
 
+def view_graph_ofdm_signal_correction():
+    filename_samples_tx = "../data/ofdm_signal_correction/samples_modulation_tx.bin"
+    filename_samples_rx = "../data/ofdm_signal_correction/samples_modulation_rx.bin"
+    
+    filename_ofdm_tx = "../data/ofdm_signal_correction/tx_ofdms.bin"
+    filename_ofdm_rx = "../data/ofdm_signal_correction/rx_ofdms.bin"
+
+    filename_ber = "../data/ofdm_signal_correction/bers.txt"
+    filename_ber_qam_16 = "../data/ofdm_signal_correction/bers_qam16.txt"
+    
+    ciclic_prefix = 40
+    CON_VIEW = 2
+    if CON_VIEW == 1:
+        id_f = 10
+        plt.figure(id_f, figsize=(10,10))
+        plt.subplot(2, 2, 1)
+        samples = array_float_to_np_complex(
+            read_file_bin(filename_samples_tx, 4))
+        plt.scatter(samples.real, samples.imag)
+
+        plt.subplot(2, 2, 2)
+        samples = array_float_to_np_complex(
+            read_file_bin(filename_samples_rx, 4))
+        plt.scatter(samples.real, samples.imag)
+
+
+        data = read_OFDMs(filename_ofdm_tx, 4)
+        print("len data - ", len(data))
+
+        view_resourse_grid(ciclic_prefix, data, id_f, (2, 2, 3), "Отправленный ofdm")
+
+        data = read_OFDMs(filename_ofdm_rx, 4)
+        print("len data - ", len(data))
+
+        view_resourse_grid(ciclic_prefix, data, id_f, (2, 2, 4), "Принятый ofdm")
+
+        # view_resourse_grid(cyclic_prefix, data[1:], id_f, (2, 2, 3), "Принятый синхронизированный по PSS")
+    elif CON_VIEW == 2:
+        hard_list = []
+        snr_list = []
+        with open(filename_ber, "r") as file:
+            for data in file:
+                aa = (data[:-1]).split(" ")
+                snr_list.append(float(aa[0]))
+                hard_list.append(float(aa[1]))
+        hard_list_qam16 = []
+        snr_list_qam16 = []
+        with open(filename_ber_qam_16, "r") as file:
+            for data in file:
+                aa = (data[:-1]).split(" ")
+                snr_list_qam16.append(float(aa[0]))
+                hard_list_qam16.append(float(aa[1]))
+              
+        plt.semilogy(snr_list, hard_list, c="r", label = "QPSK")
+        plt.semilogy(snr_list_qam16, hard_list_qam16, c="g", label = "QAM16")
+        plt.legend()
+        plt.title("BER")
+        plt.xlabel("SNR")
+        plt.ylabel("error")
+        if 1:
+            
+            # plt.legend()
+            plt.title("BER")
+            plt.xlabel("SNR")
+            plt.ylabel("error")
+            
+
 def view_data_1():
     filename_corr = "../data/corr_array3.bin"
     filename_corr = "../data/corr_array_convolve.bin" 
@@ -617,7 +684,6 @@ def ofdm_model_add_noise():
     id_f += 1
 
 
-
 def view_data_3():
     filename_corr = "../data/corr_array3.bin"
     filename_corr = "../data/corr_array_convolve.bin" 
@@ -711,6 +777,13 @@ def view_data_3():
         plt.title("Принятые QPSK")
         plt.scatter(samples.real, samples.imag)
     id_f += 1
+    # plt.figure(id_f, figsize=(10,10))
+    if 0:
+        filename_est_cfo = "../data/est_cfo.bin"
+        est = read_file_bin(filename_est_cfo, 4)
+        plt.subplot(2, 2, 1)
+        plt.title("est cfo")
+        plt.plot(est)
 
 
 FILE_SHARED_MEMORY = "."
@@ -981,7 +1054,7 @@ targets = {
     "p4":model_soft_solutions,
     "p5":view_graphic_ser_and_relay_channel,
     "p6":view_graphic_ser_multipath_channel,
-    
+    "rgr":view_graph_ofdm_signal_correction,
     "processing-commands":processing_commands,
     "vd1":view_data_1,
     "vd2":view_data_2,

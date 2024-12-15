@@ -21,6 +21,9 @@ rrr =  np.exp(-1j * 2 * np.pi * average_cfo * t)
 
 print(rrr)
 
+print(len(rrr))
+
+
 
 
 t = np.arange(0,12)

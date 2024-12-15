@@ -46,8 +46,8 @@ float mean(const std::vector<float>& numbers) {
     }
     return sum / numbers.size();
 }
-#if 0
-int evaluation_cfo1(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
+#if 1
+int evaluation_cfo(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
     VecSymbolMod est_s;
     std::vector<float> est_s2;
     for(int j = 0; j < ofdms.size(); ++j) {
@@ -68,7 +68,7 @@ int evaluation_cfo1(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
         
         float angle = std::arg(sum);
         float est = (1.f / (2.f * PI)) * angle;
-        est_s2.push_back(angle);
+        est_s2.push_back(est);
         print_log(LOG, "[%s:%d] sum: %f %f, angle: %f, est: %f\n",
             __func__, __LINE__, sum.real(), sum.imag(), angle, est);
 
@@ -86,13 +86,18 @@ int evaluation_cfo1(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
             
         // }
     }
+    write_file_bin_data("../data/est_cfo.bin", 
+            (void*)&est_s2[0], est_s2.size() * sizeof(float));
+    
     auto max_elm_it = MAX_ELM_VEC(est_s);
     mod_symbol max_elm = *max_elm_it;
     
 
     float est_mean = mean(est_s2);
-    print_log(LOG, "[%s:%d] max_elm: %f %f, mean: %f\n",
-            __func__, __LINE__, max_elm.real(), max_elm.imag(), est_mean);
+    // est_mean = *std::min_element(est_s2.begin(), est_s2.end());
+    // est_mean = ((double)est_mean * (double)1.9e6 / (double)168.f);
+    // print_log(LOG, "[%s:%d] max_elm: %f %f, mean: %f\n",
+    //         __func__, __LINE__, max_elm.real(), max_elm.imag(), est_mean);
 #if 0
     for(int i = 0; i < ofdms.size(); ++i) {
         VecSymbolMod &samples = ofdms[i];
@@ -111,6 +116,7 @@ int evaluation_cfo1(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
     }
 #else
     for(int i = 0; i < ofdms.size(); ++i) {
+        float est_mean = est_s2[i];
         VecSymbolMod &ofdm = ofdms[i];
         mod_symbol val = {0, -1};
         mod_symbol val2 = {2, 0};
@@ -134,7 +140,7 @@ int evaluation_cfo1(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
     // VecSymbolMod 
 }
 
-#endif
+#else
 
 int evaluation_cfo(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
     std::vector<float> est_s2;
@@ -151,7 +157,7 @@ int evaluation_cfo(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
         }
         float angle = std::arg(sum);
         float est = (1.f / (2.f * PI)) * angle;
-        est_s2.push_back(angle);
+        est_s2.push_back(est);
     }
     float est_mean = mean(est_s2);
     for(int i = 0; i < ofdms.size(); ++i) {
@@ -168,6 +174,6 @@ int evaluation_cfo(OFDM_symbol &ofdms, const OFDM_params &param_ofdm) {
     }
 }
 
-
+#endif
 
 

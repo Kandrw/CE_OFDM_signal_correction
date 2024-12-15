@@ -436,7 +436,7 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool foun
         // ofdm = ofdm_fft;
         fftwf_destroy_plan(plan);
         fftwf_free(out);
-        DEBUG_LINE
+        
         for(int j = 0, step = 0; j < count_rs; ++j, step += param.step_RS) {
             pilots_rx.push_back(ofdm[j + step]);
         }
@@ -449,7 +449,7 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool foun
 
         VecSymbolMod H = pilots_rx / pilots_tx;
 #endif
-        DEBUG_LINE
+        
 #if 1
         VecSymbolMod Heq = linearInterpolation(H, ofdm.size());
         VecSymbolMod ofdm_eq = ofdm / Heq;

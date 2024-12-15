@@ -117,6 +117,7 @@ int realtime_RX(int argc, char *argv[]) {
         {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
         {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
         1024 * 1024,
+        // 200000,
     };
     print_cfg_dev(cfg1.tx_cfg);
     if(DeviceTRX::initialization(cfg1)){
@@ -307,10 +308,10 @@ int test_TX(int argc, char *argv[]){
     // DeviceTRX::while_send_samples(slots);
     // DeviceTRX::while_send_samples(samples);
     print_log(CONSOLE, "============================%d", samples.size());
-    for(int i = 0; i < 2; ++i) {
-        VecSymbolMod s(samples.begin(), samples.end());
-        samples.insert(samples.end(), s.begin(), s.end());
-    }
+    // for(int i = 0; i < 2; ++i) {
+    //     VecSymbolMod s(samples.begin(), samples.end());
+    //     samples.insert(samples.end(), s.begin(), s.end());
+    // }
         
     print_log(CONSOLE, "----------------------------%d\n", samples.size());
     while(1) {

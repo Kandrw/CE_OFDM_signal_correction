@@ -5,10 +5,15 @@
 #include <cmath>
 #include <cstring>
 
+#include <algorithm>
+#include <fftw3.h>
+
 #include <complex>
 #include "../phy/types.hpp"
 #include "../loaders/load_data.hpp"
 #include "../phy/modulation.hpp"
+#include "../phy/ofdm_modulation.hpp"
+#include "../phy/cfo_correct.hpp"
 
 
 #define PI 3.1415926535
@@ -277,6 +282,7 @@ int calc_bit_error(bit_sequence &tx, bit_sequence &rx) {
     for(int i = 0; i < tx.size; ++i) {
         u_char otx = tx.buffer[i];
         u_char orx = rx.buffer[i];
+        print_log(LOG_DATA, "%d %d\n", otx, orx);
         for(int i2 = 0; i2 < 8; ++i2) {
             u_char bt = otx & 0b1;
             u_char br = orx & 0b1;
@@ -898,7 +904,343 @@ void multipath_channel() {
     }
 
 }
+/*RGR*/
+#define CENTRAL_SHIFT 0
+static void shift_fft(VecSymbolMod &data) {
+    int N = data.size();
+    // Сдвиг по частотам
+    VecSymbolMod shifted(N);
+    
+    for (int i = 0; i < N; ++i) {
+        shifted[i] = data[(i + N / 2) % N]; // Сдвигаем
+    }
+    
+    data = shifted;
+}
+static void delete_cyclic_prefix(VecSymbolMod &sample, int size_prefix) {
+    // VecSymbolMod prefix(sample.begin() + size_prefix, sample.end());
+    sample.erase(sample.begin(), sample.begin() + size_prefix);
+}
 
+VecSymbolMod OFDM_demodulator_no_correction(OFDM_symbol samples, OFDM_params &param, bool found_cprefix) {
+    // delete_cyclic_prefix(samples)
+    int central_shift = CENTRAL_SHIFT;
+    int count_sub_no_defi = 
+        param.count_subcarriers - param.def_interval * 2 - central_shift;
+    int count_rs = count_sub_no_defi / (param.step_RS + 1) + 1;
+    int size_block_data = count_sub_no_defi - count_rs;
+    print_log(CONSOLE, "[%s:%d]\n", __func__, __LINE__);
+    VecSymbolMod rx;
+    fftwf_complex* out;
+    fftwf_complex* in;
+    fftwf_plan plan;
+    VecSymbolMod ofdm_fft(count_sub_no_defi);
+
+    print_log(LOG_DATA, "ofdms:\n");
+    for(int i = 0; i < samples.size(); ++i) {
+        print_log(LOG_DATA, "\t%d ofdm:\n", i + 1);
+        print_VecSymbolMod(samples[i]);
+    }
+        
+
+    for(int i = 0; i < samples.size(); ++i) {
+// #if 0
+        VecSymbolMod &ofdm = samples[i];
+        if(found_cprefix)
+            delete_cyclic_prefix(ofdm, param.cyclic_prefix);
+        // ofdm.erase(ofdm.begin(), ofdm.begin() + param.def_interval);
+        // ofdm.erase(ofdm.end() - param.def_interval, ofdm.end());
+        print_log(LOG_DATA, "[%s:%d] ofdm.size() = %d\n", __func__, __LINE__, ofdm.size());
+
+        VecSymbolMod pilots_tx(count_rs, param.pilot);
+        VecSymbolMod pilots_rx;
+        int step_pilot = 1 + param.step_RS;
+
+        out = fftwf_alloc_complex(ofdm.size());
+        in = reinterpret_cast<fftwf_complex*>(ofdm.data());
+        plan = fftwf_plan_dft_1d(ofdm.size(),
+                in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+
+        fftwf_execute(plan);
+
+       
+        print_log(LOG_DATA, "ofdm - %d - fft - %d\n", ofdm.size(), ofdm_fft.size());
+#if 1
+        for (int i = 0; i < ofdm.size(); ++i) {
+            // ofdm_fft[i] = mod_symbol(out[i][0] /= ofdm.size(),
+            //                             out[i][1] /= ofdm.size());
+            ofdm[i] = mod_symbol(out[i][0] /= ofdm.size(),
+                                        out[i][1] /= ofdm.size());
+            // print_log(LOG_DATA, "%f %f\n", 
+            //     ofdm_fft[i].real(), ofdm_fft[i].imag());
+            print_log(LOG_DATA, "%f %f\n", 
+                ofdm[i].real(), ofdm[i].imag());
+            
+        }
+#endif
+        shift_fft(ofdm);
+        if(central_shift) {
+            int position = ofdm.size() / 2;
+            int size_old = ofdm.size();
+            ofdm.erase(ofdm.begin() + position, 
+                    ofdm.begin() + position + central_shift);
+            print_log(LOG_DATA, "[%s:%d] del central - %d, size: old - %d, new - %d\n", __func__, __LINE__, position, size_old, ofdm.size());
+        } 
+        ofdm.erase(ofdm.begin(), ofdm.begin() + param.def_interval);
+        ofdm.erase(ofdm.end() - param.def_interval, ofdm.end());
+        print_log(LOG_DATA, "ofdm.size() = %d\n", ofdm.size());
+
+        
+
+#if 1
+        print_log(LOG_DATA, "orig: %d, new: %d\n", 
+            ofdm.size(), ofdm_fft.size());
+        // ofdm = ofdm_fft;
+        fftwf_destroy_plan(plan);
+        fftwf_free(out);
+        
+        for(int j = 0, step = 0; j < count_rs; ++j, step += param.step_RS) {
+            pilots_rx.push_back(ofdm[j + step]);
+        }
+        print_log(LOG_DATA, "ofdm.size() = %d, count pilots = %d\n", ofdm.size(), pilots_rx.size());
+        print_log(LOG_DATA, "pilot tx:\n");
+        print_VecSymbolMod(pilots_tx);
+        print_log(LOG_DATA, "pilot rx:\n");
+        print_VecSymbolMod(pilots_rx);
+        VecSymbolMod H = pilots_rx / pilots_tx;
+#endif
+#if 1
+        // VecSymbolMod Heq = linearInterpolation(H, ofdm.size());
+        VecSymbolMod ofdm_eq = ofdm;
+        VecSymbolMod sample_rx;
+        int block = size_block_data;
+        int step;
+        int index = 1;
+        for(int j = 1; sample_rx.size() < size_block_data; ) {
+            step = param.step_RS;
+            if(ofdm.size() - j < param.step_RS) {
+                step = ofdm.size() - j;
+            }
+            if(step > 0) {
+                sample_rx.insert(
+                    sample_rx.end(), ofdm_eq.begin() + j, 
+                    ofdm_eq.begin() + j + step);
+                    
+            } else {
+                break;
+            }
+            j += step + 1;
+            print_log(LOG_DATA, "j = %d, sample_rx.size() = %d, step = %d\n", j, sample_rx.size(), step);
+        }
+
+        print_log(LOG_DATA, "rx data [ %d ]:\n", sample_rx.size());
+        print_VecSymbolMod(sample_rx);
+        rx.insert(rx.end(), sample_rx.begin(), sample_rx.end());
+#endif
+    }
+    print_VecSymbolMod(rx);
+    print_log(LOG_DATA, "\t[%s:%d]\n", __func__, __LINE__);
+    return rx;
+}
+
+
+
+VecSymbolMod multipath_channel_type2(const VecSymbolMod &samples,
+    int Nb, int D1, int Dn, float c, float Ts, float f0) {
+    
+    int L = samples.size();
+    VecSymbolMod s_channel = samples;
+    for(int i = 0; i < Nb; ++i) {
+        int d = rand() % (Dn - D1);
+        float tau = (float)d / (c * Ts);
+        float G = c / (4.f * PI * (float) d * f0);
+        VecSymbolMod Si(L + tau);
+        for(int k = 0; k < L + tau; ++k) {
+            if(k < tau) {
+                Si[k] = 0;
+            } else {
+                Si[k] = samples[k - tau];
+            }
+        }
+    }
+}
+
+VecSymbolMod carrier_offset(float offset, float freq_d, int N) {
+    VecSymbolMod arr_offset(N);
+    mod_symbol d = mod_symbol(0.f, -1.f) * mod_symbol(2.f, 0.f) * mod_symbol(PI, 0.f) * mod_symbol(offset, 0.f);
+    
+    for(int i = 0; i < N; ++i) {
+        
+        mod_symbol t = mod_symbol((float)i / freq_d);
+        arr_offset[i] = std::exp(d * t);
+        
+    }
+    return arr_offset;
+}
+
+VecSymbolMod carrier_offset2(float offset, float freq_d, int N, int Nfft) {
+    VecSymbolMod arr_offset(N);
+    mod_symbol d = mod_symbol(0.f, 1.f) * mod_symbol(2.f, 0.f) * mod_symbol(PI, 0.f) * mod_symbol(offset, 0.f);
+    
+    for(int i = 0; i < N; ++i) {
+        
+        mod_symbol t = mod_symbol((float)i / (float)Nfft);
+        arr_offset[i] = std::exp(d * t);
+        
+    }
+    return arr_offset;
+}
+
+void ofdm_signal_correction() {
+    int N = 2400;
+    int SNR_min = -5;
+    int SNR_max = 35;
+    OFDM_params param_ofdm = {
+        .count_subcarriers = 128,
+        .pilot = {0.7, 0.7},
+        .step_RS = 8,
+        .def_interval = 30,
+        .cyclic_prefix = 40,
+        .power = 3000,
+        .count_ofdm_in_slot = 7,
+    };
+    // TypeModulation M = TypeModulation::QAM64;
+    TypeModulation M = TypeModulation::QAM16;
+    // TypeModulation M = TypeModulation::QPSK;
+    // const char filename_ber[] = "../data/ofdm_signal_correction/bers.txt";
+    const char filename_ber[] = "../data/ofdm_signal_correction/bers_qam16.txt";
+    
+    print_to_file(filename_ber, "w", "");
+
+    // int Nb = 3;
+    // int D1 = 30;
+    // int Dn = 50;
+    // int f0 = 2.4f * (float)1e9;
+    // int B = 15 * (float)1e6;
+    // float Ts = 1.f/(float)B;
+    // multipath_channel_type2(samples_tx, )
+    // VecSymbolMod h = {(0.2, 0.2), (0.9, 0.9), (0.3, 0.3)};
+    VecSymbolMod h = {(0.9, 0.9), (0.5, 0.5), (0.3, 0.3)};
+    // VecSymbolMod h = {(0.9, 0.9), (0.7, 0.7), (0.5, 0.5), (0.3, 0.3)};
+    // VecSymbolMod h = {(1.4, 1.4), (1, 1), (0.9, 0.9), (0.8, 0.8), (0.7, 0.7), (0.6, 0.6), (0.5, 0.5), (0.3, 0.3), (0.1, 0.1)};
+    
+    
+    // VecSymbolMod h = {(0.9, 0.9), (0.8, 0.8), (1.1, 1.1), (0.5, 0.5), (0.2, 0.2)};
+    
+    // VecSymbolMod h = {(0.9, 0.9), (0.8, 0.8), (0.76, 0.76), (0.7, 0.7), (0.65, 0.65), (0.6, 0.6), (0.5, 0.5), (0.2, 0.2)};
+    
+    for(int snr = SNR_min; snr <= SNR_max; ++snr) {
+
+#if 1
+        char test_data[N];
+        for(int i = 0; i < (int)sizeof(test_data); ++i){
+            test_data[i] = (rand() % 200);
+                // test_data[i] = (rand() % 20) + 70;
+        }
+        test_data[sizeof(test_data) - 1] = 0;
+#else
+        char test_data[9] = {
+            (char)0b00000001,
+            (char)0b00100011,
+            (char)0b01000101,
+            (char)0b01100111,
+            (char)0b10001001,
+            (char)0b10101011,
+            (char)0b11001101,
+            (char)0b11101111
+        };
+#endif
+        bit_sequence data;
+        data.buffer = (u_char*)test_data;
+        data.size = sizeof(test_data);
+        VecSymbolMod samples = modulation_mapper(data, M);
+        print_log(CONSOLE, "samples count = %d\n", samples.size());
+
+
+        write_file_bin_data("../data/ofdm_signal_correction/samples_modulation_tx.bin", 
+            (void*)&samples[0], samples.size() * sizeof(mod_symbol));
+        OFDM_symbol ofdms = OFDM_modulator(samples, param_ofdm);
+        print_log(CONSOLE, "count ofdms: %d\n", ofdms.size());
+
+        addPowerOFDM(ofdms, param_ofdm.power);
+
+        write_OFDMs("../data/ofdm_signal_correction/tx_ofdms.bin", ofdms, ofdms.size());
+
+        VecSymbolMod samples_tx = OFDM_convertion_one_thread(ofdms);
+
+ 
+
+
+        //Затухание
+        samples_tx = samples_tx / 100.f;
+        //Многолучовость
+        VecSymbolMod rm = convolve(h, samples_tx);
+        // VecSymbolMod rm = samples_tx;
+        
+        //Смещение частоты
+        // VecSymbolMod cfo = carrier_offset(3000, 1920000, rm.size());
+        // VecSymbolMod cfo = carrier_offset(0.15, 1920000, rm.size(), param_ofdm.count_subcarriers);
+        // VecSymbolMod cfo = carrier_offset(0.15, 1920000, rm.size(),
+        //     param_ofdm.count_subcarriers + param_ofdm.cyclic_prefix);
+        
+        // cfo = cfo / 10.f;
+        // rm = rm + cfo;
+        // rm = rm * cfo;
+        
+
+
+        //Наложение шума
+        float Ps = calc_Ps(rm.size(), rm);
+        float h2 = powf(10.f, (float)snr * 0.1);
+        float Q2 = Ps / h2;
+        VecSymbolMod n = generate_noise_by_SNR(rm.size(), Q2);
+        VecSymbolMod r = rm + n;
+
+
+        
+        print_log(CONSOLE, "size m ch - %d\n", r.size());
+
+        OFDM_symbol ofdms_rx = samples_join_OFDM(r, 
+        param_ofdm.count_subcarriers + param_ofdm.cyclic_prefix, r.size());
+        // evaluation_cfo(ofdms_rx, param_ofdm);
+        
+        write_OFDMs("../data/ofdm_signal_correction/rx_ofdms.bin", ofdms_rx, ofdms_rx.size());
+
+
+        // OFDM_symbol ofdms_rx = ofdms;
+        // VecSymbolMod samples_rx = OFDM_demodulator_no_correction(ofdms_rx, param_ofdm, true);
+        VecSymbolMod samples_rx = OFDM_demodulator(ofdms_rx, param_ofdm, true);
+        
+
+
+        samples_rx.erase(samples_rx.begin() + samples.size(), samples_rx.begin() + samples_rx.size());
+
+        print_log(CONSOLE, "tx rx sample: %d - %d\n", samples.size(), samples_rx.size());
+        write_file_bin_data("../data/ofdm_signal_correction/samples_modulation_rx.bin", 
+            (void*)&samples_rx[0], samples_rx.size() * sizeof(mod_symbol));
+        
+#if 1
+        print_log(LOG_DATA, "samples tx rx:\n");
+        for(int i = 0; i < samples.size(); ++i) {
+            print_log(LOG_DATA, "%f %f\t\t-\t\t%f %f\n",
+                samples[i].real(), samples[i].imag(),
+                samples_rx[i].real(), samples_rx[i].imag()
+                );
+        } print_log(LOG_DATA, "\n");
+#endif
+
+
+        bit_sequence *hard_result = demodulation_mapper(samples_rx, M);
+
+        // print_bit2((u_char*)data.buffer, data.size);
+        // print_bit2((u_char*)hard_result->buffer, data.size);
+
+        int error_hard = calc_bit_error(data, *hard_result);
+        print_log(CONSOLE, "snr = %d, error bit = %d\n", snr, error_hard);
+        print_to_file(filename_ber, "a", "%d %d\n", snr, error_hard);
+    }
+
+}
 
 void modelling_channel(VecSymbolMod &samples) {
     float SNR = 25;
@@ -928,6 +1270,7 @@ void modelling_channel(VecSymbolMod &samples) {
 
 int modelling_signal(char target) {
 
+    print_log(CONSOLE, "%s: target %c\n", __func__, target);
     switch (target)
     {
     case '0':
@@ -944,6 +1287,9 @@ int modelling_signal(char target) {
         break;
     case '6':
         multipath_channel();
+        break;
+    case 'r':
+        ofdm_signal_correction();
         break;
     default:
         print_log(CONSOLE, "No target for program\n");

@@ -159,12 +159,12 @@ VecSymbolMod modulation_QPSK(bit_sequence &bits){
 }
 
 
-
+/*grey*/
 VecSymbolMod modulation_QAM16(bit_sequence &bits){
     // print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
-    print_to_file(
-            FILE_NAME_DEBUG_DATA_ANNOTATE_MODULATION, "w", NULL);
-    time_counting_start();
+    // print_to_file(
+    //         FILE_NAME_DEBUG_DATA_ANNOTATE_MODULATION, "w", NULL);
+    // time_counting_start();
    
     u_char *step = bits.buffer;
     u_char con = 0;
@@ -208,13 +208,14 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
             tmp_s = 0;
             break;
         }
-        print_to_file(
-            FILE_NAME_DEBUG_DATA_ANNOTATE_MODULATION,
-            "a", "%d%d%d%d ", g1, g2, g3, g4);
+        // print_to_file(
+        //     FILE_NAME_DEBUG_DATA_ANNOTATE_MODULATION,
+        //     "a", "%d%d%d%d ", g1, g2, g3, g4);
         
         mod_symbol t1 = {Y * 2.f - 3.f, q * 2.f - 3.f};
 
-        // print_log(LOG, "\t%f %f\n", t1.real(), t1.imag());
+        // print_log(LOG_DATA, "\t%f %f - %d%d%d%d\n", t1.real(), t1.imag());
+
         // print_log( CONSOLE, "0b%d%d%d%d,\n", g1, g2, g3, g4);
         // if(i %  == 0){
         //     print_log(CONSOLE, "\n");
@@ -226,16 +227,44 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
 
         samples.push_back(t1);
     }
-    // print_log(CONSOLE, "\n");
-    time_counting_end(CONSOLE, __func__);
-    for(i = 0; i < (int)samples.size(); ++i){
-        // print_log(LOG_DATA, "%f + %fi\t", samples[i].real(), samples[i].imag());
-    }
     // print_log(LOG, "\n");
     // print_log(LOG, "vector size = %d\n", samples.size());
-    write_file_bin_data(
-                CODE_GREY, &code_grey[0], 
-                code_grey.size());
+    // write_file_bin_data(
+    //             CODE_GREY, &code_grey[0], 
+    //             code_grey.size());
+    return samples;
+}
+
+VecSymbolMod modulation_QAM16_1(bit_sequence &bits){
+    u_char *step = bits.buffer;
+    u_char con = 0;
+    VecSymbolMod samples;
+    int i;
+    u_char g1, g2, g3, g4;
+    u_char val;
+    float Y, q;
+    std::vector<u_char> code_grey; 
+    u_char tmp_s = 0;
+    for(i = 0; i < bits.size;){
+        switch (con)
+        {
+        case 0:
+            con = 1;
+            val = *step & 0b11110000;
+            val >>= 4;
+            break;
+        default:
+            con = 0;
+            val = *step & 0b00001111;
+            step++;
+            ++i;
+            break;
+        }
+
+        mod_symbol t1 = table_QAM16[val];
+        print_log(LOG_DATA, "%d -> %f %f\n", val, t1.real(), t1.imag());
+        samples.push_back(t1);
+    }
     return samples;
 }
 
@@ -353,10 +382,13 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
                 pos = i2;
             }
         }
-        // print_log(CONSOLE, "min_dist: %f, pos - %d, %f %f - %f - %f\n", min_dist, pos,
-        //         samples[i].real(), samples[i].imag(), table_QAM16[pos].real(), table_QAM16[pos].imag());
+        print_log(LOG_DATA, "min_dist: %f, pos - %d, %f %f - %f - %f -> %d\n", min_dist, pos,
+                samples[i].real(), samples[i].imag(),
+                table_QAM16[pos].real(), table_QAM16[pos].imag(),
+                code_tableQAM16[pos]);
         // if(min_dist <= err_interval) {
-            conD = 1;       
+            conD = 1;
+#if 0
             switch(con_state) {
             case 0:
                 *step = code_tableQAM16[pos] << 4;
@@ -368,6 +400,20 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
                 con_state = 0;
                 break;
             }
+#else
+            switch(con_state) {
+            case 0:
+                *step = pos << 4;
+                con_state = 1;
+                break;
+            default:    
+                *step |= pos;
+                ++step;
+                con_state = 0;
+                break;
+            }
+
+#endif
             
         // }
         if(!conD) {
