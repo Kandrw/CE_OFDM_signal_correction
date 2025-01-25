@@ -1,29 +1,29 @@
-#include "modulation.hpp"
-
 #include <cstring>
 #include <map>
 #include <iostream>
-#include <output.hpp>
 #include <ctime>
 #include <cmath>
 
 #include <output.hpp>
+#include <complex_container.hpp>
 #include <signal_processing.hpp>
 
-mod_symbol table_QPSK[] = {
-        {0.707107, 0.707107}, {0.707107, -0.707107}, 
-        {-0.707107, 0.707107}, {-0.707107, -0.707107}, 
-};
+
 #define QAM16_LEVEL_1 (1.0f)
 #define QAM16_LEVEL_2 (3.0f)
 
 #define BITS_TO_BYTE 8
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
+using namespace DIGITAL_SIGNAL_PROCESSING;
 
-namespace DIGITAL_SIGNAL_PROCESSING {
+static mod_symbol table_QPSK[] = {
+        {0.707107, 0.707107}, {0.707107, -0.707107}, 
+        {-0.707107, 0.707107}, {-0.707107, -0.707107}, 
+};
 
-mod_symbol table_QAM16[] = {
+
+static mod_symbol table_QAM16[] = {
   // LTE-16QAM constellation:
   //                q
   //  1011  1001  |   0001  0011
@@ -67,7 +67,7 @@ mod_symbol table_QAM16[] = {
     { -1.000000, -3.000000 },
 };
 
-u_char code_tableQAM16[] = {
+static u_char code_tableQAM16[] = {
     0b0000,
     0b1100,
     0b0110,
@@ -86,8 +86,7 @@ u_char code_tableQAM16[] = {
     0b1000
 };
 
-
-mod_symbol table_QAM64[] = {
+static mod_symbol table_QAM64[] = {
         {0.46291, 0.46291}, {0.46291, 0.154303}, {0.154303, 0.46291}, {0.154303, 0.154303}, 
         {0.46291, 0.771517}, {0.46291, 1.080123}, {0.154303, 0.771517}, {0.154303, 1.080123}, 
         {0.771517, 0.46291}, {0.771517, 0.154303}, {1.080123, 0.46291}, {1.080123, 0.154303}, 
@@ -106,7 +105,26 @@ mod_symbol table_QAM64[] = {
         {-0.771517, -0.771517}, {-0.771517, -1.080123}, {-1.080123, -0.771517}, {-1.080123, -1.080123},
 };
 
-int get_bits_per_symbol(TypeModulation m){
+
+static std::map<std::string, TypeModulation> map_type_mod = {
+    {"NONE", TypeModulation::NONE},
+    {"BPSK", TypeModulation::BPSK},
+    {"QPSK", TypeModulation::QPSK},
+    {"QAM16", TypeModulation::QAM16},
+    {"QAM64", TypeModulation::QAM64},
+    {"QAM256", TypeModulation::QAM256},
+};
+static std::map<TypeModulation, std::string> map_type_str_mod = {
+    {TypeModulation::NONE, "NONE"},
+    {TypeModulation::BPSK, "BPSK"},
+    {TypeModulation::QPSK, "QPSK"},
+    {TypeModulation::QAM16, "QAM16"},
+    {TypeModulation::QAM64, "QAM64"},
+    {TypeModulation::QAM256, "QAM256"},
+};
+
+
+static int get_bits_per_symbol(TypeModulation m){
     switch (m)
     {
     case TypeModulation::BPSK:
@@ -123,7 +141,7 @@ int get_bits_per_symbol(TypeModulation m){
     return -1;
 }
 
-VecSymbolMod modulation_QPSK(bit_sequence &bits){
+static VecSymbolMod modulation_QPSK(bit_sequence &bits){
     print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
     time_counting_start();
     // int bits_symbol = 4;
@@ -164,7 +182,7 @@ VecSymbolMod modulation_QPSK(bit_sequence &bits){
 
 
 /*grey*/
-VecSymbolMod modulation_QAM16(bit_sequence &bits){
+static VecSymbolMod modulation_QAM16(bit_sequence &bits){
     // print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
     // print_to_file(
     //         FILE_NAME_DEBUG_DATA_ANNOTATE_MODULATION, "w", NULL);
@@ -239,7 +257,7 @@ VecSymbolMod modulation_QAM16(bit_sequence &bits){
     return samples;
 }
 
-VecSymbolMod modulation_QAM16_1(bit_sequence &bits){
+static VecSymbolMod modulation_QAM16_1(bit_sequence &bits){
     u_char *step = bits.buffer;
     u_char con = 0;
     VecSymbolMod samples;
@@ -272,7 +290,7 @@ VecSymbolMod modulation_QAM16_1(bit_sequence &bits){
     return samples;
 }
 
-VecSymbolMod modulation_QAM64(bit_sequence &bits){
+static VecSymbolMod modulation_QAM64(bit_sequence &bits){
     print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
 
     time_counting_start();
@@ -343,7 +361,7 @@ VecSymbolMod modulation_QAM64(bit_sequence &bits){
     return samples;
 }
 
-bool symbol_cmp(float a, float b, float error){
+static bool symbol_cmp(float a, float b, float error){
     if(a < 0 && b < 0){
         a *= -1;
         b *= -1;
@@ -356,16 +374,16 @@ bool symbol_cmp(float a, float b, float error){
 }
 
 /*comparison taking into account the error*/
-bool mod_symbol_cmp(mod_symbol &A, mod_symbol &B, float error){
+static bool mod_symbol_cmp(mod_symbol &A, mod_symbol &B, float error){
     // print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
     return symbol_cmp(A.real(), B.real(), error) && symbol_cmp(A.imag(), B.imag(), error);
 }
 
-float calc_dist(mod_symbol &A, mod_symbol &B) {
+static float calc_dist(mod_symbol &A, mod_symbol &B) {
     return sqrt(powf(A.real() - B.real(), 2) + powf(A.imag() - B.imag(), 2));
 }
 
-bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
+static  bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
     bit_sequence *data = new bit_sequence;
     data->size = samples.size() / 2;
     data->buffer = new u_char[data->size];
@@ -418,37 +436,12 @@ bit_sequence *demodulation_QAM16(VecSymbolMod &samples){
             }
 
 #endif
-            
-        // }
-        if(!conD) {
-            // print_log(CONSOLE, "Error decode\n");
-        }
     }
     return data;
 }
 
 
-bit_sequence *demodulation_QAM64(VecSymbolMod &samples){
-
-    // {
-    //     float a = 0.462910;
-    //     float b = -0.462910;
-    //     bool res = symbol_cmp(a, b, 0.004f);
-    //     print_log(CONSOLE, "\t\tTEST: res = %d\n", res);
-    // }
-    // {
-    //     float a = 0.462910;
-    //     float b = 0.462910;
-    //     bool res = symbol_cmp(a, b, 0.004f);
-    //     print_log(CONSOLE, "\t\tTEST: res = %d\n", res);
-    // }
-    // {
-    //     float a =  -1.080123;
-    //     float b =  -1.080123;
-    //     bool res = symbol_cmp(a, b, 0.004f);
-    //     print_log(CONSOLE, "\t\tTEST: res = %d\n", res);
-    // }
-
+static bit_sequence *demodulation_QAM64(VecSymbolMod &samples){
 
     print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
     time_counting_start();
@@ -526,7 +519,7 @@ bit_sequence *demodulation_QAM64(VecSymbolMod &samples){
 }
 
 
-bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
+static bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
     print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
     time_counting_start();
     int i, j, k = 0;
@@ -618,8 +611,7 @@ bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
 */
 
 
-VecSymbolMod modulation_mapper(bit_sequence bits, TypeModulation m){
-    // print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
+VecSymbolMod DIGITAL_SIGNAL_PROCESSING::modulation_mapper(bit_sequence bits, TypeModulation m){
     VecSymbolMod samples_mod;
     switch(m){
     case TypeModulation::QAM16:
@@ -635,18 +627,10 @@ VecSymbolMod modulation_mapper(bit_sequence bits, TypeModulation m){
         print_log(CONSOLE, "[%s:%d] Error: not found modulation\n");
         break;
     }
-    // print_log(LOG, "[%s:%d] TEST samples_mod.size = %d\n", __func__, __LINE__, samples_mod.size());
-    // samples_mod = modulation_QAM64(bits);
-    // write_file_bin_data(
-    //             FILE_NAME_SAVE_MODULATION, &samples_mod[0], 
-    //             samples_mod.size() * sizeof(VecSymbolMod::value_type) );
-    // print_log(LOG, "[%s:%d] end \n", __func__, __LINE__);
     return samples_mod;
 }
 
-bit_sequence *demodulation_mapper(VecSymbolMod &samples, TypeModulation m){
-    // print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
-
+bit_sequence *DIGITAL_SIGNAL_PROCESSING::demodulation_mapper(VecSymbolMod &samples, TypeModulation m){
     bit_sequence *bits = NULL;
     switch(m){
     case TypeModulation::QAM16:
@@ -662,13 +646,16 @@ bit_sequence *demodulation_mapper(VecSymbolMod &samples, TypeModulation m){
         print_log(CONSOLE, "[%s:%d] Error: not found modulation\n");
         break;
     }
-    // write_file_bin_data(
-    //             FILE_NAME_SAVE_MODULATION, &samples_mod[0], 
-    //             samples_mod.size() * sizeof(VecSymbolMod::value_type) );
-    // print_log(LOG, "[%s:%d] end \n", __func__, __LINE__);
     return bits;
 }
 
-};
+TypeModulation DIGITAL_SIGNAL_PROCESSING::string_to_TypeModulation(const std::string &tm) {
+    auto t = map_type_mod.find(tm);
+    if(t != map_type_mod.end()) {
+        return t->second;
+    }
+    return TypeModulation::NONE;
+}
+
 
 

@@ -28,6 +28,7 @@
 #define SHIFT 8
 
 using namespace DIGITAL_SIGNAL_PROCESSING;
+using namespace MODEL_COMPONENTS;
 
 void print_bit_char(u_char a, int count_bit){
     int i;
@@ -105,7 +106,7 @@ float calc_Ps(int N, const VecSymbolMod &S) {
     return (float)(1.0 / (float(N))) * sum;
 }
 
-VecSymbolMod generate_noise_by_SNR(int N, float Q_2) {
+VecSymbolMod MODEL_COMPONENTS::generate_noise_by_SNR(int N, float Q_2) {
     VecSymbolMod n;
     float koeff = sqrt(Q_2 / 2.f);
     for(int i = 0; i < N; ++i) {
@@ -1095,9 +1096,9 @@ VecSymbolMod carrier_offset2(float offset, float freq_d, int N, int Nfft) {
 }
 
 void ofdm_signal_correction() {
-    int N = 2400;
-    int SNR_min = -5;
-    int SNR_max = 35;
+    int N = 24000;
+    int SNR_min = 20;
+    int SNR_max = 20;
     OFDM_params param_ofdm = {
         .count_subcarriers = 128,
         .pilot = {0.7, 0.7},
@@ -1108,10 +1109,10 @@ void ofdm_signal_correction() {
         .count_ofdm_in_slot = 7,
     };
     // TypeModulation M = TypeModulation::QAM64;
-    TypeModulation M = TypeModulation::QAM16;
-    // TypeModulation M = TypeModulation::QPSK;
-    // const char filename_ber[] = "../data/ofdm_signal_correction/bers.txt";
-    const char filename_ber[] = "../data/ofdm_signal_correction/bers_qam16.txt";
+    // TypeModulation M = TypeModulation::QAM16;
+    TypeModulation M = TypeModulation::QPSK;
+    const char filename_ber[] = "../data/ofdm_signal_correction/bers.txt";
+    // const char filename_ber[] = "../data/ofdm_signal_correction/bers_qam16.txt";
     
     print_to_file(filename_ber, "w", "");
 
@@ -1211,8 +1212,8 @@ void ofdm_signal_correction() {
 
 
         // OFDM_symbol ofdms_rx = ofdms;
-        // VecSymbolMod samples_rx = OFDM_demodulator_no_correction(ofdms_rx, param_ofdm, true);
-        VecSymbolMod samples_rx = OFDM_demodulator(ofdms_rx, param_ofdm, true);
+        VecSymbolMod samples_rx = OFDM_demodulator_no_correction(ofdms_rx, param_ofdm, true);
+        // VecSymbolMod samples_rx = OFDM_demodulator(ofdms_rx, param_ofdm, true);
         
 
 

@@ -1,15 +1,27 @@
 
-log_file: string
-address: string
-type_modulation: string
-ofdm_parameters: {
-    count_subcarriers: int
-    pilot: complex<float> 
-    step_RS: int
-    def_interval: int
-    cyclic_prefix: int
-    power: float
-    count_ofdm_in_slot: int
+
+
+Name: config_program
+
+log_file: std::string ""
+param_trx: ParamsTRX {
+    type_modulation: std::string ""
+    ofdm_parameters: OFDM_params {
+        count_subcarriers: int 0
+        pilot: std::complex<float> 0
+        step_RS: int
+        def_interval: int
+        cyclic_prefix: int
+        power: float
+        count_ofdm_in_slot: int
+    }
+    device_phy: config_device {
+        bw_hz: long long 1
+        fs_hz: long long 1
+        lo_hz: long long 1
+        
+        block_size;
+    }
 }
 
 device_phy: {

@@ -52,14 +52,14 @@ void read_ofdm_parameters(std::ifstream &file, OFDM_params &ofdm_params) {
     }
 }
 
-std::map<std::string, TypeModulation> map_type_mod = {
+static std::map<std::string, TypeModulation> map_type_mod = {
     {"BPSK", TypeModulation::BPSK},
     {"QPSK", TypeModulation::QPSK},
     {"QAM16", TypeModulation::QAM16},
     {"QAM64", TypeModulation::QAM64},
     {"QAM256", TypeModulation::QAM256},
 };
-std::map<TypeModulation, std::string> map_type_str_mod = {
+static std::map<TypeModulation, std::string> map_type_str_mod = {
     {TypeModulation::BPSK, "BPSK"},
     {TypeModulation::QPSK, "QPSK"},
     {TypeModulation::QAM16, "QAM16"},
@@ -67,7 +67,7 @@ std::map<TypeModulation, std::string> map_type_str_mod = {
     {TypeModulation::QAM256, "QAM256"},
 };
 
-static TypeModulation string_to_TypeModulation(const std::string &tm) {
+static TypeModulation string_to_TypeM(const std::string &tm) {
     auto t = map_type_mod.find(tm);
     if(t != map_type_mod.end()) {
         return t->second;
@@ -93,7 +93,7 @@ config_program configure(const char *file_conf) {
             file >> param.address;
         } else if(buffer == "type_modulation:") {
             file >> buffer;
-            param.type_modulation = string_to_TypeModulation(buffer);
+            param.type_modulation = string_to_TypeM(buffer);
         } else if(buffer == "ofdm_parameters:") {
             read_ofdm_parameters(file, param.ofdm_params);
         }

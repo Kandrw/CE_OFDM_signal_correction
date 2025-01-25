@@ -4,6 +4,7 @@
 #include <fftw3.h>
 
 #include <output.hpp>
+#include <complex_container.hpp>
 #include <signal_processing.hpp>
 
 #define VALUE_DEF_INTERVAL 0.f 
@@ -17,6 +18,10 @@
 
 // using namespace DIGITAL_SIGNAL_PROCESSING;
 namespace DIGITAL_SIGNAL_PROCESSING {
+
+// size_t get_size_buffer_tx()
+
+
 
 bool check_correct_param(OFDM_params &param) {
     u_int16_t sub_no_def = param.count_subcarriers - param.def_interval;
@@ -32,13 +37,7 @@ bool check_correct_param(OFDM_params &param) {
         print_log(ERROR_OUT, "Incorrect param: def_interval = 0\n");
         return false;
     }
-    // if(param.count_subcarriers < ) {
-    //     print_log(ERROR_OUT, "Incorrect param: count_subcarriers = 0\n");
-    //     return false;
-    // }
 }
-
-
 
 #define TO_INT(x) (static_cast<int>(x))
 
@@ -454,11 +453,15 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool foun
 
 
         VecSymbolMod H = pilots_rx / pilots_tx;
+        
 #endif
         
 #if 1
         VecSymbolMod Heq = linearInterpolation(H, ofdm.size());
+
         VecSymbolMod ofdm_eq = ofdm / Heq;
+
+        
         VecSymbolMod sample_rx;
         int block = size_block_data;
         int step;
@@ -491,9 +494,6 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool foun
 
 
 }
-
-
-
 
 VecSymbolMod generateZadoffChuSequence(int cellId, int N) {
     VecSymbolMod pss(N);
@@ -529,92 +529,27 @@ void create_PSS(slot_ofdms &slot, u_char count_symbol) {
     slot.PSS = generateZadoffChuSequence(0, LENGTH_PSS);
 }
 
-// enum class STATE_SLOTS {
-    // FILL_SLOT,
-    // ADD_SLOT,
-    // EXIT
-// };
-/*
-VecSlotsOFDM create_slots1(const OFDM_symbol &ofdms,
-    const OFDM_params &param_ofdm)
-{
-    VecSlotsOFDM slots;
-
-    int iter = 0, slice = 0;
-    bool run = true;
-    STATE_SLOTS state = STATE_SLOTS::FILL_SLOT;
-    slot_ofdms slot;
-    create_PSS(slot, 0);
-    while(run) {
-        switch (state)
-        {
-        case STATE_SLOTS::FILL_SLOT:
-            state = 
-            slice = iter + param_ofdm.count_ofdm_in_slot;
-
-            if(slice > ofdms.size()) {
-                slice = ofdms.size();
-                if(slice == iter) {
-                    break;
-                }    
-            }
-            
-            std::copy(ofdms.begin() + iter, ofdms.begin() + slice, std::back_inserter(slot));
-            break;
-        case STATE_SLOTS::ADD_SLOT:
-            
-            break;
-        case STATE_SLOTS::EXIT:
-            
-            run = false;
-            break;
-        
-        default:
-            run = false;
-            break;
-        }
-    }
-
-    slot.ofdms = ofdms;
-    slots.push_back(slot);
-    
-    return slots;
-}
-*/
 VecSlotsOFDM create_slots(const OFDM_symbol &ofdms,
     const OFDM_params &param_ofdm)
 {
     VecSlotsOFDM slots;
-
     int iter = 0, slice = 0;
     bool run = true;
-    slot_ofdms slot;
-    // print_log(CONSOLE, "ofdms.size = %d\n", ofdms.size());     
+    slot_ofdms slot;   
     create_PSS(slot, 0);
     while(run) {
         slice = iter + param_ofdm.count_ofdm_in_slot;
-        // print_log(CONSOLE, "size - %d, iter - %d, slice - %d\n", ofdms.size(), iter, slice);
         if(slice >= ofdms.size()) {
             slice = ofdms.size();
-            // print_log(CONSOLE, "[2] size - %d, iter - %d, slice - %d\n", ofdms.size(), iter, slice);
-        
             if(slice == iter) {
                 break;
             }    
         }
-        
-        
-        std::copy(ofdms.begin() + iter, ofdms.begin() + slice, std::back_inserter(slot.ofdms));
-        // print_log(CONSOLE, "==== slot.size = %d\n", slot.ofdms.size());        
+        std::copy(ofdms.begin() + iter, ofdms.begin() + slice, std::back_inserter(slot.ofdms));       
         slots.push_back(slot); 
         slot.ofdms.clear();
         iter = slice;
     }
-    // print_log(CONSOLE, "slots.size = %d\n", slots.size());
-    // for(int i = 0; i < slots.size(); ++i) {
-    //     print_log(CONSOLE, ") %d\n", slots[i].ofdms.size());
-    // }
-    
     return slots;
 }
 

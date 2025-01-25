@@ -10,7 +10,7 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "../ipc/managment_ipc.hpp"
+// #include "../ipc/managment_ipc.hpp"
 
 #include <output.hpp>
 #include <complex_container.hpp>

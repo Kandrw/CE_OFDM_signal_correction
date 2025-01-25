@@ -11,6 +11,8 @@
 #include "../loaders/load_data.hpp"
 #include "../configure/config_parse.hpp"
 
+#include <string.h>
+
 using namespace DIGITAL_SIGNAL_PROCESSING;
 using namespace DEVICE_PHY;
 
@@ -82,13 +84,12 @@ int test_RX(int argc, char *argv[]){
     VecSymbolMod samples_tx;
     OFDM_symbol samples = generate_frame_phy(data, param_phy, samples_tx);
     // exit(0);
-
     config_device cfg1 = {
-        ip_device,
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
-        1024 * 1024,
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
+        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
+        .block_size = 1024 * 1024,
     };
+    memcpy(cfg1.ip, ip_device, sizeof(cfg1.ip));
     print_cfg_dev(cfg1.tx_cfg);
     // return -1;
     if(DeviceTRX::initialization(cfg1)){
@@ -137,12 +138,12 @@ int realtime_RX(int argc, char *argv[]) {
         .param_ofdm = param.ofdm_params,
     };
     config_device cfg1 = {
-        param.address.c_str(),
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
-        1024 * 1024,
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
+        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
+        .block_size = 1024 * 1024,
         // 200000,
     };
+    memcpy(cfg1.ip, param.address.c_str(), sizeof(cfg1.ip));
     print_cfg_dev(cfg1.tx_cfg);
     if(DeviceTRX::initialization(cfg1)){
         print_log(CONSOLE, "[%s:%d] Error: initialization, exit program\n",
@@ -305,14 +306,11 @@ int test_TX(int argc, char *argv[]){
     // };
 
     config_device cfg1 = {
-        param.address.c_str(),
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
-        // 1024 * 1024,
-        160000
-        
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
+        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
+        .block_size = 160000,
     };
-
+    memcpy(cfg1.ip, param.address.c_str(), sizeof(cfg1.ip));
     print_cfg_dev(cfg1.tx_cfg);
     // return -1;
     if(DeviceTRX::initialization(cfg1)){
@@ -398,11 +396,11 @@ int trx_test(int argc, char *argv[]){
     // exit(0);
 
     config_device cfg1 = {
-        ip_device,
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
-        1024 * 1024,
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
+        .tx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
+        .block_size = 1024 * 1024,
     };
+    memcpy(cfg1.ip, ip_device, sizeof(cfg1.ip));
     print_cfg_dev(cfg1.tx_cfg);
     // return -1;
     if(DeviceTRX::initialization(cfg1)){

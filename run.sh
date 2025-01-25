@@ -1,53 +1,41 @@
 #!/bin/bash
 
-
 BUILD_DIR=build
-COUNT_THREAD=-j16
-
-#DEBUG_BUILD=-D
+COUNT_THREAD=-j$(nproc)
 
 BUILD_FLAGS=""
+
+FILE_CONFIG=../configs/config.yaml
+PROGRAM=program
+DEBUG_BUILD=""
 
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
-ADDRESS_DEV="ip:192.168.3.1"
-SPECIFIC_OPTION="4"
-FILE_CONFIG=../configs/config.txt
-
-while getopts "dcma:l:r:v:o:" OPTION; do
+while getopts "dcml:r:" OPTION; do
     case $OPTION in
     d)
         BUILD_FLAGS=-DCMAKE_BUILD_TYPE=Debug 
-        #echo $BUILD_FLAGS
-        echo ./program $ADDRESS_DEV ../data/data_test.txt $TARGET $FILE_CONFIG $SPECIFIC_OPTION
-	
+        echo ./$PROGRAM $TARGET $FILE_CONFIG
+        DEBUG_BUILD="VERBOSE=1"
     ;;
 	c)
-        #echo $BUILD_FLAGS
         cmake $BUILD_FLAGS ..
     ;;
     m)
-        # cd $BUILD_DIR
-        rm ./program
-        make $COUNT_THREAD
-        # exit;
-    ;;
-    a)
-        ADDRESS_DEV=${OPTARG}
+        rm ./$PROGRAM
+
+        make $DEBUG_BUILD
+        # make $COUNT_THREAD
     ;;
     l)
         FILE_CONFIG=${OPTARG}
     ;;
-    o)
-        SPECIFIC_OPTION=${OPTARG}
-    ;;
 	r)
         TARGET=${OPTARG}
-        ./program $ADDRESS_DEV ../data/data_test.txt $TARGET $FILE_CONFIG $SPECIFIC_OPTION
-	;;
-	v) 
-        python3 ../visual_signal.py ${OPTARG}
+        echo ./$PROGRAM $TARGET $FILE_CONFIG
+        ./$PROGRAM $TARGET $FILE_CONFIG
+        exit;
 	;;
 	*)
 		echo "Incorrect option"
@@ -57,30 +45,12 @@ done
 
 if [[ $OPTIND == 1 ]]; then
 
-    echo "Not found command, -dcmarv"
+    echo "Commands:"
     echo "d - DEBUG"
     echo "c - cmake (rebuild makefile)"
+    echo "l - file config path"
     echo "m - make"
-    echo "a - address device, example <ip:192.168.3.1>"
-    echo "r - run project"
-    echo "v - view result project"
-    echo "o - specific option"
-
-    #echo "Example: ./run.sh -cm -a 192.168.3.1 -o 4 -r model_practice"
-fi
-
-
-exit;
-
-
-
-
-if [[ $1 == "test" ]]; then
-    g++ ./fast_test/test1.cpp -o ./fast_test/test1
-    ./fast_test/test1
-
-
-    exit;
+    echo "r - run project <target>"
 fi
 
 

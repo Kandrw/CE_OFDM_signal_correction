@@ -5,12 +5,12 @@
 namespace DIGITAL_SIGNAL_PROCESSING {
 
     enum class TypeModulation{
+        NONE,
         BPSK = 1,
         QPSK,
         QAM16,
         QAM64,
         QAM256,
-        // QAM1024,
         // COUNT_TYPES_MODULATION
     };
     struct OFDM_params{
@@ -34,7 +34,12 @@ namespace DIGITAL_SIGNAL_PROCESSING {
         unsigned char *buffer = nullptr;
     };
 
-    struct ParamsPhy{
+    struct ParamsPhy {
+        TypeModulation type_modulation;
+        OFDM_params param_ofdm;
+    };
+
+    struct ParamsTRX {
         TypeModulation type_modulation;
         OFDM_params param_ofdm;
     };
@@ -43,7 +48,7 @@ namespace DIGITAL_SIGNAL_PROCESSING {
 
     VecSymbolMod modulation_mapper(bit_sequence bits, TypeModulation m);
     bit_sequence *demodulation_mapper(VecSymbolMod &samples, TypeModulation m);
-
+    TypeModulation string_to_TypeModulation(const std::string &tm);
 
 
 

@@ -285,7 +285,7 @@ def view_graph_ofdm_signal_correction():
     filename_ber_qam_16 = "../data/ofdm_signal_correction/bers_qam16.txt"
     
     ciclic_prefix = 40
-    CON_VIEW = 2
+    CON_VIEW = 1
     if CON_VIEW == 1:
         id_f = 10
         plt.figure(id_f, figsize=(10,10))
@@ -766,11 +766,12 @@ def view_data_3():
     
     # id_f += 1
     # plt.figure(id_f, figsize=(10,10))
-    if 0:
-        samples = array_float_to_np_complex(read_file_bin(filename_mod_tx, 4))
-        plt.subplot(2, 2, 3)
-        plt.title("Отправленные QPSK")
-        plt.scatter(samples.real, samples.imag)
+    if 1:
+        if 0:
+            samples = array_float_to_np_complex(read_file_bin(filename_mod_tx, 4))
+            plt.subplot(2, 2, 3)
+            plt.title("Отправленные QPSK")
+            plt.scatter(samples.real, samples.imag)
 
         samples = array_float_to_np_complex(read_file_bin(filename_mod_rx, 4))
         plt.subplot(2, 2, 4)
@@ -827,6 +828,8 @@ def recv_ipc():
     # data = shm.read()
     # print("Данные: ", data.decode('utf-8'))
     data = fd_socket.recv(64)
+    if not data:
+        EXIT(0)
     print(data)
     # if(len(data) < 6):
     #     return header
@@ -953,7 +956,7 @@ def command_ListenData(param):
 
         ax1.clear()
         plt.title(title)
-        plt.ylim(-20, 5000)
+        plt.ylim(-20, 2000)
         if(count_arr == 1):
             arry = arr[3]
             plt.ylabel(arry[1])

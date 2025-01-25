@@ -1,0 +1,32 @@
+
+log_file: ../log.log
+env: sdr
+address: ip:192.168.2.1
+type_modulation: QPSK
+ofdm_parameters:
+  count_subcarriers: 128
+  pilot: 0.7 0.7
+  step_RS: 8
+  def_interval: 30
+  cyclic_prefix: 40
+  power: 16000
+  count_ofdm_in_slot: 7
+device_phy:
+  tx:
+    bw_hz: 1500000
+    fs_hz: 2500000
+    lo_hz: 1900000000
+    rfport: A
+    block_size: 1000000
+  rx:
+    bw_hz: 2000000
+    fs_hz: 2500000
+    lo_hz: 1900000000
+    rfport: A_BALANCED
+    block_size: 1000000
+model_channel:
+  buffer_channel: 500000
+
+
+
+

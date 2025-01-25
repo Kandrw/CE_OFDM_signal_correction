@@ -1,5 +1,3 @@
-#include "cfo_correct.hpp"
-
 #include <algorithm>
 #include <fftw3.h>
 
@@ -11,6 +9,7 @@
 #include <stdexcept>
 
 #include <output.hpp>
+#include <complex_container.hpp>
 #include <signal_processing.hpp>
 
 #define EXP 2.718281828459

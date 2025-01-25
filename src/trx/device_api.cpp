@@ -38,7 +38,7 @@ int DeviceTRX::deinitialization(){
     return 0;
 }
 
-int DeviceTRX::send_samples(void *samples, size_t size){
+int DeviceTRX::send_samples(const void *samples, size_t size){
     print_log(LOG, "[%s:%d]  send buffer[%d]\n",
             __func__, __LINE__, size);
     return write_to_device_buffer(samples, size);

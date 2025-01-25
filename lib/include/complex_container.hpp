@@ -28,3 +28,14 @@ void operator_div(VecSymbolMod &A, const mod_symbol &B);
 void operator_add(VecSymbolMod &A, const VecSymbolMod &B);
 
 VecSymbolMod conj_vec(const VecSymbolMod &A);
+// export VecSymbolMod operator / (const VecSymbolMod &A, const VecSymbolMod &B) {
+//     VecSymbolMod C;
+//     if(A.size() != B.size()) {
+//         fprintf(stderr, "Error: The sizes are not equal\n");
+//         exit(-1);
+//     }
+//     for(int i = 0; i < (int)A.size(); ++i) {
+//         C.push_back(A[i] / B[i]);
+//     }
+//     return C;
+// }

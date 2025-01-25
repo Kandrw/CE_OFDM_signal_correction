@@ -12,12 +12,12 @@
         long long bw_hz; // Analog banwidth in Hz
         long long fs_hz; // Baseband sample rate in Hz
         long long lo_hz; // Local oscillator frequency in Hz
-        const char* rfport; // Port name
+        char rfport[20]; // Port name
         unsigned int block_size;
     };
 
     struct config_device{
-        const char *ip;
+        char ip[32];
         stream_cfg rx_cfg;
         stream_cfg tx_cfg; 
         unsigned int block_size;

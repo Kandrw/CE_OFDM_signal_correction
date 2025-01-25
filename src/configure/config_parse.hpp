@@ -6,13 +6,6 @@
 #include <complex_container.hpp>
 #include <signal_processing.hpp>
 
-enum class ARGV_CONSOLE: int {
-    ARGV_IP_DEVICE = 1,
-    ARGV_FILE_DATA,
-    ARGV_TARGET_PROGRAM,
-    ARGV_FILE_CONFIG,
-    ARGV_MAX
-};
 
 
 struct config_program {
