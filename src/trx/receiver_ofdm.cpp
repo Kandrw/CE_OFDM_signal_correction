@@ -16,7 +16,7 @@
 #include <complex_container.hpp>
 #include <signal_processing.hpp>
 
-#define LENGTH_PSS 63
+// #define LENGTH_PSS 63
 
 using namespace DIGITAL_SIGNAL_PROCESSING;
 

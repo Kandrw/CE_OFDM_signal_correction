@@ -32,17 +32,19 @@ namespace ATTR_SERVICE {
     struct context {
         u_int16_t id;
         YAML::Node cfg;
+        DIGITAL_SIGNAL_PROCESSING::OFDM_params ofdm_param;
+        config_device cfg_device;
     };
     int init_components(const std::string &key);
     // int init_config_com(int argc, char *argv[], config_com &cfg);
     int init_log_system(const char *file_log);
     int deinit_log_system();
 
-    int send_msg(const context &ctx, const void *buffer, int size);
-    int recv_msg(const context &ctx, void *buffer, int size);
+    int send_msg(context &ctx, const void *buffer, int size);
+    int recv_msg(context &ctx, void *buffer, int size);
 
-    int init_system(context &cfg_dev);
-    int deinit_system(context &cfg_dev);
+    int init_system(context &ctx_dev);
+    int deinit_system(context &ctx_dev);
     int write_samples(const VecSymbolMod &samples, size_t size);
     int read_samples(VecSymbolMod &samples, size_t size);
 

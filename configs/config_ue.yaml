@@ -1,5 +1,5 @@
 
-log_file: ../log.log
+log_file: ../log_ue.log
 env: sdr
 address: ip:192.168.2.1
 type_modulation: QPSK
@@ -19,13 +19,13 @@ device_phy:
     fs_hz: 2500000
     lo_hz: 1900000000
     rfport: A
-    block_size: 1000000
+    block_size: 5000
   rx:
     bw_hz: 2000000
     fs_hz: 2500000
     lo_hz: 1900000000
     rfport: A_BALANCED
-    block_size: 1000000
+    block_size: 40000
 model_channel:
   buffer_channel: 500000
 

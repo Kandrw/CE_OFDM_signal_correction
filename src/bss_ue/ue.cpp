@@ -29,13 +29,19 @@ int ue_program(int argc, char *argv[]) {
     EXIT_IF_FAIL(ATTR_SERVICE::init_system(ctx_ue));
     
     run_eu = RUN_UE;
-    int cmd = 0;
+    std::string cmd = "";
+
     char buffer[] = "Test";
     while(run_eu) {
         std::cout<<"command: ";
         std::cin >> cmd;
-        if(cmd == 10) {
+        if(cmd == "exit") {
             break;
+        }
+        if(cmd == "while") {
+            for(int i = 0; i < 1000; ++i) {
+                ATTR_SERVICE::send_msg(ctx_ue, buffer, sizeof(buffer));
+            }
         }
         ATTR_SERVICE::send_msg(ctx_ue, buffer, sizeof(buffer));
     }

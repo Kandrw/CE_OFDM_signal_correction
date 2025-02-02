@@ -316,6 +316,7 @@ int init_device_TRX(config_device &cfg) {
 	} else {
 		BLOCK_SIZE_rx = rxcfg->block_size;
 		BLOCK_SIZE_tx = txcfg->block_size;
+		print_log(CONSOLE, "TEEEEEEESSSSTTT\n");
 	}
 	
 
@@ -454,7 +455,7 @@ int read_to_device_buffer(const void *data, int size){
 	}
 	float *buffer = (float*)data;
 	int iter = 0;
-	print_log(LOG_DATA, "[%s:%d]\n", __func__, __LINE__);
+	// print_log(LOG_DATA, "[%s:%d]\n", __func__, __LINE__);
 	for (p_dat = (int16_t*)iio_block_first(rxblock, rx0_i); p_dat < p_end, iter < size;
 			p_dat += p_inc / sizeof(*p_dat), iter++) {
 		/* Example: swap i and q */
@@ -463,8 +464,8 @@ int read_to_device_buffer(const void *data, int size){
 		buffer[0] = i;
 		buffer[1] = q;
 		buffer += 2;
-		if(buffer[0] > 4000 || buffer[0] < -4000)
-			print_log(LOG_DATA, "%f, %f\n", (float)i, (float)q);
+		// if(buffer[0] > 4000 || buffer[0] < -4000)
+		// 	print_log(LOG_DATA, "%f, %f\n", (float)i, (float)q);
 		// print_log(CONSOLE, "%f, %f\n", (float)i, (float)q);
 	}
 	return 0;

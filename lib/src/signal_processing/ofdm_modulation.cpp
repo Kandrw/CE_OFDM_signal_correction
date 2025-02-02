@@ -9,7 +9,6 @@
 
 #define VALUE_DEF_INTERVAL 0.f 
 #define NO_DATA 0.f
-#define LENGTH_PSS 63
 #define FAILED exit(-1)
 #define CENTRAL_SHIFT 0
 #define FILLING_EMPTY 0.5f
@@ -23,7 +22,7 @@ namespace DIGITAL_SIGNAL_PROCESSING {
 
 
 
-bool check_correct_param(OFDM_params &param) {
+static bool check_correct_param(OFDM_params &param) {
     u_int16_t sub_no_def = param.count_subcarriers - param.def_interval;
     if(param.count_subcarriers == 0) {
         print_log(ERROR_OUT, "Incorrect param: count_subcarriers = 0\n");
