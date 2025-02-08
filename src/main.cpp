@@ -42,8 +42,10 @@ int main(int argc, char *argv[]){
     std::map<std::string, std::function<int(int, char**)>> target_exec = {
         {"bss", bss_program},
         {"ue", ue_program},
-        {"channel_model", channel_model},
+        // {"channel_model", channel_model},
         {"monitor", monitor_signal},
+        {"receiver", recv_channel_ofdm},
+        
         
     };
     auto find_target_exec = target_exec.find(argv[TARGET_POS]);

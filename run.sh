@@ -45,6 +45,10 @@ while getopts "dcml:r:" OPTION; do
             echo "MONITOR: set config"
             FILE_CONFIG=../configs/config_monitor.yaml
         fi
+        if [[ $TARGET == "receiver" ]]; then
+            echo "receiver: set config"
+            FILE_CONFIG=../configs/config_recv.yaml
+        fi
         echo ./$PROGRAM $TARGET $FILE_CONFIG
         ./$PROGRAM $TARGET $FILE_CONFIG
         exit;

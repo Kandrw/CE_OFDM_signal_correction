@@ -1,0 +1,69 @@
+[init_log:39] 		INIT_LOG
+bw_hz = 1500000, fs_hz = 2500000, lo_hz = 1900000000, rfport = A
+[initialization:25]
+* Acquiring IIO context
+[init_device_TRX:323] addr = ip:192.168.3.1
+* Acquiring AD9361 streaming devices
+* Configuring AD9361 for streaming
+* Initializing AD9361 IIO streaming channels
+* Enabling IIO streaming channels
+* Creating non-cyclic IIO buffers with 1 MiS
+[init_device_TRX:398] configure device
+[realtime_RX:154] 
+connect, file shared memory: .
+size = 1048576
+realtime_RX:177: input:rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+realtime_RX:177: input:rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+realtime_RX:177: input:rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+rx data: 1048576
+[seconds = 0.000000] realtime_RX
+send
+realtime_RX:177: input:

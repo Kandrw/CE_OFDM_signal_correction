@@ -582,6 +582,38 @@ int target_practice(int argc, char *argv[]) {
 int ofdm_model(int argc, char *argv[]);
 int test_ipc(int argc, char *argv[]);
 
+
+
+int fast_test(int argc, char *argv[]){
+    char test_data[300];
+    init_log("../log.log");
+    for(int i = 0; i < sizeof(test_data); ++i){
+        test_data[i] = (rand() % 200) + 100;
+    }
+    OFDM_params param_ofdm = {
+        .count_subcarriers = 128,
+        .pilot = {0.7, 0.7},
+        .step_RS = 8,
+        .def_interval = 30,
+        .cyclic_prefix = 40,
+        .power = 3000,
+        .count_ofdm_in_slot = 7,
+    };
+    bit_sequence data;
+    data.buffer = (u_char*)test_data;
+    data.size = sizeof(test_data);
+    VecSymbolMod samples_tx = modulation_mapper(data, TypeModulation::QPSK);
+    
+    printf("len - %d\n", samples_tx.size());
+    OFDM_symbol ofdms = OFDM_modulator(samples_tx, param_ofdm);
+    addPowerOFDM(ofdms, param_ofdm.power);
+    print_VecSymbolMod(stdout, ofdms[0]);
+    printf("len - %d\n", ofdms[0].size());
+    write_file_bin_data("../data/fast_test_1.bin", 
+        (void*)&ofdms[0], ofdms[0].size() * sizeof(mod_symbol));
+
+}
+
 int main(int argc, char *argv[]){
     
     // const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
@@ -610,6 +642,7 @@ int main(int argc, char *argv[]){
         {"bss", bss_program},
         {"ue", ue_program},
 #endif
+        {"fast_test", fast_test},
     };
 
 

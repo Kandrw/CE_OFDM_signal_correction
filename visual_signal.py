@@ -499,9 +499,9 @@ def view_resourse_grid(del_cyclic_prefix, data, \
         return
     plt.imshow(power_amplitude, aspect='auto', cmap='jet', origin='lower')
     
-    plt.colorbar(label='Мощность (амплитуда)')
+    plt.colorbar(label='Амплитуда')
     plt.title(title)
-    plt.ylabel('Поднесущие')
+    plt.ylabel('Гц')
     plt.xlabel('Временные символы')
     # plt.xticks(np.arange(0, num_subcarriers, step=8))  # Установка меток по оси X
     # plt.yticks(np.arange(0, num_symbols, step=2))      # Установка меток по оси Y
@@ -626,7 +626,7 @@ def ofdm_model_add_noise():
     id_f = 10
     plt.figure(id_f, figsize=(10,10))
 
-    if 1:
+    if 0:
         pss = array_float_to_np_complex(read_file_bin(filename_corr_pss, 4))
         plt.subplot(2, 2, 1)
         plt.title("Корреляция PSS")
@@ -654,7 +654,7 @@ def ofdm_model_add_noise():
         print("len data - ", len(data))
 
         view_resourse_grid(0, data[1:], id_f, (2, 2, 2), "Принятый")
-    if 1:
+    if 0:
         data = read_OFDMs(filename_test_ofdm_rx, 4)
         print("len data - ", len(data))
 
@@ -682,6 +682,19 @@ def ofdm_model_add_noise():
         plt.title("Шум")
         plt.plot(noise)
     id_f += 1
+    plt.figure(id_f, figsize=(10,10))
+    if 1:
+        data = read_OFDM_slots(filename_slots_tx, 4)
+        print("len data - ", len(data))
+        for i in range(len(data)):
+            print(f"len data[{i}] - ", len(data[i]))
+        data0 = data[0]
+        print("size pss = ",len(data0[0]),"count ofdm = ", len(data0[1]))
+        plt.subplot(2, 2, 1)
+        print(data0[1:][0])
+        tmp = np.array([data0[3:][0]]).T
+        plt.plot(abs(tmp))
+        # view_resourse_grid(cyclic_prefix, data0[1:], id_f, (2, 2, 1), "Отправленный OFDM")
 
 
 def view_data_3():
@@ -693,6 +706,8 @@ def view_data_3():
     filename_slots_tx = "../data/slots_tx.bin"
     filename_rx_data = "../data/rx_sample.bin"
     filename_rx_ofdms = "../data/read_ofdms.bin"
+    filename_rx_ofdms_no_cfo = "../data/read_ofdms_no_cfo.bin"
+    
     filename_test_rx_ofdms = "../data/test_ofdm_rx.bin"
     filename_samples_tx = "../data/samples_tx.bin"
     filename_corr_test = "../data/corr_array_test.bin"
@@ -712,10 +727,19 @@ def view_data_3():
         plt.plot(abs(samples))
         if 1:
             data = read_OFDMs(filename_rx_ofdms, 4)
+            print("\n\n\n\n")
+            ofdm = data[0]
+            ofdm = np.fft.fft(ofdm)
+            ofdm = np.fft.fftshift(ofdm)
+
             print("len data - ", len(data))
             plt.subplot(2, 2, 2)
+            plt.xlabel("Гц")
+            plt.ylabel("Амплитуда")
+            
             plt.title("Пример спектра одного OFDM символа")
-            plt.plot(abs(np.fft.fft(data[0])))
+            plt.plot(abs(ofdm))
+    
     if 1:
         samples = array_float_to_np_complex(read_file_bin(filename_samples_tx, 4))
         plt.subplot(2, 2, 3)
@@ -763,7 +787,12 @@ def view_data_3():
         print("len data - ", len(data))
 
         view_resourse_grid(cyclic_prefix, data[1:], id_f, (2, 2, 3), "Принятый синхронизированный по PSS")
-    
+    if 1:
+        data = read_OFDMs(filename_rx_ofdms_no_cfo, 4)
+        print("len data - ", len(data))
+
+        # view_resourse_grid(0, data[1:], id_f, (2, 2, 2), "Принятый")
+        view_resourse_grid(0, data, id_f, (2, 2, 3), "Принятый")
     # id_f += 1
     # plt.figure(id_f, figsize=(10,10))
     if 1:
@@ -777,7 +806,7 @@ def view_data_3():
         plt.subplot(2, 2, 4)
         plt.title("Принятые QPSK")
         plt.scatter(samples.real, samples.imag)
-    id_f += 1
+    # id_f += 1
     # plt.figure(id_f, figsize=(10,10))
     if 0:
         filename_est_cfo = "../data/est_cfo.bin"
@@ -785,7 +814,153 @@ def view_data_3():
         plt.subplot(2, 2, 1)
         plt.title("est cfo")
         plt.plot(est)
+        id_f += 1
+        plt.figure(id_f, figsize=(10,10))
+    if 0:
+        data = read_OFDM_slots(filename_slots_tx, 4)
+        pss = data[0][0]
+        print(pss)
+        pss = np.array(pss)
+        plt.subplot(2, 2, 1)
+        plt.title("Пример PSS")
+        plt.xlabel("real")
+        plt.ylabel("imag")        
+        plt.scatter(pss.real, pss.imag)
+        id_f += 1
+    if 0:
+        data = read_OFDM_slots(filename_slots_tx, 4)
+        
+        print("len data - ", len(data))
+        for i in range(len(data)):
+            print(f"len data[{i}] - ", len(data[i]))
+        data_ofdms_no_pss = []
+        for i in range(len(data)):
+            if 1:
+                print("\t len - ", len(data[i][1]))
+                pss = data[i][0]
+                f_len_arr = (count_subcarriers - len(data[i][j])) // 2
+                val = -100+-100j
+                val = 0
+                pss = np.concatenate((pss, [val for i in range(52)]))
+                pss = np.concatenate(([val for i in range(53)], pss))
+                pss = pss / 10
+                print("\t len - ", len(pss))
+                print(pss)
+                data_ofdms_no_pss.append(pss)
+            for j in range(1, len(data[i])):
+                # if(len(data[i][j]) < count_subcarriers):
+                #     f_len_arr = (count_subcarriers - len(data[i][j])) // 2
+                #     data[i][j] = np.concatenate((data[i][j], [0 for i in range(f_len_arr + 2 + cyclic_prefix)]))
+                #     data[i][j] = np.concatenate(([0 for i in range(f_len_arr)], data[i][j]))
+                #     data[i][j] = data[i][j][:count_subcarriers + cyclic_prefix]
+                # data_ofdms_no_pss.append(data[i][j])
+                # print(f"len s - {len(data[i][j])}")
+                # data[i][j] = np.fft.fftshift(data[i][j])
+                data_ofdms_no_pss.append(data[i][j])
+        data0 = data[0] 
+        print("size pss = ",len(data0[0]),"count ofdm = ", len(data0[1]))
+        print(type(data0[1:]))
+        view_resourse_grid(cyclic_prefix, data_ofdms_no_pss, id_f, (2, 2, 1), "Отправленный")
+    
 
+
+def view_data_4():
+    filename_1 = "../data/dump_data/slots_rx.bin"
+    
+    filename_2 = "../data/dump_data/demod_ofdm.bin"
+    filename_3 = "../data/dump_data/slots_tx.bin"
+    filename_4 = "../data/dump_data/slots_tx_2.bin"
+    f_5 = "../data/dump_data/rx_sample.bin"
+    f_6 = "../data/dump_data/pilot_tx.bin"
+    f_7 = "../data/dump_data/pilot_rx.bin"
+    f_8 = "../data/dump_data/linearInterpolation.bin"
+    f_9 = "../data/dump_data/ofdm_1.bin"
+    f_10 = "../data/dump_data/ofdm_eq.bin"
+    f_11 = "../data/dump_data/pilot_h.bin"
+    id_f = 1
+    plt.figure(id_f, figsize=(10,10))
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin(filename_2, 4))
+        plt.subplot(2, 2, 3)
+        plt.title("QPSK")
+        plt.scatter(samples.real, samples.imag)
+
+    id_f += 1
+    plt.figure(id_f, figsize=(10,10))
+
+
+    if 1:
+        samples = array_float_to_np_complex(read_file_bin(f_5, 4))
+        plt.subplot(2, 2, 1)
+        plt.title("Буфер")
+        plt.plot(abs(samples))
+    id_f += 1
+    plt.figure(id_f, figsize=(10,10))
+
+    if 1:
+        data = read_OFDMs(filename_3, 4)
+        print("len data - ", len(data))
+        view_resourse_grid(0, data, id_f, (2, 2, 1), "Tx")
+    if 1:
+        data = read_OFDMs(filename_1, 4)
+        print("len data - ", len(data))
+        view_resourse_grid(0, data, id_f, (2, 2, 2), "Rx")
+
+    
+    if 1:
+        cyclic_prefix = 40
+        data = read_OFDM_slots(filename_4, 4)
+        
+        print("len data - ", len(data))
+        for i in range(len(data)):
+            print(f"len data[{i}] - ", len(data[i]))
+        data_ofdms_no_pss = []
+        for i in range(len(data)):
+            for j in range(1, len(data[i])):
+                # if(len(data[i][j]) < count_subcarriers):
+                #     f_len_arr = (count_subcarriers - len(data[i][j])) // 2
+                #     data[i][j] = np.concatenate((data[i][j], [0 for i in range(f_len_arr + 2 + cyclic_prefix)]))
+                #     data[i][j] = np.concatenate(([0 for i in range(f_len_arr)], data[i][j]))
+                #     data[i][j] = data[i][j][:count_subcarriers + cyclic_prefix]
+                # data_ofdms_no_pss.append(data[i][j])
+                # print(f"len s - {len(data[i][j])}")
+                # data[i][j] = np.fft.fftshift(data[i][j])
+                data_ofdms_no_pss.append(data[i][j])
+        data0 = data[0]
+        print("size pss = ",len(data0[0]),"count ofdm = ", len(data0[1]))
+        print(type(data0[1:]))
+        view_resourse_grid(cyclic_prefix, data_ofdms_no_pss, id_f,
+                            (2, 2, 3), "Отправленный")
+
+    id_f += 1
+    plt.figure(id_f, figsize=(10,10))
+    if 1:
+        
+        ptx = array_float_to_np_complex(read_file_bin(f_6, 4))
+        plt.subplot(2, 2, 1)
+        plt.title("Оценка канала")
+        plt.plot(ptx, label = "pilot tx")
+        prx = array_float_to_np_complex(read_file_bin(f_7, 4))
+        plt.plot(prx, label = "pilot rx")
+        ph = array_float_to_np_complex(read_file_bin(f_11, 4))
+        plt.plot(ph, label = "pilot rx/tx - Оценка канала")
+        plt.legend()
+
+    if 1:
+        li = array_float_to_np_complex(read_file_bin(f_8, 4))
+        plt.subplot(2, 2, 2)
+        plt.title("Линейная интерполяция к оценки канала")
+        plt.plot(li)
+        ofdm1 = array_float_to_np_complex(read_file_bin(f_9, 4))
+        plt.subplot(2, 2, 3)
+        plt.title("Принятый сигнал")
+        # plt.title("T")
+        plt.plot(ofdm1)
+        ofdm_heq = array_float_to_np_complex(read_file_bin(f_10, 4))
+        plt.subplot(2, 2, 4)
+        plt.title("Коррекция сигнала")
+        plt.plot(ofdm_heq)
+    
 
 FILE_SHARED_MEMORY = "."
 SIZE_MEMORY = 20000
@@ -1009,9 +1184,14 @@ def processing_commands():
         # time.sleep(1)
         # send_ipc(123, 32, 44, "f")
 
- 
-
-
+def fast_test():
+    tmp = array_float_to_np_complex(read_file_bin("../data/fast_test_1.bin", 4))
+    id_f = 10
+    plt.figure(id_f, figsize=(10,10))
+    print(tmp)
+    if 1:
+        plt.subplot(2, 2, 1)
+        plt.plot(abs(tmp.real))
 
 print("Start visual_signal.py")
 
@@ -1062,8 +1242,9 @@ targets = {
     "vd1":view_data_1,
     "vd2":view_data_2,
     "vd3":view_data_3,
-    "ofdm_model_add_noise": ofdm_model_add_noise
-
+    "vd4":view_data_4,
+    "ofdm_model_add_noise": ofdm_model_add_noise,
+    "fast_test":fast_test
 }
 
 

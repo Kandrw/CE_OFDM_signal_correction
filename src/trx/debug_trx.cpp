@@ -229,9 +229,10 @@ int realtime_RX(int argc, char *argv[]) {
 int test_TX(int argc, char *argv[]){
 
     const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
+    
     config_program param = configure(file_conf);
     init_log(param.file_log.c_str());
-
+    print_log(CONSOLE, "config: %s\n", file_conf);
 #if 1
     const char *filename = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
 #else
@@ -242,6 +243,8 @@ int test_TX(int argc, char *argv[]){
     char test_data[] = "Test m";
 #else    
     char test_data[100];
+    // char test_data[1000];
+    
     for(int i = 0; i < (int)sizeof(test_data); ++i){
         // test_data[i] = (rand() % 200);
         test_data[i] = (rand() % 20) + 70;

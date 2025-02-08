@@ -1,0 +1,1082 @@
+[init_log:39] 		INIT_LOG
+size samples_rx: 1048576
+samples.size() = 1048576
+[receiver_OFDM:344] 		state: 0
+[receiver_OFDM:358] pos_iter - 0
+[receiver_OFDM:365] pos_data: 59655
+[receiver_OFDM:344] 		state: 1
+[receiver_OFDM:387] add ofdm symbol - 0, [59695:59823]
+[receiver_OFDM:387] add ofdm symbol - 1, [59863:59991]
+[receiver_OFDM:387] add ofdm symbol - 2, [60031:60159]
+[receiver_OFDM:387] add ofdm symbol - 3, [60199:60327]
+[receiver_OFDM:387] add ofdm symbol - 4, [60367:60495]
+[receiver_OFDM:387] add ofdm symbol - 5, [60535:60663]
+[receiver_OFDM:387] add ofdm symbol - 6, [60703:60831]
+[receiver_OFDM:344] 		state: 0
+size sub = 128
+[evaluation_cfo:77] sum: -16099.191406 57204.617188, angle: 1.845132, est: 0.293662
+[evaluation_cfo:77] sum: -8419.236328 49873.710938, angle: 1.738031, est: 0.276616
+[evaluation_cfo:77] sum: 7918.000000 4441.000000, angle: 0.511153, est: 0.081353
+[evaluation_cfo:77] sum: -42296.000000 -1378.000000, angle: -3.109024, est: -0.494817
+[evaluation_cfo:77] sum: 14422.000000 -19334.000000, angle: -0.929899, est: -0.147998
+[evaluation_cfo:77] sum: -2605.000000 -37802.000000, angle: -1.639599, est: -0.260950
+[evaluation_cfo:77] sum: 47702.000000 -26690.000000, angle: -0.510119, est: -0.081188
+[evaluation_cfo:135] ttt: 896.000000 0.000000, mean: 0.293662
+[evaluation_cfo:135] ttt: 896.000000 0.000000, mean: 0.276616
+[evaluation_cfo:135] ttt: 896.000000 0.000000, mean: 0.081353
+[evaluation_cfo:135] ttt: 896.000000 0.000000, mean: -0.494817
+[evaluation_cfo:135] ttt: 896.000000 0.000000, mean: -0.147998
+[evaluation_cfo:135] ttt: 896.000000 0.000000, mean: -0.260950
+[evaluation_cfo:135] ttt: 896.000000 0.000000, mean: -0.081188
+size sub = 128
+[ofdm_reception:366]
+[OFDM_demodulator:377]
+[ofdm_reception:368] rx_sample - 420
+[demodulation_QPSK:523] start
+[demodulation_QPSK:571] i = 0, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.546454 + -0.541526
+[demodulation_QPSK:571] i = 1, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.557489 + -0.591272
+[demodulation_QPSK:571] i = 2, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.564898 + -0.618571
+[demodulation_QPSK:571] i = 3, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.762353 + -0.488095
+[demodulation_QPSK:571] i = 4, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.504389 + -0.621097
+[demodulation_QPSK:571] i = 5, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.543463 + -0.639478
+[demodulation_QPSK:571] i = 6, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.700795 + 0.721135
+[demodulation_QPSK:571] i = 7, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.573771 + -0.641000
+[demodulation_QPSK:571] i = 8, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.582306 + -0.620055
+[demodulation_QPSK:571] i = 9, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.604698 + -0.664386
+[demodulation_QPSK:571] i = 10, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.631561 + 0.818076
+[demodulation_QPSK:571] i = 11, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.695818 + 0.734889
+[demodulation_QPSK:571] i = 12, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.542046 + -0.620735
+[demodulation_QPSK:571] i = 13, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.561412 + -0.662929
+[demodulation_QPSK:571] i = 14, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.760132 + 0.662931
+[demodulation_QPSK:571] i = 15, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.619738 + 0.863479
+[demodulation_QPSK:571] i = 16, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.510505 + -0.590430
+[demodulation_QPSK:571] i = 17, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.538852 + -0.591014
+[demodulation_QPSK:571] i = 18, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.569823 + -0.645685
+[demodulation_QPSK:571] i = 19, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.807511 + -0.486859
+[demodulation_QPSK:571] i = 20, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.495736 + -0.678293
+[demodulation_QPSK:571] i = 21, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.547301 + -0.714069
+[demodulation_QPSK:571] i = 22, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.597332 + -0.692070
+[demodulation_QPSK:571] i = 23, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.861296 + -0.557189
+[demodulation_QPSK:571] i = 24, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.561198 + -0.698938
+[demodulation_QPSK:571] i = 25, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.582894 + -0.724778
+[demodulation_QPSK:571] i = 26, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.577361 + -0.779004
+[demodulation_QPSK:571] i = 27, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.753190 + 0.718057
+[demodulation_QPSK:571] i = 28, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.581849 + -0.713092
+[demodulation_QPSK:571] i = 29, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.768960 + 0.753804
+[demodulation_QPSK:571] i = 30, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.658531 + -0.724597
+[demodulation_QPSK:571] i = 31, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.869932 + -0.567245
+[demodulation_QPSK:571] i = 32, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.553162 + -0.680216
+[demodulation_QPSK:571] i = 33, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.586904 + -0.732473
+[demodulation_QPSK:571] i = 34, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.590223 + -0.746072
+[demodulation_QPSK:571] i = 35, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.620752 + -0.749936
+[demodulation_QPSK:571] i = 36, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.598498 + -0.771335
+[demodulation_QPSK:571] i = 37, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.778173 + 0.726565
+[demodulation_QPSK:571] i = 38, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.821510 + -0.615324
+[demodulation_QPSK:571] i = 39, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.598210 + -0.786508
+[demodulation_QPSK:571] i = 40, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.651056 + -0.680308
+[demodulation_QPSK:571] i = 41, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.672013 + -0.752780
+[demodulation_QPSK:571] i = 42, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.754068 + 0.760338
+[demodulation_QPSK:571] i = 43, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.614619 + -0.736479
+[demodulation_QPSK:571] i = 44, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.632791 + -0.765583
+[demodulation_QPSK:571] i = 45, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.739325 + 0.746791
+[demodulation_QPSK:571] i = 46, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.829989 + -0.679913
+[demodulation_QPSK:571] i = 47, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.872336 + -0.742638
+[demodulation_QPSK:571] i = 48, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.606230 + -0.797467
+[demodulation_QPSK:571] i = 49, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.624757 + -0.851826
+[demodulation_QPSK:571] i = 50, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.775657 + 0.669259
+[demodulation_QPSK:571] i = 51, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.777026 + 0.709520
+[demodulation_QPSK:571] i = 52, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.645987 + -0.828913
+[demodulation_QPSK:571] i = 53, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.816973 + 0.661728
+[demodulation_QPSK:571] i = 54, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.748969 + 0.791837
+[demodulation_QPSK:571] i = 55, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.785145 + 0.800121
+[demodulation_QPSK:571] i = 56, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.640751 + -0.748091
+[demodulation_QPSK:571] i = 57, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.709464 + 0.691472
+[demodulation_QPSK:571] i = 58, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.657944 + -0.751744
+[demodulation_QPSK:571] i = 59, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.784504 + -0.693998
+[demodulation_QPSK:571] i = 60, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.180784 + -1.238979
+[demodulation_QPSK:571] i = 61, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.775568 + 0.727523
+[demodulation_QPSK:571] i = 62, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -2.071271 + -0.342583
+[demodulation_QPSK:571] i = 63, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.708523 + 0.673887
+[demodulation_QPSK:571] i = 64, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.201904 + -1.166917
+[demodulation_QPSK:571] i = 65, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.194697 + -1.222712
+[demodulation_QPSK:571] i = 66, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.676488 + 0.638292
+[demodulation_QPSK:571] i = 67, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.733628 + 0.657539
+[demodulation_QPSK:571] i = 68, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.019617 + -1.172430
+[demodulation_QPSK:571] i = 69, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.766619 + 0.746595
+[demodulation_QPSK:571] i = 70, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.958608 + -0.297628
+[demodulation_QPSK:571] i = 71, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.101283 + -1.176926
+[demodulation_QPSK:571] i = 72, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.111814 + -1.168320
+[demodulation_QPSK:571] i = 73, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.729198 + 0.701927
+[demodulation_QPSK:571] i = 74, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.889870 + -0.353425
+[demodulation_QPSK:571] i = 75, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.122720 + 1.501568
+[demodulation_QPSK:571] i = 76, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.088744 + -1.055298
+[demodulation_QPSK:571] i = 77, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.090939 + -1.131373
+[demodulation_QPSK:571] i = 78, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.747046 + 0.660693
+[demodulation_QPSK:571] i = 79, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.878986 + -0.293231
+[demodulation_QPSK:571] i = 80, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.116755 + -1.081978
+[demodulation_QPSK:571] i = 81, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.080313 + -1.134947
+[demodulation_QPSK:571] i = 82, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.662610 + 0.671968
+[demodulation_QPSK:571] i = 83, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.708987 + 0.672971
+[demodulation_QPSK:571] i = 84, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.004130 + -1.060966
+[demodulation_QPSK:571] i = 85, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.008743 + -1.060437
+[demodulation_QPSK:571] i = 86, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.687016 + 0.689566
+[demodulation_QPSK:571] i = 87, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.711830 + 0.715317
+[demodulation_QPSK:571] i = 88, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.011050 + -1.042219
+[demodulation_QPSK:571] i = 89, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.747649 + 0.722672
+[demodulation_QPSK:571] i = 90, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.070886 + 1.413398
+[demodulation_QPSK:571] i = 91, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.698470 + 0.722193
+[demodulation_QPSK:571] i = 92, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.002690 + -0.990553
+[demodulation_QPSK:571] i = 93, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.709673 + 0.690501
+[demodulation_QPSK:571] i = 94, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.983124 + 1.426141
+[demodulation_QPSK:571] i = 95, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.725148 + 0.737107
+[demodulation_QPSK:571] i = 96, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.033037 + -0.905214
+[demodulation_QPSK:571] i = 97, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.027059 + -0.948345
+[demodulation_QPSK:571] i = 98, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.680279 + 0.741605
+[demodulation_QPSK:571] i = 99, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.017899 + -0.978855
+[demodulation_QPSK:571] i = 100, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.065846 + -0.914744
+[demodulation_QPSK:571] i = 101, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.003710 + -0.923128
+[demodulation_QPSK:571] i = 102, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.043819 + -0.997647
+[demodulation_QPSK:571] i = 103, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.022966 + 1.360153
+[demodulation_QPSK:571] i = 104, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.018460 + -0.882250
+[demodulation_QPSK:571] i = 105, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.001232 + -0.914367
+[demodulation_QPSK:571] i = 106, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.030068 + -0.981073
+[demodulation_QPSK:571] i = 107, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.656904 + 0.716169
+[demodulation_QPSK:571] i = 108, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.046240 + -0.929404
+[demodulation_QPSK:571] i = 109, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.732929 + 0.720590
+[demodulation_QPSK:571] i = 110, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.938209 + 1.412427
+[demodulation_QPSK:571] i = 111, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.626070 + -0.244083
+[demodulation_QPSK:571] i = 112, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.030649 + -0.855304
+[demodulation_QPSK:571] i = 113, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.035425 + -0.886757
+[demodulation_QPSK:571] i = 114, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.646497 + 0.710958
+[demodulation_QPSK:571] i = 115, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.679115 + 0.699466
+[demodulation_QPSK:571] i = 116, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.020287 + -0.812575
+[demodulation_QPSK:571] i = 117, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.036220 + -0.851050
+[demodulation_QPSK:571] i = 118, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.847012 + 1.367229
+[demodulation_QPSK:571] i = 119, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.016314 + -0.801708
+[demodulation_QPSK:571] i = 120, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.655390 + -0.617592
+[demodulation_QPSK:571] i = 121, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.697003 + 0.710479
+[demodulation_QPSK:571] i = 122, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.702758 + 0.746697
+[demodulation_QPSK:571] i = 123, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.720016 + -0.648455
+[demodulation_QPSK:571] i = 124, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.650391 + -0.667367
+[demodulation_QPSK:571] i = 125, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.654287 + -0.687256
+[demodulation_QPSK:571] i = 126, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.693788 + 0.764398
+[demodulation_QPSK:571] i = 127, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.669931 + -0.678224
+[demodulation_QPSK:571] i = 128, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.683187 + -0.642323
+[demodulation_QPSK:571] i = 129, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.662080 + 0.729516
+[demodulation_QPSK:571] i = 130, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.716832 + 0.730832
+[demodulation_QPSK:571] i = 131, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.673390 + -0.718614
+[demodulation_QPSK:571] i = 132, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.650006 + -0.673540
+[demodulation_QPSK:571] i = 133, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.651641 + -0.662812
+[demodulation_QPSK:571] i = 134, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.645726 + -0.708469
+[demodulation_QPSK:571] i = 135, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.645637 + -0.718250
+[demodulation_QPSK:571] i = 136, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.659854 + -0.676640
+[demodulation_QPSK:571] i = 137, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.686781 + 0.745487
+[demodulation_QPSK:571] i = 138, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.756352 + 0.757704
+[demodulation_QPSK:571] i = 139, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.668474 + -0.734880
+[demodulation_QPSK:571] i = 140, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.641885 + -0.705303
+[demodulation_QPSK:571] i = 141, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.674125 + 0.742330
+[demodulation_QPSK:571] i = 142, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.645578 + -0.697511
+[demodulation_QPSK:571] i = 143, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.754602 + 0.741444
+[demodulation_QPSK:571] i = 144, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.653221 + -0.702467
+[demodulation_QPSK:571] i = 145, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.630694 + 0.747262
+[demodulation_QPSK:571] i = 146, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.790556 + 0.719238
+[demodulation_QPSK:571] i = 147, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.755968 + 0.722527
+[demodulation_QPSK:571] i = 148, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.695582 + -0.725672
+[demodulation_QPSK:571] i = 149, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.665385 + -0.708322
+[demodulation_QPSK:571] i = 150, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.677197 + -0.731401
+[demodulation_QPSK:571] i = 151, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.790827 + -0.718583
+[demodulation_QPSK:571] i = 152, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.685146 + -0.683370
+[demodulation_QPSK:571] i = 153, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.679759 + -0.694573
+[demodulation_QPSK:571] i = 154, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.654430 + 0.755079
+[demodulation_QPSK:571] i = 155, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.774778 + -0.780709
+[demodulation_QPSK:571] i = 156, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.692730 + -0.695121
+[demodulation_QPSK:571] i = 157, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.697798 + -0.701649
+[demodulation_QPSK:571] i = 158, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.670972 + 0.754183
+[demodulation_QPSK:571] i = 159, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.678550 + -0.740587
+[demodulation_QPSK:571] i = 160, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.700351 + -0.744962
+[demodulation_QPSK:571] i = 161, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.652258 + 0.776310
+[demodulation_QPSK:571] i = 162, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.848396 + 0.715940
+[demodulation_QPSK:571] i = 163, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.786575 + -0.809038
+[demodulation_QPSK:571] i = 164, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.717591 + -0.729878
+[demodulation_QPSK:571] i = 165, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.698312 + -0.747680
+[demodulation_QPSK:571] i = 166, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.665157 + 0.768776
+[demodulation_QPSK:571] i = 167, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.831164 + 0.684233
+[demodulation_QPSK:571] i = 168, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.708094 + -0.771132
+[demodulation_QPSK:571] i = 169, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.711118 + -0.723128
+[demodulation_QPSK:571] i = 170, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.622258 + 0.736512
+[demodulation_QPSK:571] i = 171, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.798902 + 0.676288
+[demodulation_QPSK:571] i = 172, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.719944 + -0.755741
+[demodulation_QPSK:571] i = 173, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.655054 + 0.719278
+[demodulation_QPSK:571] i = 174, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.805095 + -0.777198
+[demodulation_QPSK:571] i = 175, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.728231 + -0.757262
+[demodulation_QPSK:571] i = 176, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.742812 + -0.748251
+[demodulation_QPSK:571] i = 177, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.655134 + 0.742041
+[demodulation_QPSK:571] i = 178, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.799368 + -0.818233
+[demodulation_QPSK:571] i = 179, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.821410 + 0.662380
+[demodulation_QPSK:571] i = 180, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.941434 + -0.659713
+[demodulation_QPSK:571] i = 181, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.845533 + -0.542787
+[demodulation_QPSK:571] i = 182, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.800025 + -0.483570
+[demodulation_QPSK:571] i = 183, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.613386 + 0.770585
+[demodulation_QPSK:571] i = 184, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.753613 + -0.657966
+[demodulation_QPSK:571] i = 185, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.702745 + -0.517896
+[demodulation_QPSK:571] i = 186, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.479303 + 0.767192
+[demodulation_QPSK:571] i = 187, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.638179 + -0.767021
+[demodulation_QPSK:571] i = 188, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.720606 + -0.695067
+[demodulation_QPSK:571] i = 189, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.622909 + -0.596952
+[demodulation_QPSK:571] i = 190, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.731450 + 0.653898
+[demodulation_QPSK:571] i = 191, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.799332 + -0.716413
+[demodulation_QPSK:571] i = 192, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.676842 + -0.546615
+[demodulation_QPSK:571] i = 193, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.579416 + 0.720407
+[demodulation_QPSK:571] i = 194, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.558352 + -0.700674
+[demodulation_QPSK:571] i = 195, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.686313 + -0.589584
+[demodulation_QPSK:571] i = 196, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.643847 + -0.604728
+[demodulation_QPSK:571] i = 197, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.567790 + 0.676251
+[demodulation_QPSK:571] i = 198, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.548965 + -0.672073
+[demodulation_QPSK:571] i = 199, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.685679 + -0.673445
+[demodulation_QPSK:571] i = 200, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.707074 + -0.404859
+[demodulation_QPSK:571] i = 201, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.399755 + 0.930585
+[demodulation_QPSK:571] i = 202, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.909852 + 0.583512
+[demodulation_QPSK:571] i = 203, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.690428 + 0.508074
+[demodulation_QPSK:571] i = 204, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.898924 + -0.638230
+[demodulation_QPSK:571] i = 205, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.852056 + -0.481615
+[demodulation_QPSK:571] i = 206, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.507566 + 0.861120
+[demodulation_QPSK:571] i = 207, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.806234 + -0.648963
+[demodulation_QPSK:571] i = 208, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.708796 + -0.479713
+[demodulation_QPSK:571] i = 209, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.415004 + 0.932785
+[demodulation_QPSK:571] i = 210, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.890356 + 0.544293
+[demodulation_QPSK:571] i = 211, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.894007 + -0.712568
+[demodulation_QPSK:571] i = 212, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.719341 + -0.761436
+[demodulation_QPSK:571] i = 213, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.548968 + 0.768751
+[demodulation_QPSK:571] i = 214, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.791983 + -0.873981
+[demodulation_QPSK:571] i = 215, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.809142 + 0.703376
+[demodulation_QPSK:571] i = 216, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.780402 + -0.896520
+[demodulation_QPSK:571] i = 217, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.783508 + -0.746207
+[demodulation_QPSK:571] i = 218, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.758759 + -0.622893
+[demodulation_QPSK:571] i = 219, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.653395 + 0.966129
+[demodulation_QPSK:571] i = 220, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.726794 + -0.906358
+[demodulation_QPSK:571] i = 221, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.545153 + 0.782185
+[demodulation_QPSK:571] i = 222, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.952423 + -0.969451
+[demodulation_QPSK:571] i = 223, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.863511 + 0.716574
+[demodulation_QPSK:571] i = 224, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.755810 + -1.008466
+[demodulation_QPSK:571] i = 225, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.730846 + -0.909561
+[demodulation_QPSK:571] i = 226, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.629937 + -0.831650
+[demodulation_QPSK:571] i = 227, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.611500 + -0.695943
+[demodulation_QPSK:571] i = 228, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.517849 + -0.822549
+[demodulation_QPSK:571] i = 229, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.640555 + 0.749488
+[demodulation_QPSK:571] i = 230, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.379435 + -0.829898
+[demodulation_QPSK:571] i = 231, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.880445 + 0.834511
+[demodulation_QPSK:571] i = 232, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.596737 + -0.870565
+[demodulation_QPSK:571] i = 233, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.552968 + -0.700458
+[demodulation_QPSK:571] i = 234, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.538711 + 0.935248
+[demodulation_QPSK:571] i = 235, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.983495 + 0.803816
+[demodulation_QPSK:571] i = 236, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.544198 + -0.891739
+[demodulation_QPSK:571] i = 237, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.432894 + 0.800681
+[demodulation_QPSK:571] i = 238, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.214044 + 0.577570
+[demodulation_QPSK:571] i = 239, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.972262 + -1.097329
+[demodulation_QPSK:571] i = 240, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.752818 + -0.720248
+[demodulation_QPSK:571] i = 241, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.690889 + -0.649969
+[demodulation_QPSK:571] i = 242, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.748565 + 0.698659
+[demodulation_QPSK:571] i = 243, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.754781 + -0.730290
+[demodulation_QPSK:571] i = 244, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.697362 + -0.620192
+[demodulation_QPSK:571] i = 245, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.636425 + 0.720836
+[demodulation_QPSK:571] i = 246, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.729254 + -0.707959
+[demodulation_QPSK:571] i = 247, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.653714 + -0.658559
+[demodulation_QPSK:571] i = 248, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.731670 + -0.680044
+[demodulation_QPSK:571] i = 249, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.679602 + -0.632804
+[demodulation_QPSK:571] i = 250, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.665678 + -0.638920
+[demodulation_QPSK:571] i = 251, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.775769 + 0.752213
+[demodulation_QPSK:571] i = 252, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.730105 + -0.633884
+[demodulation_QPSK:571] i = 253, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.642740 + 0.858728
+[demodulation_QPSK:571] i = 254, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.770539 + 0.745477
+[demodulation_QPSK:571] i = 255, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.741379 + 0.754983
+[demodulation_QPSK:571] i = 256, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.735192 + -0.727859
+[demodulation_QPSK:571] i = 257, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.597534 + 0.817427
+[demodulation_QPSK:571] i = 258, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.910493 + 0.698252
+[demodulation_QPSK:571] i = 259, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.797804 + 0.629546
+[demodulation_QPSK:571] i = 260, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.845052 + -0.740506
+[demodulation_QPSK:571] i = 261, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.701525 + 0.802806
+[demodulation_QPSK:571] i = 262, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.800548 + -0.764534
+[demodulation_QPSK:571] i = 263, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.891141 + 0.680677
+[demodulation_QPSK:571] i = 264, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.884590 + -0.818593
+[demodulation_QPSK:571] i = 265, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.850143 + -0.767133
+[demodulation_QPSK:571] i = 266, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.795946 + -0.739222
+[demodulation_QPSK:571] i = 267, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.776227 + -0.733218
+[demodulation_QPSK:571] i = 268, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.729296 + -0.661150
+[demodulation_QPSK:571] i = 269, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.577665 + 0.806844
+[demodulation_QPSK:571] i = 270, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.756936 + -0.875553
+[demodulation_QPSK:571] i = 271, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.689572 + -0.781251
+[demodulation_QPSK:571] i = 272, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.744844 + -0.750355
+[demodulation_QPSK:571] i = 273, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.717774 + -0.712972
+[demodulation_QPSK:571] i = 274, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.659508 + -0.695446
+[demodulation_QPSK:571] i = 275, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.732071 + -0.789150
+[demodulation_QPSK:571] i = 276, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.729148 + -0.591479
+[demodulation_QPSK:571] i = 277, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.572106 + 0.838129
+[demodulation_QPSK:571] i = 278, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.769824 + -0.778462
+[demodulation_QPSK:571] i = 279, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.798459 + 0.736125
+[demodulation_QPSK:571] i = 280, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.792950 + -0.671927
+[demodulation_QPSK:571] i = 281, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.621176 + 0.787815
+[demodulation_QPSK:571] i = 282, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.689742 + -0.697324
+[demodulation_QPSK:571] i = 283, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.828061 + 0.621005
+[demodulation_QPSK:571] i = 284, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.805534 + -0.737543
+[demodulation_QPSK:571] i = 285, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.758426 + -0.684230
+[demodulation_QPSK:571] i = 286, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.766920 + -0.657106
+[demodulation_QPSK:571] i = 287, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.630609 + 0.838825
+[demodulation_QPSK:571] i = 288, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.746395 + -0.802011
+[demodulation_QPSK:571] i = 289, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.699705 + -0.751749
+[demodulation_QPSK:571] i = 290, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.582123 + 0.801939
+[demodulation_QPSK:571] i = 291, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.861765 + -0.866386
+[demodulation_QPSK:571] i = 292, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.714435 + -0.696578
+[demodulation_QPSK:571] i = 293, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.603237 + 0.811455
+[demodulation_QPSK:571] i = 294, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.901114 + 0.649704
+[demodulation_QPSK:571] i = 295, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.735936 + -0.845647
+[demodulation_QPSK:571] i = 296, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.731961 + -0.786441
+[demodulation_QPSK:571] i = 297, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.659812 + 0.740512
+[demodulation_QPSK:571] i = 298, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.618960 + -0.795435
+[demodulation_QPSK:571] i = 299, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.815546 + -0.773126
+[demodulation_QPSK:571] i = 300, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.090887 + -1.135660
+[demodulation_QPSK:571] i = 301, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.611122 + 0.654988
+[demodulation_QPSK:571] i = 302, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.028920 + -1.161132
+[demodulation_QPSK:571] i = 303, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.756573 + -0.492604
+[demodulation_QPSK:571] i = 304, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.124932 + -1.002398
+[demodulation_QPSK:571] i = 305, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.034872 + -0.922757
+[demodulation_QPSK:571] i = 306, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.003890 + 1.426898
+[demodulation_QPSK:571] i = 307, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.132828 + -1.053337
+[demodulation_QPSK:571] i = 308, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.027507 + -0.933906
+[demodulation_QPSK:571] i = 309, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.592844 + 0.789872
+[demodulation_QPSK:571] i = 310, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.675356 + -0.379755
+[demodulation_QPSK:571] i = 311, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.754489 + 0.702746
+[demodulation_QPSK:571] i = 312, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.068241 + -0.993012
+[demodulation_QPSK:571] i = 313, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.073757 + -0.879098
+[demodulation_QPSK:571] i = 314, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.619103 + 0.946247
+[demodulation_QPSK:571] i = 315, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.120894 + 1.383058
+[demodulation_QPSK:571] i = 316, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.103181 + -1.018819
+[demodulation_QPSK:571] i = 317, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.626795 + 0.831407
+[demodulation_QPSK:571] i = 318, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.018281 + -1.036711
+[demodulation_QPSK:571] i = 319, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.204804 + 1.350510
+[demodulation_QPSK:571] i = 320, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.182648 + -1.012892
+[demodulation_QPSK:571] i = 321, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.656841 + 0.866125
+[demodulation_QPSK:571] i = 322, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.040348 + -0.980436
+[demodulation_QPSK:571] i = 323, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.202122 + 1.408859
+[demodulation_QPSK:571] i = 324, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.113989 + -1.110551
+[demodulation_QPSK:571] i = 325, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.111776 + -0.973362
+[demodulation_QPSK:571] i = 326, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.095390 + -0.861339
+[demodulation_QPSK:571] i = 327, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.260812 + 1.431623
+[demodulation_QPSK:571] i = 328, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.189482 + -0.916776
+[demodulation_QPSK:571] i = 329, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.603306 + 1.022226
+[demodulation_QPSK:571] i = 330, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.221865 + 1.429540
+[demodulation_QPSK:571] i = 331, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.144801 + 1.332082
+[demodulation_QPSK:571] i = 332, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.246427 + -1.009506
+[demodulation_QPSK:571] i = 333, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.558943 + 0.851484
+[demodulation_QPSK:571] i = 334, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.228424 + 1.166903
+[demodulation_QPSK:571] i = 335, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.226829 + -1.139038
+[demodulation_QPSK:571] i = 336, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.193369 + -1.003179
+[demodulation_QPSK:571] i = 337, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.183323 + -0.935964
+[demodulation_QPSK:571] i = 338, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.096276 + -0.899982
+[demodulation_QPSK:571] i = 339, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.103373 + -0.783614
+[demodulation_QPSK:571] i = 340, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.080806 + -0.850074
+[demodulation_QPSK:571] i = 341, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.043333 + -0.714546
+[demodulation_QPSK:571] i = 342, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.713421 + 0.805539
+[demodulation_QPSK:571] i = 343, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.644250 + 0.680920
+[demodulation_QPSK:571] i = 344, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.010531 + -0.836276
+[demodulation_QPSK:571] i = 345, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.058915 + -0.738355
+[demodulation_QPSK:571] i = 346, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.747206 + 0.896898
+[demodulation_QPSK:571] i = 347, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.673914 + 0.759391
+[demodulation_QPSK:571] i = 348, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.080815 + -0.896541
+[demodulation_QPSK:571] i = 349, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.014400 + -0.835593
+[demodulation_QPSK:571] i = 350, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.760341 + 0.919463
+[demodulation_QPSK:571] i = 351, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.650074 + 0.743570
+[demodulation_QPSK:571] i = 352, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.125377 + -0.908362
+[demodulation_QPSK:571] i = 353, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.089128 + -0.798688
+[demodulation_QPSK:571] i = 354, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.805348 + 0.939247
+[demodulation_QPSK:571] i = 355, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.689657 + 0.810444
+[demodulation_QPSK:571] i = 356, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.233699 + -0.971166
+[demodulation_QPSK:571] i = 357, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.248297 + -0.858292
+[demodulation_QPSK:571] i = 358, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.185918 + -0.702232
+[demodulation_QPSK:571] i = 359, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.703020 + 0.914508
+[demodulation_QPSK:571] i = 360, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.072137 + -0.359563
+[demodulation_QPSK:571] i = 361, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.680690 + 0.746397
+[demodulation_QPSK:571] i = 362, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.086382 + 0.325755
+[demodulation_QPSK:571] i = 363, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.019727 + -0.345621
+[demodulation_QPSK:571] i = 364, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.006333 + -0.286400
+[demodulation_QPSK:571] i = 365, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.715116 + 0.752831
+[demodulation_QPSK:571] i = 366, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.116962 + -0.288261
+[demodulation_QPSK:571] i = 367, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -1.078363 + 0.531969
+[demodulation_QPSK:571] i = 368, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.129282 + -0.257976
+[demodulation_QPSK:571] i = 369, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.673706 + 0.780185
+[demodulation_QPSK:571] i = 370, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.326515 + 1.577575
+[demodulation_QPSK:571] i = 371, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.236580 + -0.292549
+[demodulation_QPSK:571] i = 372, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.233026 + -0.243738
+[demodulation_QPSK:571] i = 373, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.699172 + 0.785001
+[demodulation_QPSK:571] i = 374, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.326016 + 1.713496
+[demodulation_QPSK:571] i = 375, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.341319 + -0.294680
+[demodulation_QPSK:571] i = 376, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.456248 + -0.266216
+[demodulation_QPSK:571] i = 377, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.465297 + -0.230218
+[demodulation_QPSK:571] i = 378, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.469273 + -0.169064
+[demodulation_QPSK:571] i = 379, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.301613 + 1.947739
+[demodulation_QPSK:571] i = 380, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.545195 + -0.264360
+[demodulation_QPSK:571] i = 381, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.539410 + -0.184423
+[demodulation_QPSK:571] i = 382, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.308141 + 2.008152
+[demodulation_QPSK:571] i = 383, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.588892 + -0.274251
+[demodulation_QPSK:571] i = 384, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.695367 + -0.273277
+[demodulation_QPSK:571] i = 385, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.612976 + 0.757291
+[demodulation_QPSK:571] i = 386, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.399280 + 2.086932
+[demodulation_QPSK:571] i = 387, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.884652 + -0.376549
+[demodulation_QPSK:571] i = 388, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.876934 + -0.347842
+[demodulation_QPSK:571] i = 389, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.904247 + -0.296422
+[demodulation_QPSK:571] i = 390, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.642383 + 0.644863
+[demodulation_QPSK:571] i = 391, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.990957 + -0.322085
+[demodulation_QPSK:571] i = 392, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -1.124632 + -0.339248
+[demodulation_QPSK:571] i = 393, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.671635 + 0.659934
+[demodulation_QPSK:571] i = 394, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -1.199787 + -0.390539
+[demodulation_QPSK:571] i = 395, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.461789 + 2.631427
+[demodulation_QPSK:571] i = 396, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.730413 + 0.609373
+[demodulation_QPSK:571] i = 397, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.640262 + 0.627566
+[demodulation_QPSK:571] i = 398, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.655760 + 0.585543
+[demodulation_QPSK:571] i = 399, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.593703 + 0.626719
+[demodulation_QPSK:571] i = 400, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.041779 + 0.671880
+[demodulation_QPSK:571] i = 401, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.010864 + 0.714429
+[demodulation_QPSK:571] i = 402, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.024762 + 0.697825
+[demodulation_QPSK:571] i = 403, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.071094 + 0.689781
+[demodulation_QPSK:571] i = 404, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.009240 + 0.639037
+[demodulation_QPSK:571] i = 405, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.115443 + 0.640612
+[demodulation_QPSK:571] i = 406, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.001470 + 0.479086
+[demodulation_QPSK:571] i = 407, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.029753 + 0.537904
+[demodulation_QPSK:571] i = 408, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: -0.170038 + 0.441750
+[demodulation_QPSK:571] i = 409, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.053629 + 0.283471
+[demodulation_QPSK:571] i = 410, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.091997 + 0.385849
+[demodulation_QPSK:571] i = 411, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: -0.150181 + 0.270944
+[demodulation_QPSK:571] i = 412, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.047855 + 0.249836
+[demodulation_QPSK:571] i = 413, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: -0.002635 + 0.053463
+[demodulation_QPSK:571] i = 414, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: -0.006098 + 0.132207
+[demodulation_QPSK:571] i = 415, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.183771 + 0.198823
+[demodulation_QPSK:571] i = 416, j = 4, shit = 6, mask = 192
+[demodulation_QPSK:590] Error decode symbol: 0.148588 + 0.017326
+[demodulation_QPSK:571] i = 417, j = 4, shit = 4, mask = 48
+[demodulation_QPSK:590] Error decode symbol: 0.314055 + -0.039432
+[demodulation_QPSK:571] i = 418, j = 4, shit = 2, mask = 12
+[demodulation_QPSK:590] Error decode symbol: 0.321693 + 0.159785
+[demodulation_QPSK:571] i = 419, j = 4, shit = 0, mask = 3
+[demodulation_QPSK:590] Error decode symbol: 0.328862 + 0.032754
+[end demodulation_QPSK:596]
+[seconds = 0.000000] demodulation_QPSK
+87 - 87
+81 - 81
+88 - 88
+82 - 82
+87 - 87
+87 - 87
+84 - 84
+71 - 71
+85 - 85
+77 - 77
+89 - 89
+79 - 79
+80 - 80
+74 - 74
+71 - 71
+76 - 204
+80 - 240
+77 - 207
+78 - 206
+83 - 243
+80 - 240
+80 - 240
+72 - 72
+72 - 200
+81 - 241
+86 - 86
+84 - 244
+75 - 75
+80 - 240
+89 - 91
+75 - 75
+89 - 89
+73 - 73
+85 - 85
+73 - 73
+70 - 70
+74 - 74
+87 - 87
+83 - 83
+81 - 81
+75 - 75
+82 - 82
+82 - 82
+77 - 77
+78 - 78
+84 - 84
+83 - 83
+89 - 89
+71 - 71
+71 - 71
+74 - 74
+81 - 81
+73 - 73
+76 - 76
+84 - 84
+76 - 76
+85 - 85
+70 - 70
+82 - 82
+75 - 75
+89 - 89
+79 - 79
+86 - 86
+72 - 72
+74 - 74
+70 - 70
+85 - 85
+79 - 79
+87 - 87
+78 - 78
+70 - 70
+84 - 84
+83 - 83
+75 - 75
+71 - 71
+71 - 79
+89 - 89
+76 - 76
+82 - 82
+70 - 70
+70 - 70
+86 - 86
+74 - 74
+73 - 73
+85 - 85
+80 - 80
+80 - 208
+80 - 240
+80 - 240
+84 - 252
+77 - 73
+71 - 206
+73 - 203
+73 - 203
+86 - 254
+89 - 251
+73 - 203
+81 - 243
+70 - 206
+0 - 0
+87 87
+81 81
+88 88
+82 82
+87 87
+87 87
+84 84
+71 71
+85 85
+77 77
+89 89
+79 79
+80 80
+74 74
+71 71
+76 204
+80 240
+77 207
+78 206
+83 243
+80 240
+80 240
+72 72
+72 200
+81 241
+86 86
+84 244
+75 75
+80 240
+89 91
+75 75
+89 89
+73 73
+85 85
+73 73
+70 70
+74 74
+87 87
+83 83
+81 81
+75 75
+82 82
+82 82
+77 77
+78 78
+84 84
+83 83
+89 89
+71 71
+71 71
+74 74
+81 81
+73 73
+76 76
+84 84
+76 76
+85 85
+70 70
+82 82
+75 75
+89 89
+79 79
+86 86
+72 72
+74 74
+70 70
+85 85
+79 79
+87 87
+78 78
+70 70
+84 84
+83 83
+75 75
+71 71
+71 79
+89 89
+76 76
+82 82
+70 70
+70 70
+86 86
+74 74
+73 73
+85 85
+80 80
+80 208
+80 240
+80 240
+84 252
+77 73
+71 206
+73 203
+73 203
+86 254
+89 251
+73 203
+81 243
+70 206
+0 0
+count error = 50/840
+read_data: size = 105, data: WQXRWWTGUMYOPJGÌðÏÎóððHÈñVôKð[KYIUIFJWSQKRRMNTSYGGJQILTLUFRKYOVHJFUOWNFTSKGOYLRFFVJIUPÐððüIÎËËþûËóÎ
+input size: 100, output size: 105
+End ofdm_reception
+[DEINIT_LOG, time work program: 6.000000]
