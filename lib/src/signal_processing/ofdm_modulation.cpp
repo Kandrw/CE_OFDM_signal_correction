@@ -459,6 +459,8 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool foun
         VecSymbolMod Heq = linearInterpolation(H, ofdm.size());
 
         VecSymbolMod ofdm_eq = ofdm / Heq;
+        // VecSymbolMod ofdm_eq = ofdm;
+
 
         
         VecSymbolMod sample_rx;

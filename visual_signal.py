@@ -499,10 +499,10 @@ def view_resourse_grid(del_cyclic_prefix, data, \
         return
     plt.imshow(power_amplitude, aspect='auto', cmap='jet', origin='lower')
     
-    plt.colorbar(label='Мощность (амплитуда)')
+    plt.colorbar(label='Амплитуда')
     plt.title(title)
-    plt.ylabel('Поднесущие')
-    plt.xlabel('Временные символы')
+    plt.ylabel('ГЦ')
+    plt.xlabel('Временные символы OFDM')
     # plt.xticks(np.arange(0, num_subcarriers, step=8))  # Установка меток по оси X
     # plt.yticks(np.arange(0, num_symbols, step=2))      # Установка меток по оси Y
     plt.grid(False)
@@ -712,10 +712,15 @@ def view_data_3():
         plt.plot(abs(samples))
         if 1:
             data = read_OFDMs(filename_rx_ofdms, 4)
+            ofdm = data[0]
+            ofdm = np.fft.fft(ofdm)
+            ofdm = np.fft.fftshift(ofdm)
+
+            
             print("len data - ", len(data))
             plt.subplot(2, 2, 2)
             plt.title("Пример спектра одного OFDM символа")
-            plt.plot(abs(np.fft.fft(data[0])))
+            plt.plot(abs(ofdm))
     if 1:
         samples = array_float_to_np_complex(read_file_bin(filename_samples_tx, 4))
         plt.subplot(2, 2, 3)
@@ -750,13 +755,13 @@ def view_data_3():
         data0 = data[0]
         print("size pss = ",len(data0[0]),"count ofdm = ", len(data0[1]))
         print(type(data0[1:]))
-        view_resourse_grid(cyclic_prefix, data_ofdms_no_pss, id_f, (2, 2, 1), "Отправленный")
+        view_resourse_grid(cyclic_prefix, data_ofdms_no_pss, id_f, (2, 2, 1), "Отправленный слот")
     if 1:
         data = read_OFDMs(filename_rx_ofdms, 4)
         print("len data - ", len(data))
 
         # view_resourse_grid(0, data[1:], id_f, (2, 2, 2), "Принятый")
-        view_resourse_grid(0, data, id_f, (2, 2, 2), "Принятый")
+        view_resourse_grid(0, data, id_f, (2, 2, 2), "Принятый слот")
         
     if 0:
         data = read_OFDMs(filename_test_rx_ofdms, 4)
