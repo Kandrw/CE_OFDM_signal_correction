@@ -33,6 +33,22 @@ while getopts "dcml:r:" OPTION; do
     ;;
 	r)
         TARGET=${OPTARG}
+        if [[ $TARGET == "bss" ]]; then
+            echo "BSS: set config"
+            FILE_CONFIG=../configs/config_bss.yaml
+        fi
+        if [[ $TARGET == "ue" ]]; then
+            echo "UE: set config"
+            FILE_CONFIG=../configs/config_ue.yaml
+        fi
+        if [[ $TARGET == "monitor" ]]; then
+            echo "MONITOR: set config"
+            FILE_CONFIG=../configs/config_monitor.yaml
+        fi
+        if [[ $TARGET == "receiver" ]]; then
+            echo "receiver: set config"
+            FILE_CONFIG=../configs/config_recv.yaml
+        fi
         echo ./$PROGRAM $TARGET $FILE_CONFIG
         ./$PROGRAM $TARGET $FILE_CONFIG
         exit;

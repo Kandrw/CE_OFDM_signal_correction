@@ -2,6 +2,13 @@
 #include <iostream>
 #include <yaml-cpp/yaml.h>
 
+/*running: /run.sh load_yaml.cpp -lyaml-cpp*/
+
+struct test1{
+    double r1;
+    double r2;
+};
+
 int main() {
 
 
@@ -18,6 +25,15 @@ int main() {
         printf("address: %s\n", config["address11212"].as<std::string>().c_str());
     
 
+
+    YAML::Node cfg = config["ofdm_parameters"];
+
+    printf("==========\n");
+    std::cout<< cfg<<"\n";
+    printf("==========\n");
+    test1 t1 = {cfg["pilot"][0].as<double>(),
+            cfg["pilot"][1].as<double>()};
+    printf("t1: %f %f\n", t1.r1, t1.r2);
     printf("End\n");
 }
 

@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <thread>
 
 #include <yaml-cpp/yaml.h>
 
@@ -16,6 +17,15 @@ enum class ARGV_CONSOLE {
 
 void exit_and_clear_resource() {
 
+}
+
+
+void broadcast_msg(ATTR_SERVICE::context &ctx) {
+    char buffer[] = "HELLO, msg from bss";
+    while(true) {
+        ATTR_SERVICE::send_msg(ctx, buffer, sizeof(buffer));
+        usleep(100);
+    }
 }
 
 int bss_program(int argc, char *argv[]) {
@@ -41,10 +51,12 @@ int bss_program(int argc, char *argv[]) {
     //     exit(EXIT_FAILURE);
     // }
     run_bss = RUN_BSS;
-    
+    char buffer[256];
+    // std::thread thr = std::thread(broadcast_msg, std::ref(ctx_bss));
     while(run_bss) {
         // sigwait(&signalSet, &sig);
-        sleep(1);
+        ATTR_SERVICE::recv_msg(ctx_bss, buffer, sizeof(buffer));
+        // sleep(1);
     }
     print_log(CONSOLE, "End bss\n");
 

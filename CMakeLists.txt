@@ -42,8 +42,10 @@ set(SOURCE
     src/bss_ue/bss.cpp
     src/bss_ue/ue.cpp
     src/bss_ue/monitor.cpp
+    src/bss_ue/ofdm.cpp
     src/bss_ue/components.cpp
     src/bss_ue/channel_model.cpp
+    src/bss_ue/receiver_channel.cpp
     src/model/modelling.cpp
     src/ipc/managment_ipc.cpp
 )

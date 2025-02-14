@@ -16,7 +16,7 @@
 #include <complex_container.hpp>
 #include <signal_processing.hpp>
 
-#define LENGTH_PSS 63
+// #define LENGTH_PSS 63
 
 using namespace DIGITAL_SIGNAL_PROCESSING;
 
@@ -407,7 +407,8 @@ int receiver_OFDM(VecSymbolMod &samples,
         
     }
     if(ofdms.size() > 0) {
-        evaluation_cfo(ofdms, param_ofdm);
+        write_OFDMs("../data/read_ofdms_no_cfo.bin", ofdms, ofdms.size());
+        evaluation_cfo(ofdms, param_ofdm);  
     }
     if(ofdms.size() != count_send_ofdm) {
         print_log(CONSOLE, "Not all ofdms symbol are accepted - %d\n", ofdms.size());

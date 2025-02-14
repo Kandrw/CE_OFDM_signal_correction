@@ -1,9 +1,13 @@
 #include "components.hpp"
 
 #include <cstring>
+#include <ctime>
+#include <unistd.h>
 
+#include "ofdm.hpp"
 #include "../trx/device_api.hpp"
 #include "channel_model.hpp"
+#include "../loaders/load_data.hpp"
 
 using namespace ATTR_SERVICE;
 
@@ -15,7 +19,6 @@ using namespace ATTR_SERVICE;
 
 #include <output.hpp>
 #include <complex_container.hpp>
-#include <signal_processing.hpp>
 #include <configure.hpp>
 
 // #define FILE_CONFIG 1
@@ -44,14 +47,35 @@ static config_device convert_config_device(const YAML::Node &cfg) {
             .lo_hz = cfg["device_phy"]["tx"]["lo_hz"].as<long long>(),
             .block_size = cfg["device_phy"]["tx"]["block_size"].as<unsigned int>()
         },
-        1000000
+        0
     };
-    memcpy(cfg_out.ip, cfg["address"].as<std::string>().c_str(), sizeof(cfg_out.ip));
-    memcpy(cfg_out.rx_cfg.rfport, cfg["device_phy"]["rx"]["rfport"].as<std::string>().c_str(),
+    memcpy(cfg_out.ip, cfg["address"].as<std::string>().c_str(),
+        sizeof(cfg_out.ip));
+    memcpy(cfg_out.rx_cfg.rfport,
+        cfg["device_phy"]["rx"]["rfport"].as<std::string>().c_str(),
         sizeof(cfg_out.rx_cfg.rfport));
-    memcpy(cfg_out.tx_cfg.rfport, cfg["device_phy"]["tx"]["rfport"].as<std::string>().c_str(),
+    memcpy(cfg_out.tx_cfg.rfport,
+        cfg["device_phy"]["tx"]["rfport"].as<std::string>().c_str(),
         sizeof(cfg_out.tx_cfg.rfport));
     return cfg_out;
+}
+
+static DIGITAL_SIGNAL_PROCESSING::OFDM_params load_ofdm_params_in_yaml(
+    const YAML::Node &cfg_all) {
+    mod_symbol pilot;
+    YAML::Node cfg = cfg_all["ofdm_parameters"];
+    pilot = {cfg["pilot"][0].as<type_complex>(),
+            cfg["pilot"][1].as<type_complex>()};
+    DIGITAL_SIGNAL_PROCESSING::OFDM_params param = {
+        .count_subcarriers = cfg["count_subcarriers"].as<u_int16_t>(),
+        .pilot = pilot,
+        .step_RS = cfg["step_RS"].as<u_int16_t>(),
+        .def_interval = cfg["def_interval"].as<u_int16_t>(),
+        .cyclic_prefix = cfg["cyclic_prefix"].as<u_int16_t>(),
+        .power = cfg["power"].as<float>(),
+        .count_ofdm_in_slot = cfg["count_ofdm_in_slot"].as<u_int8_t>(),
+    };
+    return param;
 }
 
 int ATTR_SERVICE::init_log_system(const char *file_log) {
@@ -66,9 +90,11 @@ int ATTR_SERVICE::deinit_log_system() {
     return STATUS_ACCESS;
 }
 
-static int init_device(context &cfg_dev) {
-    config_device cfg = convert_config_device(cfg_dev.cfg);
-    if(DEVICE_PHY::DeviceTRX::initialization(cfg)){
+static int init_device(context &ctx_dev) {
+    // config_device cfg = convert_config_device(ctx_dev.cfg);
+    ctx_dev.cfg_device = convert_config_device(ctx_dev.cfg);
+    ctx_dev.ofdm_param = load_ofdm_params_in_yaml(ctx_dev.cfg);
+    if(DEVICE_PHY::DeviceTRX::initialization(ctx_dev.cfg_device)){
         print_log(CONSOLE, "[%s:%d] Error: initialization device, exit program\n",
             __func__, __LINE__);
         return STATUS_FAIL;
@@ -76,7 +102,7 @@ static int init_device(context &cfg_dev) {
     return STATUS_ACCESS;
 }
 
-static int deinit_device(context &cfg_dev) {
+static int deinit_device(context &ctx_dev) {
     DEVICE_PHY::DeviceTRX::deinitialization();
     return STATUS_ACCESS;
 }
@@ -84,8 +110,12 @@ static int deinit_device(context &cfg_dev) {
 static int read_radio(VecSymbolMod &samples, size_t size) {
     return DEVICE_PHY::DeviceTRX::recv_samples(samples, size);
 }
-
+#define DEBUG_DUMP_DATA
 static int write_radio(const VecSymbolMod &samples, size_t size) {
+// #ifdef DEBUG_DUMP_DATA
+//         write_OFDMs("../data/dump_data/slots_tx.bin",
+//                 slots[0].ofdms, slots[0].ofdms.size());
+// #endif
     return DEVICE_PHY::DeviceTRX::send_samples((void*)&samples[0], size);
 }
 
@@ -130,24 +160,91 @@ int ATTR_SERVICE::read_samples(VecSymbolMod &samples, size_t size) {
 
 
 
-int ATTR_SERVICE::send_msg(const context &ctx, const void *buffer, int size) {
+
+int ATTR_SERVICE::send_msg(context &ctx, const void *buffer, int size) {
 
     u_char buffer_tx[SIZE_BUFFER] = {};
-    u_char *data = buffer_tx;
-    header_phy *hv1 = (header_phy*)buffer;
+    u_char *data = buffer_tx + sizeof(header_phy);
+    header_phy *hv1 = (header_phy*)buffer_tx;
+    DIGITAL_SIGNAL_PROCESSING::TypeModulation mod =
+        DIGITAL_SIGNAL_PROCESSING::string_to_TypeModulation(
+        ctx.cfg["type_modulation"].as<std::string>());
     int size_tx = sizeof(header_phy) + size + SIZE_PREAMBULA;
     hv1->id = ctx.id;
-    hv1->mod = static_cast<u_char>(DIGITAL_SIGNAL_PROCESSING::string_to_TypeModulation(
-        ctx.cfg["type_modulation"].as<std::string>()));
+    hv1->mod = static_cast<u_char>(mod);
     hv1->size = size;
-    memcpy(data, buffer, size);
+    memcpy(data, (char*)buffer, size);
+
+    write_file_bin_data("../data/dump_data/data_tx.bin", 
+        (void*)buffer_tx, size_tx);
+
+    // for(int i = 0; i < 29; ++i) {
+    //     print_log(CONSOLE, "%d - %c | ", data[i], (char)data[i]);
+    // }print_log(CONSOLE, "\n");
     
-    
+    print_log(LOG, "size data: %d\n", size + sizeof(header_phy));
+    VecSymbolMod samples = convert_msg_to_samples(ctx, buffer_tx, size_tx);
+    int res = write_samples(samples, samples.size());
+    print_log(LOG, "tx: %d, res: %d\n", samples.size(), res);
 }
 
-int ATTR_SERVICE::recv_msg(const context &ctx, void *buffer, int size) {
-
+static int calc_bit_error1(DIGITAL_SIGNAL_PROCESSING::bit_sequence &tx,
+    DIGITAL_SIGNAL_PROCESSING::bit_sequence &rx) {
+    int error = 0;
     
-
-
+    // print_bit2((u_char*)tx.buffer, tx.size);
+    // print_bit2((u_char*)rx.buffer, rx.size);
+    for(int i = 0; i < tx.size; ++i) {
+        u_char otx = tx.buffer[i];
+        u_char orx = rx.buffer[i];
+        print_log(LOG_DATA, "%d %d\n", otx, orx);
+        for(int i2 = 0; i2 < 8; ++i2) {
+            u_char bt = otx & 0b1;
+            u_char br = orx & 0b1;
+            
+            if(bt != br) {
+                error++;
+            }
+            otx >>= 1;
+            orx >>= 1;
+        }
+    }
+    return error;
 }
+
+int ATTR_SERVICE::recv_msg(context &ctx, void *buffer, int size) {
+    u_char buffer_rx[SIZE_BUFFER] = {};
+    u_char *data = buffer_rx + sizeof(header_phy);
+    header_phy *hv1 = (header_phy*)buffer_rx;
+    int size_rx = sizeof(buffer_rx);
+    static VecSymbolMod samples(ctx.cfg_device.rx_cfg.block_size);
+    print_log(LOG_DATA, "\n[%s:%d] buffer rx: %d\n", __func__, __LINE__, samples.size());
+    clock_t start = clock();
+    int res = read_samples(samples, samples.size()); 
+    // usleep(200);
+    // sleep(10);
+    double rt =  (double) (clock() - start) / CLOCKS_PER_SEC;
+    // print_log(LOG, "rx, res: %d, clock: %f\n", res, rt);
+    start = clock();
+    res = convert_samples_to_msg(ctx, samples, buffer_rx, size);
+    if(res) {
+        print_log(LOG, "header: id: %d, size: %d, msg: %s\n", hv1->id, hv1->size, (char*)data);
+        for(int i = 0; i < 29; ++i) {
+            print_log(CONSOLE, "%d - %c | ", data[i], (char)data[i]);
+        }print_log(CONSOLE, "\n");
+        DIGITAL_SIGNAL_PROCESSING::bit_sequence data_rx;
+        data_rx.buffer = buffer_rx;
+        data_rx.size = res;
+        DIGITAL_SIGNAL_PROCESSING::bit_sequence data_tx;
+        data_tx.buffer = read_file_data("../data/dump_data/data_tx.bin", &data_tx.size);
+        int count_error = calc_bit_error1(data_tx, data_rx);
+        print_log(CONSOLE, "count error = %d/%d\n", count_error, data_tx.size * 8);
+
+    }
+    rt =  (double) (clock() - start) / CLOCKS_PER_SEC;
+    // print_log(LOG, "rx, res: %d, clock: %f\n", res, rt);
+    return res;
+}
+
+
+

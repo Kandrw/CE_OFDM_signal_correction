@@ -2,6 +2,9 @@
 #include <vector>
 #include <complex_container.hpp>
 
+
+#define LENGTH_PSS 63
+
 namespace DIGITAL_SIGNAL_PROCESSING {
 
     enum class TypeModulation{
@@ -43,9 +46,7 @@ namespace DIGITAL_SIGNAL_PROCESSING {
         TypeModulation type_modulation;
         OFDM_params param_ofdm;
     };
-
-    bool init_log_lib(void (*cb)(int, const char*, ...));
-
+    
     VecSymbolMod modulation_mapper(bit_sequence bits, TypeModulation m);
     bit_sequence *demodulation_mapper(VecSymbolMod &samples, TypeModulation m);
     TypeModulation string_to_TypeModulation(const std::string &tm);
@@ -74,6 +75,7 @@ namespace DIGITAL_SIGNAL_PROCESSING {
 
     VecSymbolMod generateZadoffChuSequence(int cellId, int N);
 
+    OFDM_symbol create_zero_ofdms(int count, OFDM_params &param_ofdm);
 
     int evaluation_cfo(OFDM_symbol &ofdms, const OFDM_params &param_ofdm);
 

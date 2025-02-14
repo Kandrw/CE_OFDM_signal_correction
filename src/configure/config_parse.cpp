@@ -83,6 +83,7 @@ config_program configure(const char *file_conf) {
     config_program param; 
     if(!file.is_open()) {
         printf("Error open: %s\n", file_conf);
+        exit(-1);
         return param;
     }
     std::string buffer;
