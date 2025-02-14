@@ -1,0 +1,14 @@
+[init_log:39] 		INIT_LOG
+[init_components:136] set env: sdr
+[initialization:25]
+* Acquiring IIO context
+TEEEEEEESSSSTTT
+[init_device_TRX:324] addr = ip:192.168.3.1
+* Acquiring AD9361 streaming devices
+* Configuring AD9361 for streaming
+* Initializing AD9361 IIO streaming channels
+* Enabling IIO streaming channels
+* Creating non-cyclic IIO buffers with 1 MiS
+[init_device_TRX:399] configure device
+connect, file shared memory: .
+disconnect, file shared memory: .

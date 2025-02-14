@@ -601,6 +601,7 @@ int main(int argc, char *argv[]){
         {"rx", test_RX},
         {"tx", test_TX},
         {"realtime", realtime_RX},
+        {"realtime_vd", realtime_RX_v2},
 #endif
         {"test_ipc", test_ipc},
 #if 0
