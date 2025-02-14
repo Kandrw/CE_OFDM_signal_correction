@@ -39,13 +39,15 @@ static config_device convert_config_device(const YAML::Node &cfg) {
             .bw_hz = cfg["device_phy"]["rx"]["bw_hz"].as<long long>(),
             .fs_hz = cfg["device_phy"]["rx"]["fs_hz"].as<long long>(),
             .lo_hz = cfg["device_phy"]["rx"]["lo_hz"].as<long long>(),
-            .block_size = cfg["device_phy"]["rx"]["block_size"].as<unsigned int>()
+            .block_size = cfg["device_phy"]["rx"]["block_size"].as<unsigned int>(),
+            .power_gain = cfg["device_phy"]["rx"]["power_gain"].as<unsigned int>(),
         },
         .tx_cfg = {
             .bw_hz = cfg["device_phy"]["tx"]["bw_hz"].as<long long>(),
             .fs_hz = cfg["device_phy"]["tx"]["fs_hz"].as<long long>(),
             .lo_hz = cfg["device_phy"]["tx"]["lo_hz"].as<long long>(),
-            .block_size = cfg["device_phy"]["tx"]["block_size"].as<unsigned int>()
+            .block_size = cfg["device_phy"]["tx"]["block_size"].as<unsigned int>(),
+            .power_gain = cfg["device_phy"]["tx"]["power_gain"].as<unsigned int>(),
         },
         0
     };
@@ -116,7 +118,7 @@ static int write_radio(const VecSymbolMod &samples, size_t size) {
 //         write_OFDMs("../data/dump_data/slots_tx.bin",
 //                 slots[0].ofdms, slots[0].ofdms.size());
 // #endif
-    return DEVICE_PHY::DeviceTRX::send_samples((void*)&samples[0], size);
+    return DEVICE_PHY::DeviceTRX::send_samples((void*)&samples[0], size * sizeof(mod_symbol));
 }
 
 int ATTR_SERVICE::init_components(const std::string &key) {
@@ -237,6 +239,8 @@ int ATTR_SERVICE::recv_msg(context &ctx, void *buffer, int size) {
         data_rx.size = res;
         DIGITAL_SIGNAL_PROCESSING::bit_sequence data_tx;
         data_tx.buffer = read_file_data("../data/dump_data/data_tx.bin", &data_tx.size);
+        // data_tx.buffer = read_file_data("../data/data_test.txt", &data_tx.size);
+        
         int count_error = calc_bit_error1(data_tx, data_rx);
         print_log(CONSOLE, "count error = %d/%d\n", count_error, data_tx.size * 8);
 

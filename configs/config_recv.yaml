@@ -1,7 +1,7 @@
 
-log_file: ../log/log.log
+log_file: ../log/log_recv.log
 env: sdr
-address: ip:192.168.2.1
+address: ip:192.168.3.1
 type_modulation: QPSK
 ofdm_parameters:
   count_subcarriers: 128
@@ -19,17 +19,17 @@ device_phy:
     fs_hz: 2500000
     lo_hz: 1900000000
     rfport: A
-    block_size: 1000000
+    block_size: 20000
     power_gain: 0
   rx:
     bw_hz: 2000000
     fs_hz: 2500000
     lo_hz: 1900000000
     rfport: A_BALANCED
-    block_size: 1000000
+    block_size: 20000
     power_gain: 20
 model_channel:
-  buffer_channel: 500000
+  buffer_channel: 200000
 
 
 

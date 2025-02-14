@@ -5,6 +5,8 @@
 #define GHZ(x) ((long long)(x*1000000000.0 + .5))
 
 
+
+
 // namespace DEVICE_PHY {
 
     /* common RX and TX streaming params */
@@ -14,6 +16,7 @@
         long long lo_hz; // Local oscillator frequency in Hz
         char rfport[20]; // Port name
         unsigned int block_size;
+        long long power_gain;
     };
 
     struct config_device{

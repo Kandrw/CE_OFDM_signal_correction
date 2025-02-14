@@ -1,6 +1,7 @@
 import numpy as np
 import struct
 import matplotlib.pyplot as plt
+import sys
 
 def read_file_bin(filename, size_type):
     size = 0

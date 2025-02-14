@@ -496,3 +496,16 @@ def view_data_4():
         plt.title("Коррекция сигнала")
         plt.plot(ofdm_heq)
     
+
+def view_dump_data():
+
+
+    
+
+
+
+
+
+
+    return
+

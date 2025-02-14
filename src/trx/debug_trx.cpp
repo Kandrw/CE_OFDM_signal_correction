@@ -85,8 +85,8 @@ int test_RX(int argc, char *argv[]){
     OFDM_symbol samples = generate_frame_phy(data, param_phy, samples_tx);
     // exit(0);
     config_device cfg1 = {
-        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED", 20},
+        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A", 0},
         .block_size = 1024 * 1024,
     };
     memcpy(cfg1.ip, ip_device, sizeof(cfg1.ip));
@@ -138,8 +138,8 @@ int realtime_RX(int argc, char *argv[]) {
         .param_ofdm = param.ofdm_params,
     };
     config_device cfg1 = {
-        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED", 20},
+        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A", 0},
         .block_size = 1024 * 1024,
         // 200000,
     };
@@ -240,8 +240,8 @@ int realtime_RX_v2(int argc, char *argv[]) {
         .param_ofdm = param.ofdm_params,
     };
     config_device cfg1 = {
-        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED", 20},
+        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A", 0},
         .block_size = 1024 * 1024,
         // 200000,
     };
@@ -411,8 +411,8 @@ int test_TX(int argc, char *argv[]){
     // };
 
     config_device cfg1 = {
-        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED", 20},
+        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A", 0},
         .block_size = 160000,
     };
     memcpy(cfg1.ip, param.address.c_str(), sizeof(cfg1.ip));
@@ -501,8 +501,8 @@ int trx_test(int argc, char *argv[]){
     // exit(0);
 
     config_device cfg1 = {
-        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        .tx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED", 20},
+        .tx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A", 0},
         .block_size = 1024 * 1024,
     };
     memcpy(cfg1.ip, ip_device, sizeof(cfg1.ip));

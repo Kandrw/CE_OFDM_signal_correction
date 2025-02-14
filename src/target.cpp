@@ -114,8 +114,8 @@ int ofdm_model(int argc, char *argv[]){
     };
     config_device cfg1 = {
         "None",
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED", 20},
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A", 0},
         1024 * 1024,
     };
     print_log(LOG_DATA, "size = %d, data: %s\n", data.size, data.buffer);
@@ -336,8 +336,8 @@ int ofdm_reception(int argc, char *argv[]){
     
     config_device cfg1 = {
         "None",
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
-        {MHZ(2), MHZ(2.5), GHZ(1.9), "A"},
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED", 20},
+        {MHZ(2), MHZ(2.5), GHZ(1.9), "A", 0},
         1024 * 1024,
     };
     VecSymbolMod samples_rx(cfg1.block_size);

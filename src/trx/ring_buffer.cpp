@@ -56,11 +56,3 @@ int RingBuffer::Push(const void *el) {
     lock_flag.clear(std::memory_order_release);
     return 1;
 }
-
-
-
-
-
-
-
-

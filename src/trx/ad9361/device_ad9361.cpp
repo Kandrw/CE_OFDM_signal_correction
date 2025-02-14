@@ -181,7 +181,7 @@ bool cfg_ad9361_streaming_ch1(struct stream_cfg *cfg, enum iodev type, int chid)
 	wr_ch_lli(chn, "frequency", cfg->lo_hz);
 	return true;
 }
-
+#if 0
 bool cfg_ad9361_streaming_ch2(struct stream_cfg *cfg, enum iodev type, int chid)
 {
   struct iio_channel *chn = NULL;
@@ -207,9 +207,7 @@ bool cfg_ad9361_streaming_ch2(struct stream_cfg *cfg, enum iodev type, int chid)
   wr_ch_lli(chn, "frequency", cfg->lo_hz);
   return true;
 }
-
-#define RX_GAIN 20
-#define TX_GAIN 0
+#endif
 
 
 bool cfg_ad9361_streaming_ch(struct stream_cfg *cfg, enum iodev type, int chid)
@@ -238,10 +236,10 @@ bool cfg_ad9361_streaming_ch(struct stream_cfg *cfg, enum iodev type, int chid)
   
 
   if(type == RX){
-    wr_ch_lli(chn, "hardwaregain",RX_GAIN);
+    wr_ch_lli(chn, "hardwaregain", cfg->power_gain);
   }
   else {
-    wr_ch_lli(chn, "hardwaregain", TX_GAIN);
+    wr_ch_lli(chn, "hardwaregain", cfg->power_gain);
   }
 
   // Configure LO channel

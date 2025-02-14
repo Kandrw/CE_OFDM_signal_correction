@@ -1,8 +1,7 @@
-data/samples
 build
 data
 log
 backup
 Reports
-configs/*
+src/graphical_display/__pycache__
 Книги
