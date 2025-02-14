@@ -1,5 +1,5 @@
 
-log_file: ../log_monitor.log
+log_file: ../log/log_monitor.log
 env: sdr
 address: ip:192.168.3.1
 type_modulation: QPSK

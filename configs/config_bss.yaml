@@ -1,5 +1,5 @@
 
-log_file: ../log_bss.log
+log_file: ../log/log_bss.log
 env: sdr
 address: ip:192.168.3.1
 type_modulation: QPSK

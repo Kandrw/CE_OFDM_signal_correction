@@ -332,7 +332,7 @@ int ofdm_reception(int argc, char *argv[]){
         .param_ofdm = param.ofdm_params,
     };
     // init_log(param.file_log.c_str());
-    init_log("../log_processing.log");
+    init_log("../log/log_processing.log");
     
     config_device cfg1 = {
         "None",

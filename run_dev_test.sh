@@ -9,6 +9,8 @@ COUNT_THREAD=-j16
 BUILD_FLAGS=""
 
 mkdir -p $BUILD_DIR
+mkdir -p data
+mkdir -p log
 cd $BUILD_DIR
 
 ADDRESS_DEV="ip:192.168.3.1"
@@ -28,6 +30,9 @@ while getopts "dcma:l:r:v:o:" OPTION; do
     ;;
     m)
         rm ./$PROGRAM
+
+        echo FDSAFSDF
+        
         make $COUNT_THREAD
     ;;
     a)
@@ -44,7 +49,7 @@ while getopts "dcma:l:r:v:o:" OPTION; do
         ./$PROGRAM $ADDRESS_DEV ../data/data_test.txt $TARGET $FILE_CONFIG $SPECIFIC_OPTION
 	;;
 	v) 
-        python3 ../visual_signal.py ${OPTARG}
+        python3 ../src/graphical_display/visual_signal.py ${OPTARG}
 	;;
 	*)
 		echo "Incorrect option"

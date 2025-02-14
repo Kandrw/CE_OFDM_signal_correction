@@ -24,7 +24,7 @@ while getopts "dcml:r:" OPTION; do
     ;;
     m)
         rm ./$PROGRAM
-
+        mkdir -p data log
         make $DEBUG_BUILD
         # make $COUNT_THREAD
     ;;
