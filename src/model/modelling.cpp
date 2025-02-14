@@ -1097,8 +1097,8 @@ VecSymbolMod carrier_offset2(float offset, float freq_d, int N, int Nfft) {
 
 void ofdm_signal_correction() {
     int N = 24000;
-    int SNR_min = 20;
-    int SNR_max = 20;
+    int SNR_min = 5;
+    int SNR_max = 30;
     OFDM_params param_ofdm = {
         .count_subcarriers = 128,
         .pilot = {0.7, 0.7},
@@ -1109,10 +1109,10 @@ void ofdm_signal_correction() {
         .count_ofdm_in_slot = 7,
     };
     // TypeModulation M = TypeModulation::QAM64;
-    // TypeModulation M = TypeModulation::QAM16;
-    TypeModulation M = TypeModulation::QPSK;
-    const char filename_ber[] = "../data/ofdm_signal_correction/bers.txt";
-    // const char filename_ber[] = "../data/ofdm_signal_correction/bers_qam16.txt";
+    TypeModulation M = TypeModulation::QAM16;
+    // TypeModulation M = TypeModulation::QPSK;
+    // const char filename_ber[] = "../data/ofdm_signal_correction/bers.txt";
+    const char filename_ber[] = "../data/ofdm_signal_correction/bers_qam16.txt";
     
     print_to_file(filename_ber, "w", "");
 

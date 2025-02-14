@@ -226,12 +226,115 @@ int realtime_RX(int argc, char *argv[]) {
     return 0;
 }
 
-int test_TX(int argc, char *argv[]){
+int realtime_RX_v2(int argc, char *argv[]) {
+    if(argc < static_cast<int>(ARGV_CONSOLE::ARGV_MAX)){
+        printf("Error: Not enough arguments: <ip> <filename data>\n");
+        return -1;
+    }
 
     const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
     config_program param = configure(file_conf);
     init_log(param.file_log.c_str());
+    ParamsPhy param_phy = {
+        .type_modulation = param.type_modulation,
+        .param_ofdm = param.ofdm_params,
+    };
+    config_device cfg1 = {
+        .rx_cfg = {MHZ(2), MHZ(2.5), GHZ(1.9), "A_BALANCED"},
+        .tx_cfg = {MHZ(1.5), MHZ(2.5), GHZ(1.9), "A"},
+        .block_size = 1024 * 1024,
+        // 200000,
+    };
+    memcpy(cfg1.ip, param.address.c_str(), sizeof(cfg1.ip));
+    print_cfg_dev(cfg1.tx_cfg);
+    if(DeviceTRX::initialization(cfg1)){
+        print_log(CONSOLE, "[%s:%d] Error: initialization, exit program\n",
+            __func__, __LINE__);
 
+        return -1;
+    }
+    print_log(CONSOLE, "[%s:%d] \n", __func__, __LINE__);
+    if(init_ipc()) {
+        print_log(CONSOLE, "Exit\n");
+        return -1;
+    }
+    
+
+    int result;
+    VecSymbolMod samples_rx(cfg1.block_size);
+    print_log(CONSOLE, "size = %d\n", samples_rx.size());
+    
+    int command = 0;
+    int attemps = 0;
+    while(1) {
+
+
+        if(attemps > 0) {
+            attemps--;
+        } else {
+            command = 0;
+        }
+
+        if(command != 12) {
+            print_log(CONSOLE, "%s:%d: input:", __func__, __LINE__);
+            std::cin >> command;
+            if(command == 12) {
+                attemps = 5;
+            }
+        } else {
+            // sleep(1)
+        }
+        std::string str = "Test complex";
+        result = DeviceTRX::recv_samples(samples_rx, cfg1.block_size);
+        data_array d3 = data_array(str.size(), (const u_char*)str.c_str(), 8 * samples_rx.size(), 
+            static_cast<u_char>(TYPE_ARRAY::TYPE_COMPLEX_FLOAT), (u_char*)&samples_rx[0]);
+        print_log(LOG, "rx data: %d\n", samples_rx.size());
+        write_file_bin_data("../data/rx_sample.bin", 
+            (void*)&samples_rx[0], samples_rx.size() * 2 * 4);
+        std::vector<data_array*> arr;
+        arr.push_back(&d3);
+        time_counting_start();
+        full_data_arrays("realtime rx", arr);
+        time_counting_end(CONSOLE, __func__);
+
+        if(command) {
+            print_log(CONSOLE, "send\n");
+            std::string asd = "asdfasfdsdf";
+            send_ipc(command, 4, 12, (u_char*)asd.c_str());
+            if(command == 10) {
+                break;
+            }
+            if(command == 12) {
+                msg_header msg;
+                recv_ipc(&msg, 0, NULL);
+            }
+#if 0
+            msg_header msg;
+            recv_ipc(&msg, 0, NULL);
+            for(int i = 0; i < sizeof(msg); ++i) {
+        print_log(CONSOLE, "%d) %x %d\n",i,
+         *((char*)(&msg) + i),  *((char*)(&msg) + i));
+    }
+    print_log(CONSOLE, "\nsizeof(msg_con) = %d\n", sizeof(msg));
+            print_log(CONSOLE, "c = %d, t = %d, s = %d\n", msg.command, msg.type, msg.size_data_shm);
+#endif
+        }
+    }
+
+    deinit_ipc();
+    DeviceTRX::deinitialization();
+    print_log(CONSOLE, "End %s\n", __func__);
+    deinit_log();
+    return 0;
+}
+
+int test_TX(int argc, char *argv[]){
+
+    const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
+    
+    config_program param = configure(file_conf);
+    init_log(param.file_log.c_str());
+    print_log(CONSOLE, "config: %s\n", file_conf);
 #if 1
     const char *filename = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_DATA)];
 #else
@@ -242,6 +345,8 @@ int test_TX(int argc, char *argv[]){
     char test_data[] = "Test m";
 #else    
     char test_data[100];
+    // char test_data[1000];
+    
     for(int i = 0; i < (int)sizeof(test_data); ++i){
         // test_data[i] = (rand() % 200);
         test_data[i] = (rand() % 20) + 70;

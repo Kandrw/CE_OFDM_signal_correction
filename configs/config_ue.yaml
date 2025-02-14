@@ -19,7 +19,7 @@ device_phy:
     fs_hz: 2500000
     lo_hz: 1900000000
     rfport: A
-    block_size: 5000
+    block_size: 100000
   rx:
     bw_hz: 2000000
     fs_hz: 2500000

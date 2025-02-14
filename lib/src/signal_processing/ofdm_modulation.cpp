@@ -8,6 +8,7 @@
 #include <signal_processing.hpp>
 
 #define VALUE_DEF_INTERVAL 0.f 
+// #define NO_DATA 0.67f
 #define NO_DATA 0.f
 #define FAILED exit(-1)
 #define CENTRAL_SHIFT 0
@@ -364,6 +365,9 @@ VecSymbolMod linearInterpolation(VecSymbolMod& points, size_t num_points) {
 
     return interpolated;
 }
+
+// #define DEBUG_OFDM_MODULATOR
+
 VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool found_cprefix) {
     // delete_cyclic_prefix(samples)
     int central_shift = CENTRAL_SHIFT;
@@ -378,22 +382,13 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool foun
     fftwf_plan plan;
     VecSymbolMod ofdm_fft(count_sub_no_defi);
 
-    // print_log(LOG_DATA, "ofdms:\n");
-    // for(int i = 0; i < samples.size(); ++i) {
-    //     print_log(LOG_DATA, "\t%d ofdm:\n", i + 1);
-    //     print_VecSymbolMod(samples[i]);
-    // }
-        
-
     for(int i = 0; i < samples.size(); ++i) {
-// #if 0
         VecSymbolMod &ofdm = samples[i];
         if(found_cprefix)
             delete_cyclic_prefix(ofdm, param.cyclic_prefix);
-        // ofdm.erase(ofdm.begin(), ofdm.begin() + param.def_interval);
-        // ofdm.erase(ofdm.end() - param.def_interval, ofdm.end());
+#ifdef DEBUG_OFDM_MODULATOR
         print_log(LOG_DATA, "[%s:%d] ofdm.size() = %d\n", __func__, __LINE__, ofdm.size());
-
+#endif
         VecSymbolMod pilots_tx(count_rs, param.pilot);
         VecSymbolMod pilots_rx;
         int step_pilot = 1 + param.step_RS;
@@ -405,62 +400,74 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool foun
 
         fftwf_execute(plan);
 
-       
+#ifdef DEBUG_OFDM_MODULATOR
         print_log(LOG_DATA, "ofdm - %d - fft - %d\n", ofdm.size(), ofdm_fft.size());
-#if 1
+#endif
         for (int i = 0; i < ofdm.size(); ++i) {
-            // ofdm_fft[i] = mod_symbol(out[i][0] /= ofdm.size(),
-            //                             out[i][1] /= ofdm.size());
             ofdm[i] = mod_symbol(out[i][0] /= ofdm.size(),
                                         out[i][1] /= ofdm.size());
-            // print_log(LOG_DATA, "%f %f\n", 
-            //     ofdm_fft[i].real(), ofdm_fft[i].imag());
-            print_log(LOG_DATA, "%f %f\n", 
-                ofdm[i].real(), ofdm[i].imag());
-            
         }
-#endif
         shift_fft(ofdm);
         if(central_shift) {
             int position = ofdm.size() / 2;
             int size_old = ofdm.size();
             ofdm.erase(ofdm.begin() + position, 
                     ofdm.begin() + position + central_shift);
+#ifdef DEBUG_OFDM_MODULATOR
             print_log(LOG_DATA, "[%s:%d] del central - %d, size: old - %d, new - %d\n", __func__, __LINE__, position, size_old, ofdm.size());
+#endif
         } 
         ofdm.erase(ofdm.begin(), ofdm.begin() + param.def_interval);
         ofdm.erase(ofdm.end() - param.def_interval, ofdm.end());
+#ifdef DEBUG_OFDM_MODULATOR
         print_log(LOG_DATA, "ofdm.size() = %d\n", ofdm.size());
-
+        print_log(LOG_DATA, "orig: %d, new: %d\n", 
+            ofdm.size(), ofdm_fft.size());
+#endif
         
 
 #if 1
-        print_log(LOG_DATA, "orig: %d, new: %d\n", 
-            ofdm.size(), ofdm_fft.size());
-        // ofdm = ofdm_fft;
         fftwf_destroy_plan(plan);
         fftwf_free(out);
         
         for(int j = 0, step = 0; j < count_rs; ++j, step += param.step_RS) {
             pilots_rx.push_back(ofdm[j + step]);
         }
+#ifdef DEBUG_OFDM_MODULATOR
         print_log(LOG_DATA, "ofdm.size() = %d, count pilots = %d\n", ofdm.size(), pilots_rx.size());
-        // print_log(LOG_DATA, "pilot tx:\n");
-        // print_VecSymbolMod(pilots_tx);
-        // print_log(LOG_DATA, "pilot rx:\n");
-        // print_VecSymbolMod(pilots_rx);
+#endif
+
 
 
         VecSymbolMod H = pilots_rx / pilots_tx;
-        
+
+#if 1
+
+        write_file_bin_data("../data/dump_data/pilot_tx.bin", 
+            (void*)&pilots_tx[0], pilots_tx.size() * sizeof(mod_symbol));
+        write_file_bin_data("../data/dump_data/pilot_rx.bin", 
+            (void*)&pilots_rx[0], pilots_rx.size() * sizeof(mod_symbol));
+        write_file_bin_data("../data/dump_data/pilot_h.bin", 
+            (void*)&H[0], H.size() * sizeof(mod_symbol));
+#endif
+
+
+
 #endif
         
-#if 1
         VecSymbolMod Heq = linearInterpolation(H, ofdm.size());
 
-        VecSymbolMod ofdm_eq = ofdm / Heq;
 
-        
+        VecSymbolMod ofdm_eq = ofdm / Heq;
+#if 1
+
+        write_file_bin_data("../data/dump_data/linearInterpolation.bin", 
+            (void*)&Heq[0], Heq.size() * sizeof(mod_symbol));
+        write_file_bin_data("../data/dump_data/ofdm_1.bin", 
+            (void*)&ofdm[0], ofdm.size() * sizeof(mod_symbol));
+         write_file_bin_data("../data/dump_data/ofdm_eq.bin", 
+            (void*)&ofdm_eq[0], ofdm_eq.size() * sizeof(mod_symbol));
+#endif
         VecSymbolMod sample_rx;
         int block = size_block_data;
         int step;
@@ -479,19 +486,13 @@ VecSymbolMod OFDM_demodulator(OFDM_symbol samples, OFDM_params &param, bool foun
                 break;
             }
             j += step + 1;
+#ifdef DEBUG_OFDM_MODULATOR
             print_log(LOG_DATA, "j = %d, sample_rx.size() = %d, step = %d\n", j, sample_rx.size(), step);
-        }
-
-        print_log(LOG_DATA, "rx data [ %d ]:\n", sample_rx.size());
-        // print_VecSymbolMod(sample_rx);
-        rx.insert(rx.end(), sample_rx.begin(), sample_rx.end());
 #endif
+        }
+        rx.insert(rx.end(), sample_rx.begin(), sample_rx.end());
     }
-    // print_VecSymbolMod(rx);
-    print_log(LOG_DATA, "\t[%s:%d]\n", __func__, __LINE__);
     return rx;
-
-
 }
 
 VecSymbolMod generateZadoffChuSequence(int cellId, int N) {
@@ -544,12 +545,26 @@ VecSlotsOFDM create_slots(const OFDM_symbol &ofdms,
                 break;
             }    
         }
-        std::copy(ofdms.begin() + iter, ofdms.begin() + slice, std::back_inserter(slot.ofdms));       
+        std::copy(ofdms.begin() + iter, ofdms.begin() + slice,
+            std::back_inserter(slot.ofdms));   
         slots.push_back(slot); 
         slot.ofdms.clear();
         iter = slice;
     }
     return slots;
+}
+
+OFDM_symbol create_zero_ofdms(int count, OFDM_params &param_ofdm) {
+    int size_data_zero = ((param_ofdm.count_subcarriers -
+        param_ofdm.def_interval * 2) - param_ofdm.step_RS) * count;
+    DEBUG_LINE
+    VecSymbolMod samples(size_data_zero, {NO_DATA, NO_DATA});
+    DEBUG_LINE
+    OFDM_symbol ofdm = OFDM_modulator(samples, param_ofdm);
+    DEBUG_LINE
+    print_log(LOG, "[%s:%d] size_data_zero - %d size zero ofdms: %d\n",
+        __func__, __LINE__, size_data_zero, ofdm.size());
+    return ofdm;
 }
 
 };

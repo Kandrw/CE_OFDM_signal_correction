@@ -316,7 +316,6 @@ int init_device_TRX(config_device &cfg) {
 	} else {
 		BLOCK_SIZE_rx = rxcfg->block_size;
 		BLOCK_SIZE_tx = txcfg->block_size;
-		print_log(CONSOLE, "TEEEEEEESSSSTTT\n");
 	}
 	
 

@@ -75,6 +75,7 @@ namespace DIGITAL_SIGNAL_PROCESSING {
 
     VecSymbolMod generateZadoffChuSequence(int cellId, int N);
 
+    OFDM_symbol create_zero_ofdms(int count, OFDM_params &param_ofdm);
 
     int evaluation_cfo(OFDM_symbol &ofdms, const OFDM_params &param_ofdm);
 
