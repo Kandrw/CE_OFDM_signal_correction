@@ -1,13 +1,13 @@
-#include "components.hpp"
+#include "ofdm.hpp"
+#include "types_trx.hpp"
 
 #include <cstring>
 
 #include <output.hpp>
 #include <signal_processing.hpp>
 
-#include "../trx/receiver_ofdm.hpp"
+#include "receiver_ofdm.hpp"
 
-using namespace ATTR_SERVICE;
 
 using namespace DIGITAL_SIGNAL_PROCESSING;
 

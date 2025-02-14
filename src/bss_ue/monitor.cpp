@@ -9,6 +9,8 @@
 
 #include "../ipc/managment_ipc.hpp"
 
+#include "../trx/device_api.hpp"
+
 enum class ARGV_CONSOLE {
     ARGV_FILE_CONFIG = 2
 };
@@ -42,7 +44,7 @@ void reading_command() {
 int monitor_signal(int argc, char *argv[]) {
     int result;
     const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
-    ATTR_SERVICE::context ctx_m = {0};
+    context ctx_m = {0};
     ctx_m.cfg = YAML::LoadFile(file_conf);
     EXIT_IF_FAIL(ATTR_SERVICE::init_log_system("../log_monitor.log"));
         
@@ -62,7 +64,8 @@ int monitor_signal(int argc, char *argv[]) {
     con_command = 12;
     while(run) {
         std::string str = "Test complex";
-        result = ATTR_SERVICE::read_samples(samples_rx, samples_rx.size());
+        
+        result = DEVICE_PHY::DeviceTRX::recv_samples(samples_rx, samples_rx.size());
         data_array d3 = data_array(str.size(), (const u_char*)str.c_str(), 8 * samples_rx.size(), 
             static_cast<u_char>(TYPE_ARRAY::TYPE_COMPLEX_FLOAT), (u_char*)&samples_rx[0]);
         // print_log(LOG, "rx data: %d\n", samples_rx.size());

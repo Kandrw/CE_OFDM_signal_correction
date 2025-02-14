@@ -36,13 +36,14 @@ set(SOURCE_DEV_TEST
 set(SOURCE
     src/main.cpp
     src/trx/device_api.cpp
+    src/trx/device_buffer.cpp
     src/trx/ad9361/device_ad9361.cpp
     src/trx/receiver_ofdm.cpp
+    src/trx/ofdm.cpp
     src/loaders/load_data.cpp
     src/bss_ue/bss.cpp
     src/bss_ue/ue.cpp
     src/bss_ue/monitor.cpp
-    src/bss_ue/ofdm.cpp
     src/bss_ue/components.cpp
     src/bss_ue/channel_model.cpp
     src/bss_ue/receiver_channel.cpp

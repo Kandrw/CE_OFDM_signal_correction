@@ -19,7 +19,7 @@ int ue_program(int argc, char *argv[]) {
     int result;
     const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
     
-    ATTR_SERVICE::context ctx_ue = {500};
+    context ctx_ue = {500};
     ctx_ue.cfg = YAML::LoadFile(file_conf);
 
     printf("\t%s\n", file_conf);

@@ -19,7 +19,7 @@ int recv_channel_ofdm(int argc, char *argv[]) {
     int status = STATUS_ACCESS;
     int result;
     const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
-    ATTR_SERVICE::context ctx = {555};
+    context ctx = {555};
     ctx.cfg = YAML::LoadFile(file_conf);
     
     printf("\t%s\n", file_conf);

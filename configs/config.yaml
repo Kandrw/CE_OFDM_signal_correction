@@ -28,6 +28,17 @@ device_phy:
     rfport: A_BALANCED
     block_size: 1000000
     power_gain: 20
+phy:
+  rx:
+    interval_of_with_dev: 100  
+    ring_buffer_sample:
+      size: 10
+      thread: 1
+  tx:
+    interval_of_with_dev: 100  
+    ring_buffer_sample:
+      size: 10
+      thread: 1
 model_channel:
   buffer_channel: 500000
 

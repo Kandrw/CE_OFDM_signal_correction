@@ -57,7 +57,7 @@ std::mutex mutex_buffer;
 static VecSymbolMod buffer_channel_model; 
 static bool running;
 static zmq::socket_t socket;
-static zmq::context_t context;
+static zmq::context_t context_zmq;
 static void print_log_channel(int out, const char* format, ...) {
     va_list ap;
     va_start(ap, format);
@@ -103,15 +103,15 @@ int channel_change_over_time() {
     }
 }
 
-int CHANNEL_MODEL::model_channel_init(ATTR_SERVICE::context &cfg_dev) {
-    context = zmq::context_t(1);
-    socket = zmq::socket_t(context, ZMQ_REQ);
+int CHANNEL_MODEL::model_channel_init(context &cfg_dev) {
+    context_zmq = zmq::context_t(1);
+    socket = zmq::socket_t(context_zmq, ZMQ_REQ);
     std::string addr_send = "tcp://localhost:" + std::to_string(SERVER_PORT);
     socket.connect(addr_send);
     return STATUS_ACCESS;
 }
 
-int CHANNEL_MODEL::model_channel_deinit(ATTR_SERVICE::context &cfg_dev) {
+int CHANNEL_MODEL::model_channel_deinit(context &cfg_dev) {
 
     return STATUS_ACCESS;
 }
@@ -234,8 +234,8 @@ int channel_model(int argc, char *argv[]) {
     print_log_channel(LOG, "[%s:%d] set size buffer channel model: %d\n",
         __func__, __LINE__, buffer_channel_model.size());
     std::string addr_send = "tcp://*:" + std::to_string(SERVER_PORT);
-    context = zmq::context_t(1);
-    socket = zmq::socket_t(context, ZMQ_REP);
+    context_zmq = zmq::context_t(1);
+    socket = zmq::socket_t(context_zmq, ZMQ_REP);
     socket.bind(addr_send);
     
     running = true;

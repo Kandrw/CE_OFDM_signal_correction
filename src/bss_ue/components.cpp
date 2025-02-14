@@ -4,10 +4,11 @@
 #include <ctime>
 #include <unistd.h>
 
-#include "ofdm.hpp"
-#include "../trx/device_api.hpp"
+// #include "ofdm.hpp"
+// #include "../trx/device_api.hpp"
 #include "channel_model.hpp"
 #include "../loaders/load_data.hpp"
+#include "../trx/device_buffer.hpp"
 
 using namespace ATTR_SERVICE;
 
@@ -18,16 +19,13 @@ using namespace ATTR_SERVICE;
 #define SIZE_BUFFER 1024
 
 #include <output.hpp>
-#include <complex_container.hpp>
 #include <configure.hpp>
-
-// #define FILE_CONFIG 1
 
 struct dev_components {
     int (*init_dev)(context &cfg_dev);
     int (*deinit_dev)(context &cfg_dev);
-    int (*send_dev)(const VecSymbolMod &samples, size_t size);
-    int (*recv_dev)(VecSymbolMod &samples, size_t size);
+    int (*send_dev)(const msg_buffer *msg);
+    int (*recv_dev)(msg_buffer *msg);
     
 };
 
@@ -62,6 +60,23 @@ static config_device convert_config_device(const YAML::Node &cfg) {
     return cfg_out;
 }
 
+static config_x iter_read_cfg_x(const YAML::Node &cfg, const char *con) {
+    config_x out = {
+        .size = cfg["phy"][con]["ring_buffer_sample"]["size"].as<unsigned int>(),
+        .thread_count = cfg["phy"][con]["ring_buffer_sample"]["thread"].as<unsigned int>(),
+        .interval_of_with_dev = cfg["phy"][con]["interval_of_with_dev"].as<unsigned int>(),
+    };
+    return out;
+}
+
+static config_buffer convert_dev_buffer(const YAML::Node &cfg) {
+    config_buffer cfg_out = {
+        .rx = iter_read_cfg_x(cfg, "rx"),
+        .tx = iter_read_cfg_x(cfg, "tx"),
+    };
+    return cfg_out;
+}
+
 static DIGITAL_SIGNAL_PROCESSING::OFDM_params load_ofdm_params_in_yaml(
     const YAML::Node &cfg_all) {
     mod_symbol pilot;
@@ -92,49 +107,23 @@ int ATTR_SERVICE::deinit_log_system() {
     return STATUS_ACCESS;
 }
 
-static int init_device(context &ctx_dev) {
-    // config_device cfg = convert_config_device(ctx_dev.cfg);
-    ctx_dev.cfg_device = convert_config_device(ctx_dev.cfg);
-    ctx_dev.ofdm_param = load_ofdm_params_in_yaml(ctx_dev.cfg);
-    if(DEVICE_PHY::DeviceTRX::initialization(ctx_dev.cfg_device)){
-        print_log(CONSOLE, "[%s:%d] Error: initialization device, exit program\n",
-            __func__, __LINE__);
-        return STATUS_FAIL;
-    }
-    return STATUS_ACCESS;
-}
-
-static int deinit_device(context &ctx_dev) {
-    DEVICE_PHY::DeviceTRX::deinitialization();
-    return STATUS_ACCESS;
-}
-
-static int read_radio(VecSymbolMod &samples, size_t size) {
-    return DEVICE_PHY::DeviceTRX::recv_samples(samples, size);
-}
 #define DEBUG_DUMP_DATA
-static int write_radio(const VecSymbolMod &samples, size_t size) {
-// #ifdef DEBUG_DUMP_DATA
-//         write_OFDMs("../data/dump_data/slots_tx.bin",
-//                 slots[0].ofdms, slots[0].ofdms.size());
-// #endif
-    return DEVICE_PHY::DeviceTRX::send_samples((void*)&samples[0], size * sizeof(mod_symbol));
-}
+
 
 int ATTR_SERVICE::init_components(const std::string &key) {
     if(key == "sdr") {
         dev_com = {
-            .init_dev = init_device,
-            .deinit_dev = deinit_device,
-            .send_dev = write_radio,
-            .recv_dev = read_radio
+            .init_dev = DeviceBuffer::initialization,
+            .deinit_dev = DeviceBuffer::deinitialization,
+            .send_dev = DeviceBuffer::send_msg,
+            .recv_dev = DeviceBuffer::recv_msg
         };
     } else if(key == "model") {
         dev_com = {
             .init_dev = CHANNEL_MODEL::model_channel_init,
             .deinit_dev = CHANNEL_MODEL::model_channel_deinit,
-            .send_dev = CHANNEL_MODEL::write_channel,
-            .recv_dev = CHANNEL_MODEL::read_channel
+            // .send_dev = CHANNEL_MODEL::write_channel,
+            // .recv_dev = CHANNEL_MODEL::read_channel
         };
     } else {
         print_log(ERROR_OUT, "Error set env: %s\n", key.c_str());
@@ -144,24 +133,22 @@ int ATTR_SERVICE::init_components(const std::string &key) {
     return STATUS_ACCESS;
 }
 
-int ATTR_SERVICE::init_system(context &cfg_dev) {
-    return dev_com.init_dev(cfg_dev);
+int ATTR_SERVICE::init_system(context &ctx_dev) {
+    ctx_dev.cfg_device = convert_config_device(ctx_dev.cfg);
+    ctx_dev.cfg_buf = convert_dev_buffer(ctx_dev.cfg);
+    
+    ctx_dev.ofdm_param = load_ofdm_params_in_yaml(ctx_dev.cfg);
+    if(dev_com.init_dev(ctx_dev)){
+        print_log(CONSOLE, "[%s:%d] Error: initialization device, exit program\n",
+            __func__, __LINE__);
+        return STATUS_FAIL;
+    }
+    return STATUS_ACCESS;
 }
 
 int ATTR_SERVICE::deinit_system(context &cfg_dev) {
     return dev_com.deinit_dev(cfg_dev);
 }
-
-int ATTR_SERVICE::write_samples(const VecSymbolMod &samples, size_t size) {
-    return dev_com.send_dev(samples, size);
-}
-
-int ATTR_SERVICE::read_samples(VecSymbolMod &samples, size_t size) {
-    return dev_com.recv_dev(samples, size);
-}
-
-
-
 
 int ATTR_SERVICE::send_msg(context &ctx, const void *buffer, int size) {
 
@@ -185,9 +172,12 @@ int ATTR_SERVICE::send_msg(context &ctx, const void *buffer, int size) {
     // }print_log(CONSOLE, "\n");
     
     print_log(LOG, "size data: %d\n", size + sizeof(header_phy));
+    // write_msg()
+#if 0
     VecSymbolMod samples = convert_msg_to_samples(ctx, buffer_tx, size_tx);
     int res = write_samples(samples, samples.size());
     print_log(LOG, "tx: %d, res: %d\n", samples.size(), res);
+#endif
 }
 
 static int calc_bit_error1(DIGITAL_SIGNAL_PROCESSING::bit_sequence &tx,
@@ -219,6 +209,7 @@ int ATTR_SERVICE::recv_msg(context &ctx, void *buffer, int size) {
     u_char *data = buffer_rx + sizeof(header_phy);
     header_phy *hv1 = (header_phy*)buffer_rx;
     int size_rx = sizeof(buffer_rx);
+#if 0
     static VecSymbolMod samples(ctx.cfg_device.rx_cfg.block_size);
     print_log(LOG_DATA, "\n[%s:%d] buffer rx: %d\n", __func__, __LINE__, samples.size());
     clock_t start = clock();
@@ -228,6 +219,7 @@ int ATTR_SERVICE::recv_msg(context &ctx, void *buffer, int size) {
     double rt =  (double) (clock() - start) / CLOCKS_PER_SEC;
     // print_log(LOG, "rx, res: %d, clock: %f\n", res, rt);
     start = clock();
+
     res = convert_samples_to_msg(ctx, samples, buffer_rx, size);
     if(res) {
         print_log(LOG, "header: id: %d, size: %d, msg: %s\n", hv1->id, hv1->size, (char*)data);
@@ -247,7 +239,10 @@ int ATTR_SERVICE::recv_msg(context &ctx, void *buffer, int size) {
     }
     rt =  (double) (clock() - start) / CLOCKS_PER_SEC;
     // print_log(LOG, "rx, res: %d, clock: %f\n", res, rt);
+
     return res;
+#endif
+
 }
 
 

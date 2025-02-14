@@ -20,7 +20,7 @@ void exit_and_clear_resource() {
 }
 
 
-void broadcast_msg(ATTR_SERVICE::context &ctx) {
+void broadcast_msg(context &ctx) {
     char buffer[] = "HELLO, msg from bss";
     while(true) {
         ATTR_SERVICE::send_msg(ctx, buffer, sizeof(buffer));
@@ -35,7 +35,7 @@ int bss_program(int argc, char *argv[]) {
     const char *file_conf = argv[static_cast<int>(ARGV_CONSOLE::ARGV_FILE_CONFIG)];
     // sigset_t signalSet;
     // int sig;
-    ATTR_SERVICE::context ctx_bss = {200};
+    context ctx_bss = {200};
     ctx_bss.cfg = YAML::LoadFile(file_conf);
 
     printf("\t%s\n", file_conf);

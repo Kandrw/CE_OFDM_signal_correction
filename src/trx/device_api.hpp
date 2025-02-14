@@ -11,10 +11,6 @@ namespace DEVICE_PHY {
     
     using namespace DIGITAL_SIGNAL_PROCESSING;
 
-
-
-
-
     class DeviceTRX{
 
     public:
