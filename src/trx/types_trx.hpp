@@ -44,9 +44,12 @@ enum class STATUS_BUFFER {
 struct msg_buffer {
     int id;
     int size;
-    void *data;
+    u_char *data;
 };
 
+struct phy_buffer {
+    uint32_t size;
+};
 
 enum class ENV_DEV {
     SDR,

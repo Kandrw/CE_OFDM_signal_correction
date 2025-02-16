@@ -36,6 +36,7 @@ set(SOURCE_DEV_TEST
 set(SOURCE
     src/main.cpp
     src/trx/device_api.cpp
+    src/trx/ring_buffer.cpp    
     src/trx/device_buffer.cpp
     src/trx/ad9361/device_ad9361.cpp
     src/trx/receiver_ofdm.cpp

@@ -1,6 +1,6 @@
 
 log_file: ../log/log.log
-address: ip:192.168.3.1
+address: ip:192.168.2.1
 type_modulation: QPSK
 ofdm_parameters:
     count_subcarriers: 128

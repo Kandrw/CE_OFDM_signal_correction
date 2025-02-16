@@ -69,7 +69,7 @@ int convert_samples_to_msg(context &ctx_dev, const VecSymbolMod &samples,
     t1 = clock();
     decode_buffer_rx(samples, ctx_dev.ofdm_param, slots_rx);
 
-#if 1
+#if 0
     {
         VecSymbolMod s1 = samples;
         OFDM_symbol ofdms_rx;

@@ -1,7 +1,7 @@
 
 log_file: ../log/log_monitor.log
 env: sdr
-address: ip:192.168.3.1
+address: ip:192.168.2.1
 type_modulation: QPSK
 ofdm_parameters:
   count_subcarriers: 128
@@ -20,12 +20,14 @@ device_phy:
     lo_hz: 1900000000
     rfport: A
     block_size: 500000
+    power_gain: 0
   rx:
     bw_hz: 2000000
     fs_hz: 2500000
     lo_hz: 1900000000
     rfport: A_BALANCED
     block_size: 500000
+    power_gain: 20
 phy:
   rx:
     interval_of_with_dev: 100  

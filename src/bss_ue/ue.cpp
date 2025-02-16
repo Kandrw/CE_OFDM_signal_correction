@@ -45,8 +45,16 @@ int ue_program(int argc, char *argv[]) {
                 ATTR_SERVICE::send_msg(ctx_ue, buffer, sizeof(buffer));
             }
         }
+        if(cmd == "1") {
+            result = ATTR_SERVICE::recv_msg(ctx_ue, buffer, sizeof(buffer));
+            print_log(CONSOLE, "status msg: %d\n", result);
+        } else {
         // for(int i = 0; i < 10; ++i)
-        ATTR_SERVICE::send_msg(ctx_ue, buffer, sizeof(buffer));
+            // result = ATTR_SERVICE::send_msg(ctx_ue, buffer, sizeof(buffer));
+            result = ATTR_SERVICE::send_msg(ctx_ue, cmd.c_str(), cmd.size());
+            
+            print_log(CONSOLE, "status msg: %d\n", result);
+        }
     }
     print_log(CONSOLE, "End ue id%d\n", ctx_ue.id);
 

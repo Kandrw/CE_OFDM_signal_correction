@@ -172,7 +172,12 @@ int ATTR_SERVICE::send_msg(context &ctx, const void *buffer, int size) {
     // }print_log(CONSOLE, "\n");
     
     print_log(LOG, "size data: %d\n", size + sizeof(header_phy));
-    // write_msg()
+    msg_buffer msg;
+    msg.size = size_tx;
+    msg.data = buffer_tx;
+    DEBUG_LINE
+
+    return dev_com.send_dev(&msg);
 #if 0
     VecSymbolMod samples = convert_msg_to_samples(ctx, buffer_tx, size_tx);
     int res = write_samples(samples, samples.size());
@@ -209,6 +214,9 @@ int ATTR_SERVICE::recv_msg(context &ctx, void *buffer, int size) {
     u_char *data = buffer_rx + sizeof(header_phy);
     header_phy *hv1 = (header_phy*)buffer_rx;
     int size_rx = sizeof(buffer_rx);
+    msg_buffer msg;
+    DEBUG_LINE
+    return dev_com.recv_dev(&msg);
 #if 0
     static VecSymbolMod samples(ctx.cfg_device.rx_cfg.block_size);
     print_log(LOG_DATA, "\n[%s:%d] buffer rx: %d\n", __func__, __LINE__, samples.size());
