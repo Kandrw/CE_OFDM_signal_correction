@@ -59,7 +59,11 @@ void thread_encode_msg();
 
 
 int DeviceBuffer::initialization(context &ctx) {   
-    // int size_buffer_phy =  
+    print_log(CONSOLE, "[DeviceBuffer:%s:%d] tx: %d, rx: %d\n", __func__, __LINE__,
+    sizeof(phy_buffer) + ctx.cfg_device.tx_cfg.block_size * sizeof(mod_symbol), 
+     sizeof(phy_buffer) + ctx.cfg_device.rx_cfg.block_size * sizeof(mod_symbol)
+    );
+
     ring_send_samples = new RingSamples(
         ctx.cfg_buf.tx.size, 1,
         sizeof(phy_buffer) + ctx.cfg_device.tx_cfg.block_size * sizeof(mod_symbol));
@@ -72,21 +76,35 @@ int DeviceBuffer::initialization(context &ctx) {
         ctx.cfg_buf.rx.size, 1, sizeof(msg_buffer));
     
     ctx_dev = &ctx;
+    if(DEVICE_PHY::DeviceTRX::initialization(ctx.cfg_device)) {
+        print_log(CONSOLE, "Fail init\n");
+        return -1;
+    }
     RUN_CON = true;
     t_write_dev = std::thread(thread_write_device);
     t_read_dev = std::thread(thread_read_device);
     t_enc_msg = std::thread(thread_encode_msg);
+    t_dec_msg = std::thread(thread_decode_msg);
+    
 
     for(int i = 0; i < count_task; i++) {
         con_shift_time_ring[i] = ACTION;
     }
-    // t_read_dev = std::thread(thread_write_device);
     
     
-    return DEVICE_PHY::DeviceTRX::initialization(ctx.cfg_device);
+    return 0;
 }
 
 int DeviceBuffer::deinitialization(context &ctx) {
+    for(int i = 0; i < count_task; i++) {
+        con_shift_time_ring[i] = NONE;
+    }
+    RUN_CON = false;
+    t_read_dev.join();
+    t_write_dev.join();
+    t_enc_msg.join();
+    t_dec_msg.join();
+    delete ring_send_samples, ring_recv_samples, ring_send_msg, ring_recv_msg;
     return DEVICE_PHY::DeviceTRX::deinitialization();
 }
 
@@ -160,18 +178,31 @@ void thread_decode_msg() {
     u_char *buffer = new u_char[ sizeof(phy_buffer) +
         DeviceBuffer::get_context()->cfg_device.rx_cfg.block_size * sizeof(mod_symbol)];
     phy_buffer *phy_h = (phy_buffer*)buffer;
-    u_char *data = sizeof(phy_buffer) + buffer; 
+    u_char *data = sizeof(phy_buffer) + buffer;
+    std::vector<msg_buffer> msg_list;
+
     while(RUN_CON) {
         switch (con_shift_time_ring[DECODE_MSG])
         {
         case NONE:
             break;
         case ACTION:
-            
-            ring_recv_samples->Pop(buffer);
-
-            
-
+            if(ring_recv_samples->Pop(buffer)) {
+                
+                if(convert_samples_to_msg(DeviceBuffer::get_context(), data, phy_h->size, msg_list)) {
+                    for(int i = 0; i < msg_list.size(); i++) {
+                        
+                        if(msg_list[i].size > 0) {
+                            
+                            ring_recv_msg->Push(&msg_list[i]);
+                            delete[] msg_list[i].data;
+                        }
+                    }
+                    if(msg_list.size() > 0)
+                        msg_list.clear();
+                }
+                
+            }
             break;
         case SLEEP:
 

@@ -142,8 +142,6 @@ static int get_bits_per_symbol(TypeModulation m){
 }
 
 static VecSymbolMod modulation_QPSK(bit_sequence &bits){
-    print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
-    time_counting_start();
     // int bits_symbol = 4;
     VecSymbolMod samples;
     int i, j;
@@ -155,8 +153,6 @@ static VecSymbolMod modulation_QPSK(bit_sequence &bits){
         u_char shift = 6;
         for(j = 0; j < 4; ++j){
             val = (*step & mask) >> shift;
-            print_log(LOG_DATA, "[%d][%d]val = %d, shit = %d, mask = %d, size = %d\n", 
-                i, j, val, shift, mask, samples.size());
             if(val < 0 || val > 3){
                 print_log(ERROR_OUT, "Error logic\n");
                 exit(-1);
@@ -170,12 +166,6 @@ static VecSymbolMod modulation_QPSK(bit_sequence &bits){
         }
         ++step;
     }
-    time_counting_end(CONSOLE, __func__);
-    for(i = 0; i < (int)samples.size(); ++i){
-        print_log(LOG_DATA, "%f + %fi\t", samples[i].real(), samples[i].imag());
-    }
-    print_log(LOG, "\n");
-    print_log(LOG, "vector size = %d\n", samples.size());
     return samples;
 
 }
@@ -520,8 +510,6 @@ static bit_sequence *demodulation_QAM64(VecSymbolMod &samples){
 
 
 static bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
-    print_log(LOG, "[%s:%d] start\n", __func__, __LINE__);
-    time_counting_start();
     int i, j, k = 0;
     float error_cmp = 0.004;
     int bits_symbol = 2;
@@ -568,7 +556,6 @@ static bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
             // }
         }
         u_char bits_data = pos;
-        print_log(LOG_DATA, "[%s:%d] i = %d, j = %d, shit = %d, mask = %d\n", __func__, __LINE__, i, j, shift, mask);
         *step = (*step | (bits_data << shift));
         if(k == 3){
             k = 0;
@@ -587,14 +574,12 @@ static bit_sequence *demodulation_QPSK(VecSymbolMod &samples){
 
 
         if(!if_decode_symbol){
-            print_log(LOG_DATA, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].real(), samples[i].imag());
+            // print_log(LOG_DATA, "[%s:%d] Error decode symbol: %f + %f\n", __func__, __LINE__, samples[i].real(), samples[i].imag());
         }
 
     }
     
     
-    print_log(LOG, "[end %s:%d]\n", __func__, __LINE__);
-    time_counting_end(CONSOLE, __func__);
     return bits;
 }
 

@@ -215,8 +215,16 @@ int ATTR_SERVICE::recv_msg(context &ctx, void *buffer, int size) {
     header_phy *hv1 = (header_phy*)buffer_rx;
     int size_rx = sizeof(buffer_rx);
     msg_buffer msg;
-    DEBUG_LINE
-    return dev_com.recv_dev(&msg);
+    if(dev_com.recv_dev(&msg)) {
+        DEBUG_LINE
+        print_log(LOG, "%s: data: %p, size = %d\n", __func__, msg.data, msg.size);
+        hv1 = (header_phy*)msg.data;
+        data = msg.data + sizeof(header_phy);
+        print_log(LOG, "phy: size: %d, header: id: %d, size: %d, msg: %s\n",
+            msg.size, hv1->id, hv1->size, (char*)data);
+
+        delete[] msg.data;
+    }
 #if 0
     static VecSymbolMod samples(ctx.cfg_device.rx_cfg.block_size);
     print_log(LOG_DATA, "\n[%s:%d] buffer rx: %d\n", __func__, __LINE__, samples.size());

@@ -157,6 +157,114 @@ int convert_samples_to_msg(context &ctx_dev, const VecSymbolMod &samples,
     return 0;
 }
 
+int convert_samples_to_msg(context *ctx_dev,
+    const u_char *data_input, int size_in,
+    std::vector<msg_buffer> &msg_list) {
+
+    vec_status_slot slots_rx; /*pss is not filled*/
+    clock_t t1 = 0, t2 = 0;
+    t1 = clock();
+    VecSymbolMod samples((const mod_symbol*)data_input,
+        (const mod_symbol*)data_input + (size_in / sizeof(mod_symbol)));
+    decode_buffer_rx(samples, ctx_dev->ofdm_param, slots_rx);
+
+#if 0
+    {
+        VecSymbolMod s1 = samples;
+        OFDM_symbol ofdms_rx;
+        int result = receiver_OFDM(s1, ctx_dev.ofdm_param, ofdms_rx);
+    }
+#endif
+
+
+    t1 = clock() - t1;
+    // print_log(CONSOLE, "End proc buffer\n");
+#ifdef DEBUG_DUMP_DATA
+    if(slots_rx.size() > 0) {
+
+        #if 1
+            print_log(LOG, "[%s:%d] write size: %d\n",
+                __func__, __LINE__, samples.size() * 2 * 4);
+            write_file_bin_data("../data/dump_data/rx_sample.bin", 
+                (void*)&samples[0], samples.size() * 2 * 4);
+            DEBUG_LINE
+        #endif
+        
+        write_OFDMs("../data/dump_data/slots_rx.bin",
+            slots_rx[0].slot.ofdms, slots_rx[0].slot.ofdms.size());
+    }
+    VecSymbolMod demod_ofdm;
+    // u_char data[3000];// fix it later
+    int count_msg = 0;
+#endif
+    // int shift_data = 0;
+    if(slots_rx.size() > 0) {
+#ifdef DEBUG_CSTM
+        print_log(LOG, "[%s:%d] slots_rx.size() = %d, slots_rx[i].slot.ofdms - %d\n",
+        __func__, __LINE__, slots_rx.size(), slots_rx[0].slot.ofdms.size());
+#endif
+        t2 = clock();
+        for(int i = 0; i < slots_rx.size(); ++i) {
+            if(slots_rx[i].full && slots_rx[i].cfo_correct) {
+                VecSymbolMod rx_sample = OFDM_demodulator(
+                        slots_rx[i].slot.ofdms, ctx_dev->ofdm_param, false);
+#ifdef DEBUG_DUMP_DATA
+                demod_ofdm.insert(demod_ofdm.end(),
+                    rx_sample.begin(), rx_sample.end());
+
+#endif
+                bit_sequence *read_data = demodulation_mapper(rx_sample,
+                    TypeModulation::QPSK);
+
+                if(!read_data) {
+                    print_log(CONSOLE, "[%s:%d] Error decode\n",
+                    __func__, __LINE__);
+                    continue;
+                }
+                // memcpy(data, read_data->buffer, read_data->size);
+
+                // shift_data += read_data->size;
+                print_log(LOG, "GET MESSAGE: %p\n", read_data->buffer);
+                msg_buffer msg;
+                msg.size = read_data->size;
+                msg.data = read_data->buffer;
+                msg_list.push_back(msg);
+                count_msg++;
+
+#ifdef DEBUG_CSTM
+                // print_log(LOG, "GET MESSAGE: %s, size: %d\n", msg, read_data->size);
+                // for(int k = 6; k < 20; ++k) {
+                //     print_log(LOG, "%d - %c | ",
+                //         read_data->buffer[k], read_data->buffer[k]);
+                // }print_log(LOG, "\n");
+#endif
+
+            } else {
+                print_log(LOG, "[%s:%d] the message is corrupted\n",
+                    __func__, __LINE__);
+            }
+
+        }
+#ifdef DEBUG_DUMP_DATA
+        if(slots_rx.size() > 0) {
+            write_file_bin_data("../data/dump_data/demod_ofdm.bin",
+                (void*)&demod_ofdm[0], sizeof(mod_symbol) * (demod_ofdm.size()));
+        }
+
+#endif
+        t2 = clock() - t2;
+        print_log(LOG, "[%s:%d] count msg = %d\n",
+                    __func__, __LINE__, count_msg);
+        return count_msg;
+    }
+#ifdef DEBUG_CSTM
+    print_log(LOG_DATA, "[%s:%d] decode_buffer_rx: %f, demod: %f\n",
+                    __func__, __LINE__, (double) (t1) / CLOCKS_PER_SEC,
+                    (double) (t2) / CLOCKS_PER_SEC);
+#endif
+    return 0;
+}
+
 // #define DEBUG_DECODE_OFDM
 // #include <thread>
 // #include <future>

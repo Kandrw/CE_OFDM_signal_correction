@@ -53,7 +53,7 @@ struct header {
 
 static param_model prm_mod;
 static std::thread thr;
-std::mutex mutex_buffer;
+static std::mutex mutex_buffer;
 static VecSymbolMod buffer_channel_model; 
 static bool running;
 static zmq::socket_t socket;

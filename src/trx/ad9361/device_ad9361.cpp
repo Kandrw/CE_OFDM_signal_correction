@@ -1,10 +1,6 @@
 #include "device_ad9361.hpp"
 
-// #include <stdbool.h>
-// #include <stdint.h>
-// #include <string.h>
-// #include <signal.h>
-// #include <stdio.h>
+#include <mutex>
 
 #ifdef M_FOUND_LIBIIO || 1
 // #include <iio.h>
@@ -23,14 +19,14 @@
 	} \
 }
 
-
+#if 1
 #define dev_perror(dev, err, ...) do{}while(0)
-
-// #define dev_perror(dev, err, ...)	ctx_perror(__dev_ctx_or_null(dev), err, \
-// 						   "%s: " __FIRST(__VA_ARGS__, 0) "%s", \
-// 						   __dev_id_or_null(dev), \
-// 						   __SKIPFIRST(__VA_ARGS__, ""))
-
+#else
+#define dev_perror(dev, err, ...)	ctx_perror(__dev_ctx_or_null(dev), err, \
+						   "%s: " __FIRST(__VA_ARGS__, 0) "%s", \
+						   __dev_id_or_null(dev), \
+						   __SKIPFIRST(__VA_ARGS__, ""))
+#endif
 enum iodev { RX = 1, TX };
 
 static struct iio_device *tx = NULL;
@@ -53,6 +49,7 @@ static struct iio_channels_mask *txmask = NULL;
 
 
 static bool stop;
+static std::mutex mutex_dev;
 
 /* cleanup and exit */
 void shutdown()
@@ -312,14 +309,13 @@ int init_device_TRX(config_device &cfg) {
 		BLOCK_SIZE_rx = cfg.block_size;
 		BLOCK_SIZE_tx = cfg.block_size;
 	} else {
-		BLOCK_SIZE_rx = rxcfg->block_size;
-		BLOCK_SIZE_tx = txcfg->block_size;
+		BLOCK_SIZE_rx = rxcfg->block_size * sizeof(mod_symbol);
+		BLOCK_SIZE_tx = txcfg->block_size * sizeof(mod_symbol);
 	}
 	
 
 	int err;
-	print_log(LOG, "[%s:%d] addr = %s\n", __func__, __LINE__, addr);
-	
+
 	IIO_ENSURE((ctx = iio_create_context(NULL, addr)) && "No context");
 	
 	if(!ctx) {
@@ -403,7 +399,7 @@ int write_to_device_buffer(const void *data, int size){
 	ptrdiff_t p_inc;
 	const struct iio_block *txblock;
 	int err = 0;
-	// print_log(CONSOLE, "%s:%d - txstream - %p\n", __func__, __LINE__, txstream);
+	mutex_dev.lock();
 	txblock = iio_stream_get_next_block(txstream);
 	// print_log(CONSOLE, "%s:%d - %p\n", __func__, __LINE__, txblock);
 	err = iio_err(txblock);
@@ -411,7 +407,6 @@ int write_to_device_buffer(const void *data, int size){
 		print_log(LOG_DEVICE, "ERROR: Unable to send block");
 		return -1;
 	}
-	DEBUG_LINE
 	p_inc = tx_sample_sz;
 	// print_log(CONSOLE, "tx_sample_sz = %d\n", tx_sample_sz);
 	p_end = (int16_t*)iio_block_end(txblock);
@@ -431,8 +426,7 @@ int write_to_device_buffer(const void *data, int size){
 #endif
 		// DEBUG_LINE
 	}
-	// txblock = iio_stream_get_next_block(txstream);
-	// print_log(CONSOLE, "%s:%d\n", __func__, __LINE__);
+	mutex_dev.unlock();
 	return 0;
 }
 
@@ -441,10 +435,11 @@ int read_to_device_buffer(const void *data, int size){
 	ptrdiff_t p_inc;
 	const struct iio_block *rxblock;
 	p_inc = rx_sample_sz;
+	mutex_dev.lock();
 	rxblock = iio_stream_get_next_block(rxstream);
 	p_end = (int16_t*)iio_block_end(rxblock);
 	int err = 0;
-
+	
 	err = iio_err(rxblock);
 	if (err) {
 		print_log(LOG_DEVICE, "ERROR: Unable to receive block");
@@ -452,7 +447,6 @@ int read_to_device_buffer(const void *data, int size){
 	}
 	float *buffer = (float*)data;
 	int iter = 0;
-	// print_log(LOG_DATA, "[%s:%d]\n", __func__, __LINE__);
 	for (p_dat = (int16_t*)iio_block_first(rxblock, rx0_i); p_dat < p_end, iter < size;
 			p_dat += p_inc / sizeof(*p_dat), iter++) {
 		/* Example: swap i and q */
@@ -465,5 +459,6 @@ int read_to_device_buffer(const void *data, int size){
 		// 	print_log(LOG_DATA, "%f, %f\n", (float)i, (float)q);
 		// print_log(CONSOLE, "%f, %f\n", (float)i, (float)q);
 	}
+	mutex_dev.unlock();
 	return 0;
 }

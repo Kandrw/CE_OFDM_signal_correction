@@ -26,7 +26,7 @@ device_phy:
     fs_hz: 2500000
     lo_hz: 1900000000
     rfport: A_BALANCED
-    block_size: 10000
+    block_size: 40000
     power_gain: 20
 phy:
   rx:

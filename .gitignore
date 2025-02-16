@@ -1,6 +1,7 @@
 build
 data
 log
+.vscode
 backup
 Reports
 src/graphical_display/__pycache__

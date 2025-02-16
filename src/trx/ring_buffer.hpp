@@ -11,6 +11,7 @@ class RingBuffer {
 public:
 
     RingBuffer(int size, int size_block, int size_type);
+    ~RingBuffer();
     int Pop(void *el);
     int Push(const void* el);
     void lock();
